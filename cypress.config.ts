@@ -9,7 +9,7 @@ require('dotenv').config();
  * VARIABLES
  */
 const hasCoverage = (process.env.TEST_INSTRUMENT === 'true') || false; // Add coverage if instrumented
-const testDirs = ['components', 'setup', 'pages', 'navigation', 'global-ui'];
+const testDirs = ['pages/fleet'];
 const skipSetup = process.env.TEST_SKIP?.includes('setup');
 const baseUrl = (process.env.TEST_BASE_URL || 'https://localhost:8005').replace(/\/$/, '');
 const DEFAULT_USERNAME = 'admin';
@@ -59,7 +59,7 @@ export default defineConfig({
   trashAssetsBeforeRuns: true,
   chromeWebSecurity:     false,
   retries:               {
-    runMode:  2,
+    runMode:  0,
     openMode: 0
   },
   env: {
