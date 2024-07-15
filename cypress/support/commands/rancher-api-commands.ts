@@ -854,3 +854,52 @@ Cypress.Commands.add('createFleetWorkspace', (name: string, description?: string
       }
     });
 });
+
+/**
+* Create createClusterRoleTemplateBinding
+*/
+Cypress.Commands.add('createClusterRoleTemplateBinding', (clusterId, userPrincipalId, failOnStatusCode = false) => {
+  return cy.request({
+    method:  'POST',
+    url:     `${ Cypress.env('api') }/v3/clusterroletemplatebindings`,
+    headers: {
+      'x-api-csrf': token.value,
+      Accept:       'application/json'
+    },
+    failOnStatusCode,
+    body: {
+      type: 'clusterroletemplatebinding', clusterId, roleTemplateId: 'projects-create', userPrincipalId
+    }
+  })
+    .then((resp) => {
+      if (failOnStatusCode) {
+        expect(resp.status).to.eq(201);
+      }
+    });
+});
+
+/**
+* Create createProjectRoleTemplateBinding
+*/
+Cypress.Commands.add('createProjectRoleTemplateBindings', (projectId, userPrincipalId, failOnStatusCode = false) => {
+  return cy.request({
+    method:  'POST',
+    url:     `${ Cypress.env('api') }/v3/projectroletemplatebindings`,
+    headers: {
+      'x-api-csrf': token.value,
+      Accept:       'application/json'
+    },
+    failOnStatusCode,
+    body: {
+      type:           'projectroletemplatebinding',
+      roleTemplateId: 'project-owner',
+      userPrincipalId,
+      projectId
+    }
+  })
+    .then((resp) => {
+      if (failOnStatusCode) {
+        expect(resp.status).to.eq(201);
+      }
+    });
+});
