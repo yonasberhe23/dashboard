@@ -771,6 +771,16 @@ Cypress.Commands.add('updateNamespaceFilter', (clusterName: string, groupBy:stri
   });
 });
 
+// update user preference
+Cypress.Commands.add('updateUserPreference', (userPreferencePayload: any) => {
+  return cy.getRancherResource('v3', 'users?me=true').then((resp: Cypress.Response<any>) => {
+    const userId = resp.body.data[0].id.trim();
+
+    userPreferencePayload.id = userId;
+    cy.setRancherResource('v1', 'userpreferences', userId, userPreferencePayload);
+  });
+});
+
 /**
  * Create token (API Keys)
  */
