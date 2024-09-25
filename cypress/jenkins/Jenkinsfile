@@ -27,7 +27,13 @@ node {
                         string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
                         string(credentialsId: 'AZURE_AKS_SUBSCRIPTION_ID', variable: 'AZURE_AKS_SUBSCRIPTION_ID'),
                         string(credentialsId: 'AZURE_CLIENT_ID', variable: 'AZURE_CLIENT_ID'),
-                        string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET')]) {
+                        string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
+                        string(credentialsId: 'GITHUB_USER1', variable: 'GITHUB_USER1'),
+                        string(credentialsId: 'GITHUB_PASSWORD1', variable: 'GITHUB_PASSWORD1'),
+                        string(credentialsId: 'GITHUB_USER2', variable: 'GITHUB_USER2'),
+                        string(credentialsId: 'GITHUB_PASSWORD2', variable: 'GITHUB_PASSWORD2'),
+                        string(credentialsId: 'GITHUB_CLIENT_ID', variable: 'GITHUB_CLIENT_ID'),
+                        string(credentialsId: 'GITHUB_CLIENT_SECRET', variable: 'GITHUB_CLIENT_SECRET')]) {
         withEnv(paramsMap) {
             stage('Checkout') {
             deleteDir()

@@ -68,7 +68,7 @@ declare global {
 
       state(state: any): any;
 
-      login(username?: string, password?: string, cacheSession?: boolean): Chainable<Element>;
+      login(username?: string, password?: string, cacheSession?: boolean, localAuth?: boolean, switchToLocalAuth?: boolean, authProvider?: string): Chainable<Element>;
       logout(): Chainable;
       byLabel(label: string): Chainable<Element>;
       getRootE2EResourceName(): Chainable<string>;
@@ -98,7 +98,8 @@ declare global {
       waitForRancherResources(prefix: 'v3' | 'v1', resourceType: string, expectedResourcesTotal: number, greaterThan: boolean): Chainable;
       deleteRancherResource(prefix: 'v3' | 'v1' | 'k8s', resourceType: string, resourceId: string, failOnStatusCode?: boolean): Chainable;
       deleteNodeTemplate(nodeTemplateId: string, timeout?: number, failOnStatusCode?: boolean)
-
+      enableGithubAuth()
+      disableAuth(prefix: 'v3' | 'v1', resourceType: string, resourceName: string)
       tableRowsPerPageAndNamespaceFilter(rows: number, cluster: string, groupBy: string, namespacefilter: string, interation?: number)
 
       /**

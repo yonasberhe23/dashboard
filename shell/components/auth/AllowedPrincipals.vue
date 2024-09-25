@@ -73,6 +73,7 @@ export default {
           name="accessMode"
           :mode="mode"
           :options="accessModeOptions"
+          data-testid="access-mode-options"
         />
       </div>
       <div class="col span-6">

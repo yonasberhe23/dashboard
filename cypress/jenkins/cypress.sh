@@ -19,6 +19,6 @@ yarn add -W mocha cypress-mochawesome-reporter cypress-multi-reporters cypress-c
 
 yarn add -W https://github.com/elaichenkov/cypress-delete-downloads-folder
 
-NO_COLOR=1 CYPRESS_grepTags="CYPRESSTAGS" cypress run --browser chrome --config-file cypress/jenkins/cypress.config.jenkins.ts
+NO_COLOR=1 CYPRESS_grepTags="CYPRESSTAGS" cypress run --browser chrome --config-file cypress.config.jenkins.ts
 
 echo "CYPRESS EXIT CODE: $?"

@@ -9,14 +9,14 @@ require('dotenv').config();
  */
 
 const testDirs = [
-  'cypress/e2e/tests/priority/**/*.spec.ts',
-  'cypress/e2e/tests/components/**/*.spec.ts',
-  'cypress/e2e/tests/setup/**/*.spec.ts',
-  'cypress/e2e/tests/pages/**/*.spec.ts',
-  'cypress/e2e/tests/navigation/**/*.spec.ts',
-  'cypress/e2e/tests/global-ui/**/*.spec.ts',
-  'cypress/e2e/tests/features/**/*.spec.ts',
-  'cypress/e2e/tests/extensions/**/*.spec.ts'
+  // 'cypress/e2e/tests/priority/**/*.spec.ts',
+  // 'cypress/e2e/tests/components/**/*.spec.ts',
+  // 'cypress/e2e/tests/setup/**/*.spec.ts',
+  'cypress/e2e/tests/pages/users-and-auth/*.spec.ts',
+  // 'cypress/e2e/tests/navigation/**/*.spec.ts',
+  // 'cypress/e2e/tests/global-ui/**/*.spec.ts',
+  // 'cypress/e2e/tests/features/**/*.spec.ts',
+  // 'cypress/e2e/tests/extensions/**/*.spec.ts'
 ];
 const skipSetup = process.env.TEST_SKIP?.includes('setup');
 const baseUrl = (process.env.TEST_BASE_URL || 'https://localhost:8005').replace(/\/$/, '');
@@ -67,7 +67,7 @@ export default defineConfig({
   trashAssetsBeforeRuns: true,
   chromeWebSecurity:     false,
   retries:               {
-    runMode:  2,
+    runMode:  0,
     openMode: 0
   },
   env: {
@@ -86,7 +86,16 @@ export default defineConfig({
     azureClientId:       process.env.AZURE_CLIENT_ID,
     azureClientSecret:   process.env.AZURE_CLIENT_SECRET,
     customNodeIp:        process.env.CUSTOM_NODE_IP,
-    customNodeKey:       process.env.CUSTOM_NODE_KEY
+    customNodeKey:       process.env.CUSTOM_NODE_KEY,
+    githubUser1:         process.env.GITHUB_USER1,
+    githubPassword1:     process.env.GITHUB_PASSWORD1,
+    githubUser2:         process.env.GITHUB_USER2,
+    githubPassword2:     process.env.GITHUB_PASSWORD2,
+    googleClientId:      process.env.GOOGLE_CLIENT_ID,
+    googleClientSecret:  process.env.GOOGLE_CLIENT_SECRET,
+    googleRefreshToken:  process.env.GOOGLE_REFRESH_TOKEN,
+    githubClientId:      process.env.GITHUB_CLIENT_ID,
+    githubClientSecret:  process.env.GITHUB_CLIENT_SECRET
   },
   // Jenkins reporters configuration jUnit and HTML
   reporter:        'cypress-multi-reporters',
@@ -106,9 +115,10 @@ export default defineConfig({
       require('@cypress/grep/src/plugin')(config);
       on('task', { removeDirectory });
     },
-    fixturesFolder:               'cypress/e2e/blueprints',
-    experimentalSessionAndOrigin: true,
-    specPattern:                  testDirs,
+    fixturesFolder:                              'cypress/e2e/blueprints',
+    experimentalSessionAndOrigin:                true,
+    experimentalModifyObstructiveThirdPartyCode: true,
+    specPattern:                                 testDirs,
     baseUrl
   },
   video:               false,

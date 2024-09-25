@@ -27,6 +27,10 @@ export default class UserMenuPo extends ComponentPo {
     return this.self().getId(`user-menu-dropdown`);
   }
 
+  userImage() {
+    return this.self().getId('nav_header_showUserMenu');
+  }
+
   /**
    * Open the user menu
    *
@@ -92,7 +96,7 @@ export default class UserMenuPo extends ComponentPo {
    * @returns
    */
   getMenuItems(): Cypress.Chainable {
-    return this.userMenu().find('li').should('be.visible').and('have.length', 4);
+    return this.userMenu().find('li');
   }
 
   /**

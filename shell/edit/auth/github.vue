@@ -236,6 +236,7 @@ export default {
           <div class="col span-6">
             <LabeledInput
               v-model:value="model.clientId"
+              data-testid="input-github-clientId"
               :label="t(`authConfig.${NAME}.clientId.label`)"
               :mode="mode"
             />
@@ -243,6 +244,7 @@ export default {
           <div class="col span-6">
             <LabeledInput
               v-model:value="model.clientSecret"
+              data-testid="input-github-clientSecret"
               type="password"
               :label="t(`authConfig.${NAME}.clientSecret.label`)"
               :mode="mode"

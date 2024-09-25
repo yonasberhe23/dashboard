@@ -98,3 +98,46 @@ Cypress.Commands.add('shouldHaveCssVar', { prevSubject: true }, (subject, styleN
       .should('eq', evaluatedStyle);
   });
 });
+
+let accessToken = '';
+
+Cypress.Commands.add('fetchGmailMessage', (query) => {
+  const clientId = Cypress.env('googleClientId');
+  const clientSecret = Cypress.env('googleClientSecret');
+  const refreshToken = Cypress.env('googleRefreshToken');
+
+  // get a new access token
+  return cy.request({
+    method: 'POST',
+    url:    'https://oauth2.googleapis.com/token',
+    form:   true,
+    body:   {
+      client_id:     clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type:    'refresh_token',
+    }
+  }).then((resp) => {
+    // if (resp.status === 400 && resp.body.error === 'invalid_grant') {
+    //   throw new Error('Refresh token has expired or been revoked. Please generate a new refresh token.');
+    // }
+    accessToken = resp.body.access_token;
+
+    // use the access token to query the Gmail API
+    return cy.request({
+      method:  'GET',
+      url:     'https://gmail.googleapis.com/gmail/v1/users/me/messages',
+      headers: { Authorization: `Bearer ${ accessToken }` },
+      qs:      { q: query } // use Gmail search syntax, e.g., "subject:test"
+    }).then((resp) => {
+      // get the message ID of the first email
+      const messageId = resp.body.messages[0].id;
+
+      cy.request({
+        method:  'GET',
+        url:     `https://gmail.googleapis.com/gmail/v1/users/me/messages/${ messageId }`,
+        headers: { Authorization: `Bearer ${ accessToken }` }
+      });
+    });
+  });
+});

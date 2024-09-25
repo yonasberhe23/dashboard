@@ -94,7 +94,16 @@ export default defineConfig({
     azureClientId:       process.env.AZURE_CLIENT_ID,
     azureClientSecret:   process.env.AZURE_CLIENT_SECRET,
     customNodeIp:        process.env.CUSTOM_NODE_IP,
-    customNodeKey:       process.env.CUSTOM_NODE_KEY
+    customNodeKey:       process.env.CUSTOM_NODE_KEY,
+    githubUser1:         process.env.GITHUB_USER1,
+    githubPassword1:     process.env.GITHUB_PASSWORD1,
+    githubUser2:         process.env.GITHUB_USER2,
+    githubPassword2:     process.env.GITHUB_PASSWORD2,
+    googleClientId:      process.env.GOOGLE_CLIENT_ID,
+    googleClientSecret:  process.env.GOOGLE_CLIENT_SECRET,
+    googleRefreshToken:  process.env.GOOGLE_REFRESH_TOKEN,
+    githubClientId:      process.env.GITHUB_CLIENT_ID,
+    githubClientSecret:  process.env.GITHUB_CLIENT_SECRET
   },
   e2e: {
     fixturesFolder: 'cypress/e2e/blueprints',

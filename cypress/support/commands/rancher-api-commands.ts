@@ -14,41 +14,50 @@ Cypress.Commands.add('login', (
   username = Cypress.env('username'),
   password = Cypress.env('password'),
   cacheSession = true,
+  localAuth = true,
+  switchToLocalAuth = false,
+  authProvider = 'GitHub'
 ) => {
   const login = () => {
     cy.intercept('POST', '/v3-public/localProviders/local*').as('loginReq');
+    cy.intercept('GET', '/v3-public/authProviders').as('authReq');
 
     LoginPagePo.goTo(); // Needs to happen before the page element is created/located
     const loginPage = new LoginPagePo();
 
-    loginPage
-      .checkIsCurrentPage();
+    loginPage.waitForPage();
 
-    loginPage.switchToLocal();
+    if (localAuth) {
+      if (switchToLocalAuth) {
+        loginPage.switchToLocal().click({ force: true });
+      }
 
-    loginPage.canSubmit()
-      .should('eq', true);
+      loginPage.canSubmit()
+        .should('eq', true);
 
-    loginPage.username()
-      .set(username);
+      loginPage.username()
+        .set(username);
 
-    loginPage.password()
-      .set(password);
+      loginPage.password()
+        .set(password);
 
-    loginPage.canSubmit()
-      .should('eq', true);
-    loginPage.submit();
+      loginPage.canSubmit()
+        .should('eq', true);
+      loginPage.submit();
 
-    cy.wait('@loginReq').its('request.body')
-      .should(
-        'deep.equal',
-        {
-          username,
-          password,
-          description:  'UI session',
-          responseType: 'cookie'
-        }
-      );
+      cy.wait('@loginReq').its('request.body')
+        .should(
+          'deep.equal',
+          {
+            username,
+            password,
+            description:  'UI session',
+            responseType: 'cookie'
+          }
+        );
+    } else {
+      loginPage.useAuthProvider(`Log in with ${ authProvider }`).click({ force: true });
+    }
   };
 
   if (cacheSession) {
@@ -1057,6 +1066,223 @@ Cypress.Commands.add('tableRowsPerPageAndNamespaceFilter', (rows: number, cluste
             return Promise.reject(new Error('tableRowsPerPageAndNamespaceFilter failed'));
           }
         });
+    });
+  });
+});
+
+Cypress.Commands.add('disableAuth', (prefix, resourceType, resourceName) => {
+  cy.getCookie('CSRF').then((token) => {
+    return cy.request({
+      method:  'POST',
+      url:     `${ Cypress.env('api') }/${ prefix }/${ resourceType }/${ resourceName }?action=disable`,
+      headers: {
+        'x-api-csrf': token.value,
+        Accept:       'application/json'
+      },
+      failOnStatusCode: false,
+    });
+  })
+    .then((resp) => {
+      if (resp.status === 404 && resp.body.code === 'ActionNotAvailable') {
+        cy.log('Auth already disabled.');
+
+        return '';
+      } else {
+        expect(resp.status).to.eq(200);
+      }
+    });
+});
+
+let principalId;
+let uuid;
+
+Cypress.Commands.add('enableGithubAuth', () => {
+  const githubClientId = Cypress.env('githubClientId');
+  const githubClientSecret = Cypress.env('githubClientSecret');
+
+  return cy.request({
+    method:  'GET',
+    url:     `${ Cypress.env('api') }/v3/authConfigs`,
+    headers: {
+      'x-api-csrf': token.value,
+      Accept:       'application/json'
+    }
+  }).then((response) => {
+    expect(response.status).to.eq(200);
+
+    response.body.data.forEach((item: any) => {
+      if (item.id === 'github') {
+        uuid = item.uuid;
+
+        cy.log(uuid);
+      }
+    });
+
+    // Step 1: Configure GitHub auth
+    return cy.request({
+      method:  'POST',
+      url:     `${ Cypress.env('api') }/v3/githubConfigs/github?action=configureTest`,
+      headers: {
+        'x-api-csrf': token.value,
+        Accept:       'application/json'
+      },
+      body: {
+        actions: {
+          configureTest: 'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=configureTest',
+          testAndApply:  'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=testAndApply'
+        },
+        annotations:        { 'management.cattle.io/auth-provider-cleanup': 'rancher-locked' },
+        baseType:           'authConfig',
+        // created:            '2024-11-24T18:15:51Z',
+        // createdTS:          1732472151000,
+        creatorId:          null,
+        enabled:            false,
+        hostname:           'github.com',
+        id:                 'github',
+        labels:             { 'cattle.io/creator': 'norman' },
+        links:              { self: 'https://yb211.qa.rancher.space/v3/githubConfigs/github', update: 'https://yb211.qa.rancher.space/v3/githubConfigs/github' },
+        logoutAllSupported: false,
+        name:               'github',
+        tls:                true,
+        type:               'githubConfig',
+        uuid,
+        __clone:            true,
+        clientSecret:       githubClientSecret,
+        clientId:           githubClientId
+      }
+    }).then((response) => {
+      expect(response.status).to.eq(200);
+      cy.log('GitHub Auth configured successfully.');
+
+      // Step 2: Save GitHub auth configuration
+      return cy.request({
+        method:  'PUT',
+        url:     `${ Cypress.env('api') }/v3/githubConfigs/github`,
+        headers: {
+          'x-api-csrf': token.value,
+          Accept:       'application/json'
+        },
+        body: {
+          enabled:      true,
+          githubConfig: {
+            actions: {
+              configureTest: 'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=configureTest',
+              testAndApply:  'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=testAndApply'
+            },
+            annotations:         { 'management.cattle.io/auth-provider-cleanup': 'rancher-locked' },
+            baseType:            'authConfig',
+            // created:             '2024-11-24T18:15:51Z',
+            // createdTS:           1732472151000,
+            creatorId:           null,
+            enabled:             true,
+            hostname:            'github.com',
+            id:                  'github',
+            labels:              { 'cattle.io/creator': 'norman' },
+            links:               { self: 'https://yb211.qa.rancher.space/v3/githubConfigs/github', update: 'https://yb211.qa.rancher.space/v3/githubConfigs/github' },
+            logoutAllSupported:  false,
+            name:                'github',
+            tls:                 true,
+            type:                'githubConfig',
+            uuid,
+            __clone:             true,
+            clientSecret:        githubClientSecret,
+            clientId:            githubClientId,
+            accessMode:          'restricted',
+            allowedPrincipalIds: ['github_user://188918568']
+
+          },
+          description: 'Enable GitHub',
+          // code:        ''
+        }
+      }).then((saveResponse) => {
+        expect(saveResponse.status).to.eq(200);
+        cy.log('GitHub Auth configuration saved successfully.');
+
+        // Step 3: Apply GitHub auth configuration
+        return cy.request({
+          method:  'PUT',
+          url:     `${ Cypress.env('api') }/v3/githubConfigs/github?action=testAndApply`,
+          headers: {
+            'x-api-csrf': token.value,
+            Accept:       'application/json'
+          },
+          body: {
+            enabled:      true,
+            githubConfig: {
+              actions: {
+                configureTest: 'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=configureTest',
+                testAndApply:  'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=testAndApply'
+              },
+              annotations:         { 'management.cattle.io/auth-provider-cleanup': 'rancher-locked' },
+              baseType:            'authConfig',
+              created:             '2024-11-24T18:15:51Z',
+              createdTS:           1732472151000,
+              creatorId:           null,
+              enabled:             true,
+              hostname:            'github.com',
+              id:                  'github',
+              labels:              { 'cattle.io/creator': 'norman' },
+              links:               { self: 'https://yb211.qa.rancher.space/v3/githubConfigs/github', update: 'https://yb211.qa.rancher.space/v3/githubConfigs/github' },
+              logoutAllSupported:  false,
+              name:                'github',
+              tls:                 true,
+              type:                'githubConfig',
+              uuid,
+              __clone:             true,
+              clientId:            githubClientId,
+              clientSecret:        githubClientSecret,
+              accessMode:          'restricted',
+              allowedPrincipalIds: ['github_user://188918568'],
+              // oauthToken:          ''
+            },
+            description: 'Enable GitHub',
+            // code:        ''
+          }
+        }).then((saveResponse) => {
+          expect(saveResponse.status).to.eq(200);
+          cy.log('GitHub Auth configuration applied successfully.?????????????????????????????????');
+
+          // Step 4: apply to UI?????????????
+          return cy.request({
+            method:  'PUT',
+            url:     `${ Cypress.env('api') }/v3/githubConfigs/github`,
+            headers: {
+              'x-api-csrf': token.value,
+              Accept:       'application/json'
+            },
+            body: {
+              accessMode: 'restricted',
+              actions:    {
+                configureTest: 'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=configureTest',
+                disable:       'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=disable',
+                testAndApply:  'https://yb211.qa.rancher.space/v3/githubConfigs/github?action=testAndApply'
+              },
+              annotations:         { 'management.cattle.io/auth-provider-cleanup': 'unlocked' },
+              baseType:            'authConfig',
+              clientId:            githubClientId,
+              created:             '2024-11-24T18:15:51Z',
+              createdTS:           1732472151000,
+              creatorId:           null,
+              enabled:             true,
+              hostname:            'github.com',
+              id:                  'github',
+              labels:              { 'cattle.io/creator': 'norman' },
+              links:               { self: 'https://yb211.qa.rancher.space/v3/githubConfigs/github', update: 'https://yb211.qa.rancher.space/v3/githubConfigs/github' },
+              logoutAllSupported:  false,
+              name:                'github',
+              status:              { conditions: [{ status: 'True', type: 'SecretsMigrated' }], type: '/v3/schemas/authConfigStatus' },
+              tls:                 true,
+              type:                'githubConfig',
+              uuid,
+              clientSecret:        githubClientSecret,
+              allowedPrincipalIds: ['github_user://188918568']
+            }
+          }).then((saveResponse) => {
+            expect(saveResponse.status).to.eq(200);
+            cy.log('GitHub Auth configuration applied to UI successfully.???????????????????');
+          });
+        });
+      });
     });
   });
 });
