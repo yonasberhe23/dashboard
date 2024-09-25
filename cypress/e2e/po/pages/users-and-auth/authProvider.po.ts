@@ -1,6 +1,7 @@
 import PagePo from '@/cypress/e2e/po/pages/page.po';
 import ProductNavPo from '@/cypress/e2e/po/side-bars/product-side-nav.po';
 import BurgerMenuPo from '@/cypress/e2e/po/side-bars/burger-side-menu.po';
+import GenericPrompt from '@/cypress/e2e/po/prompts/genericPrompt.po';
 
 export default class AuthProviderPo extends PagePo {
   private static createPath(clusterId: string, id?: string ) {
@@ -28,5 +29,13 @@ export default class AuthProviderPo extends PagePo {
 
   selectAzureAd() {
     return this.self().find('[data-testid="select-icon-grid-AzureAD"]').click();
+  }
+
+  selectGit() {
+    return this.self().find('[data-testid="select-icon-grid-GitHub"]').click();
+  }
+
+  disableAuthProviderModal(): GenericPrompt {
+    return new GenericPrompt('.prompt-restore');
   }
 }
