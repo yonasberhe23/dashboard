@@ -44,6 +44,10 @@ export class LoginPagePo extends PagePo {
     });
   }
 
+  useAuthProvider(text: string) {
+    return cy.get('button.btn').contains(text);
+  }
+
   submitButton(): AsyncButtonPo {
     return new AsyncButtonPo('[data-testid="login-submit"]', this.self());
   }
