@@ -12,7 +12,7 @@ function updateUserRetentionSetting(settingId, newValue) {
   });
 }
 
-describe('Auth Index', { testIsolation: 'off', tags: ['@explorer', '@adminUser'] }, () => {
+describe('Auth Index', { testIsolation: 'off', tags: ['@usersAndAuths', '@adminUser'] }, () => {
   const runTimestamp = +new Date();
   const usernameBlock = `user_to_block_${ runTimestamp }`;
   const usernameRetention = `user_retention_access_${ runTimestamp }`;
@@ -184,6 +184,14 @@ describe('Auth Index', { testIsolation: 'off', tags: ['@explorer', '@adminUser']
   });
 
   after(() => {
+    // reset user retention settings
+    updateUserRetentionSetting('disable-inactive-user-after', null);
+
+    updateUserRetentionSetting('user-retention-cron', null);
+
+    updateUserRetentionSetting('delete-inactive-user-after', null);
+
+    // delete users
     userIdsList.forEach((r) => cy.deleteRancherResource('v3', 'Users', r, false));
   });
 });
