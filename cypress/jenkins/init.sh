@@ -213,8 +213,11 @@ fi
 
 echo "Rancher type: ${RANCHER_TYPE}"
 
-override_node=$(semver lt "${RANCHER_VERSION}" "2.9.99")
-if [[ ${override_node} -eq 0 && "${RANCHER_IMAGE_TAG}" != "head" ]]; then NODEJS_VERSION="16.20.2"; fi
+if semver lt "${RANCHER_VERSION}" "2.9.99" && [[ "${RANCHER_IMAGE_TAG}" != "head" ]]; then
+    NODEJS_VERSION="16.20.2"
+else
+    NODEJS_VERSION="20.17.0"
+fi
 
 corral config vars set rancher_type "${RANCHER_TYPE}"
 corral config vars set nodejs_version "${NODEJS_VERSION}"
