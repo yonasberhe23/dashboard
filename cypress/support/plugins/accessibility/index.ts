@@ -127,6 +127,7 @@ function registerHooks(on, config) {
   }
 
   on('task', {
+<<<<<<< HEAD
     a11y(options: Options) {
       const { violations, titlePath } = options;
       const found = createPath(titlePath);
@@ -157,6 +158,12 @@ function registerHooks(on, config) {
         }
         fs.renameSync(details.path, destFile);
       }
+=======
+    a11y(violations: any[]) {
+      allViolations.push(...violations);
+
+      console.log(this);
+>>>>>>> 244f3dbea (WIP: Accessibility e2e test suite and support)
 
       return null;
     }
@@ -176,6 +183,7 @@ function registerHooks(on, config) {
   });
 
   on('before:spec', (spec) => {
+<<<<<<< HEAD
     const newSpec = {
       name:       spec.baseName,
       children:   [],
@@ -213,6 +221,17 @@ function registerHooks(on, config) {
 
     const reportHTML = createHtmlReport({
       results: { violations: deDuplicate(allViolations) },
+=======
+    console.log('Before spec');
+    console.log(spec);
+  });
+
+  on('after:run', () => {
+    fs.writeFileSync(path.join(folder, 'accessibility.json'), JSON.stringify(allViolations, null, 2));
+
+    const reportHTML = createHtmlReport({
+      results: { violations: allViolations },
+>>>>>>> 244f3dbea (WIP: Accessibility e2e test suite and support)
       options: {
         projectKey:            'Rancher Manager',
         doNotCreateReportFile: true,
@@ -221,6 +240,11 @@ function registerHooks(on, config) {
 
     fs.writeFileSync(path.join(folder, 'accessibility.html'), reportHTML);
 
+<<<<<<< HEAD
+=======
+    // Write the validation data to disk and transform to HTML
+
+>>>>>>> 244f3dbea (WIP: Accessibility e2e test suite and support)
     return null;
   });
 

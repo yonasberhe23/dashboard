@@ -105,6 +105,7 @@ export default defineConfig({
     accessibility:       !!process.env.TEST_A11Y, // Are we running accessibility tests?
     a11yFolder:          path.join('.', 'cypress', 'accessibility'),
     gkeServiceAccount:   process.env.GKE_SERVICE_ACCOUNT,
+    a11yFolder:          path.join('.', 'cypress', 'accessibility'),
   },
   e2e: {
     fixturesFolder: 'cypress/e2e/blueprints',
