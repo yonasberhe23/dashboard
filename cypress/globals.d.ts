@@ -179,7 +179,7 @@ declare global {
       /**
        * Run an accessibility check on the current page or the specified element
        */
-      checkPageAccessibility(description?: string);
+      checkPageAccessibility(context?: string, description?: string, skipFailures?: boolean);
 
       /**
        * Run an accessibility check on the specified element

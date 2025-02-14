@@ -31,7 +31,7 @@ export default class ClusterManagerCreatePagePo extends ClusterManagerCreateImpo
   }
 
   rkeToggle() {
-    return new ToggleSwitchPo('.toggle-container', this.self());
+    return new ToggleSwitchPo('.toggle-container');
   }
 
   rkeToggleExistance(assertion: string) {
