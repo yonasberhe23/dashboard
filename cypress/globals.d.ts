@@ -41,6 +41,9 @@ declare global {
       createNamespace(nsName: string, projId: string): Chainable;
       createPod(nsName: string, podName: string, image: string): Chainable;
       createAwsCloudCredentials(nsName: string, cloudCredName: string, defaultRegion: string, accessKey: string, secretKey: string): Chainable;
+      createNamespaceInProject(nsName: string, projId: string): Chainable;
+      waitForRancherResource(prefix: 'v3' | 'v1', resourceType: string, resourceId: string, testFn: (resp: any) => boolean, retries?: number): Chainable;
+      createToken(description: string, ttl: number, failOnStatusCode?: boolean, clusterId?: string): Chainable;
 
       getRancherResource(prefix: 'v3' | 'v1', resourceType: string, resourceId?: string, expectedStatusCode?: number): Chainable;
       setRancherResource(prefix: 'v3' | 'v1', resourceType: string, resourceId: string, body: string): Chainable;
