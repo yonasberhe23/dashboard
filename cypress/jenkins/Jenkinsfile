@@ -69,7 +69,65 @@ node {
             try {
               stage('Grab Results') {
                   sh "cypress/jenkins/scpget.sh dashboard/results.xml"
-                  sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html"
+                  
+                  // Add debugging to see what's on the remote machine
+                  sh '''
+                    echo "=== Checking remote machine for HTML reports ==="
+                    export PATH=$PATH:"${WORKSPACE}/bin"
+                    NODE_EXTERNAL_IP="$(corral vars ci first_node_ip)"
+                    PRIV_KEY="${WORKSPACE}/.ssh/corral_private_key"
+                    
+                    echo "Checking for reports in dashboard directory..."
+                    ssh -i ${PRIV_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@${NODE_EXTERNAL_IP}" "find /dashboard -name '*.html' -type f 2>/dev/null || echo 'No HTML files found in /dashboard'"
+                    
+                    echo "Checking for reports in cypress directory..."
+                    ssh -i ${PRIV_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@${NODE_EXTERNAL_IP}" "find /dashboard/cypress -name '*.html' -type f 2>/dev/null || echo 'No HTML files found in /dashboard/cypress'"
+                    
+                    echo "Checking for reports in reports directory..."
+                    ssh -i ${PRIV_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@${NODE_EXTERNAL_IP}" "find /dashboard -name 'reports' -type d 2>/dev/null || echo 'No reports directory found'"
+                    
+                    echo "Checking for reports in cypress/reports directory..."
+                    ssh -i ${PRIV_KEY} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@${NODE_EXTERNAL_IP}" "ls -la /dashboard/cypress/reports/ 2>/dev/null || echo 'No cypress/reports directory found'"
+                  '''
+                  
+                  // Copy the entire html directory instead of using wildcards
+                  sh '''
+                    echo "=== Attempting to copy HTML reports ==="
+                    if cypress/jenkins/scpget.sh dashboard/cypress/reports/html html; then
+                      echo "Primary copy successful"
+                    else
+                      echo "Primary copy failed, trying alternatives..."
+                      
+                      # Try alternative locations
+                      for location in "dashboard/cypress/reports" "dashboard/cypress/reports/html" "dashboard/reports" "cypress/reports/html"; do
+                        echo "Trying location: $location"
+                        if cypress/jenkins/scpget.sh "$location" html_alt; then
+                          if [ -d "html_alt" ] && [ -f "html_alt/index.html" ]; then
+                            echo "Found HTML reports in $location"
+                            mv html_alt html
+                            break
+                          else
+                            echo "Location $location copied but no index.html found"
+                            rm -rf html_alt
+                          fi
+                        else
+                          echo "Failed to copy from $location"
+                        fi
+                      done
+                    fi
+                  '''
+                  
+                  // Add debugging to see what was copied
+                  sh "ls -la html/ || echo 'html directory not found'"
+                  sh "find html/ -name '*.html' -type f || echo 'No HTML files found'"
+                  
+                  // Create html directory if it doesn't exist (for analyzer)
+                  sh '''
+                    if [ ! -d "html" ]; then
+                      echo "Creating html directory for analyzer..."
+                      mkdir -p html
+                    fi
+                  '''
               }
             } catch(err) {
                 echo "Error: " + err
@@ -90,7 +148,24 @@ node {
               stage('Test Report') {
                   step([$class: 'JUnitResultArchiver', testResults: '**/results.xml'])
                   sh "pwd && ls -al && ls -al cypress"
-                  publishHTML(target : [allowMissing: false,
+                  
+                  // Add debugging for html directory
+                  sh "ls -la html/ || echo 'html directory not found'"
+                  sh "find html/ -name '*.html' -type f || echo 'No HTML files found'"
+                  
+                  // Check if html directory and index.html exist before publishing
+                  sh '''
+                    if [ -d "html" ] && [ -f "html/index.html" ]; then
+                      echo "HTML report found, publishing..."
+                    else
+                      echo "HTML report not found or incomplete"
+                      ls -la html/ || echo "html directory does not exist"
+                      find . -name "*.html" -type f || echo "No HTML files found anywhere"
+                      exit 1
+                    fi
+                  '''
+                  
+                  publishHTML(target : [allowMissing: true,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
                     // The path is relative to ${WORKSPACE}
@@ -104,6 +179,182 @@ node {
               echo "Error: " + err
               currentBuild.result = 'FAILURE'
             }
+            
+            // Test result analysis
+            try {
+              stage('Test Result Analysis') {
+                // Install Node.js if not available
+                sh '''
+                  echo "=== Installing Node.js ==="
+                  
+                  # Check if Node.js is already installed
+                  if command -v node >/dev/null 2>&1; then
+                    echo "Node.js already installed:"
+                    node --version
+                    npm --version
+                  else
+                    echo "Installing Node.js..."
+                    echo "Environment: $(uname -a)"
+                    echo "Available commands: $(which curl wget tar || echo 'basic commands')"
+                    
+                    # Try direct binary installation (no sudo required)
+                    echo "Attempting direct Node.js binary installation..."
+                    cd /tmp
+                    NODE_VERSION="20.17.0"
+                    NODE_PACKAGE="node-v${NODE_VERSION}-linux-x64"
+                    
+                    if curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_PACKAGE}.tar.xz" -o node.tar.xz; then
+                      echo "Downloaded Node.js binary"
+                      if tar -xf node.tar.xz; then
+                        echo "Extracted Node.js binary"
+                        # Copy to a location we can use
+                        mkdir -p ${WORKSPACE}/node-local
+                        cp -r ${NODE_PACKAGE}/* ${WORKSPACE}/node-local/
+                        echo "Node.js installed to ${WORKSPACE}/node-local"
+                        
+                        # Test installation
+                        ${WORKSPACE}/node-local/bin/node --version
+                        ${WORKSPACE}/node-local/bin/npm --version
+                        
+                        # Add to PATH for subsequent commands
+                        export PATH=${WORKSPACE}/node-local/bin:$PATH
+                        echo "Node.js added to PATH"
+                      else
+                        echo "Failed to extract Node.js"
+                      fi
+                    else
+                      echo "Failed to download Node.js, trying NVM alternative..."
+                      
+                      # Try NVM installation with better error handling
+                      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+                      export NVM_DIR="$HOME/.nvm"
+                      if [ -s "$NVM_DIR/nvm.sh" ]; then
+                        . "$NVM_DIR/nvm.sh"
+                        echo "NVM loaded successfully"
+                        
+                        # Install Node.js 20 via NVM
+                        nvm install 20 || echo "NVM install failed"
+                        nvm use 20 || echo "NVM use failed"
+                        
+                        # Test NVM installation
+                        echo "NVM installation result:"
+                        which node || echo "node still not found"
+                        which npm || echo "npm still not found"
+                      else
+                        echo "NVM installation failed"
+                      fi
+                    fi
+                    
+                    cd ${WORKSPACE}
+                    
+                    # Final check
+                    echo "Final Node.js check:"
+                    which node || echo "node not found"
+                    which npm || echo "npm not found"
+                    
+                    if command -v node >/dev/null 2>&1; then
+                      echo "Node.js successfully installed:"
+                      node --version
+                      npm --version
+                      
+                      # Install project dependencies
+                      echo "Installing project dependencies..."
+                      npm install || echo "npm install failed"
+                    else
+                      echo "❌ Node.js installation failed completely"
+                    fi
+                  fi
+                '''
+                
+                // Run analysis from workspace where results have been copied
+                withEnv([
+                  "BUILD_NUMBER=${env.BUILD_NUMBER}",
+                  "BRANCH_NAME=${env.BRANCH_NAME}"
+                ]) {
+                  sh '''
+                    pwd
+                    ls -la
+                    ls -la cypress/ || echo "No cypress directory"
+                    ls -la html/ || echo "No html directory"
+                    find . -name "*.xml" -type f || echo "No XML files found"
+                    
+                    # Add local Node.js to PATH if available
+                    if [ -d "${WORKSPACE}/node-local/bin" ]; then
+                      export PATH=${WORKSPACE}/node-local/bin:$PATH
+                      echo "Added local Node.js to PATH"
+                    fi
+                    
+                    # Check for Node.js availability
+                    echo "=== Checking Node.js availability ==="
+                    which node || echo "node not found"
+                    which npx || echo "npx not found"
+                    which yarn || echo "yarn not found"
+                    which npm || echo "npm not found"
+                    
+                    # Check if project dependencies are already installed
+                    echo "=== Checking project dependencies ==="
+                    ls -la node_modules/ || echo "node_modules not found"
+                    ls -la node_modules/.bin/ || echo "node_modules/.bin not found"
+                    
+                    # Try different ways to run Node.js
+                    echo "=== Attempting to run analyzer ==="
+                    
+                    # Method 1: Try direct node if available
+                    if command -v node >/dev/null 2>&1; then
+                      echo "Using system Node.js..."
+                      node cypress/jenkins/test-result-analyzer.js
+                    # Method 2: Try local installation
+                    elif [ -f "${WORKSPACE}/node-local/bin/node" ]; then
+                      echo "Using local Node.js installation..."
+                      ${WORKSPACE}/node-local/bin/node cypress/jenkins/test-result-analyzer.js
+                    # Method 3: Try npx if available
+                    elif command -v npx >/dev/null 2>&1; then
+                      echo "Using npx..."
+                      npx node cypress/jenkins/test-result-analyzer.js
+                    # Method 4: Try local node_modules if available
+                    elif [ -f "./node_modules/.bin/node" ]; then
+                      echo "Using local node_modules Node.js..."
+                      ./node_modules/.bin/node cypress/jenkins/test-result-analyzer.js
+                    # Method 5: Try yarn if available
+                    elif command -v yarn >/dev/null 2>&1; then
+                      echo "Using yarn..."
+                      yarn node cypress/jenkins/test-result-analyzer.js
+                    # Method 6: Try npm if available
+                    elif command -v npm >/dev/null 2>&1; then
+                      echo "Using npm..."
+                      npm exec node cypress/jenkins/test-result-analyzer.js
+                    else
+                      echo "❌ No Node.js runtime found. Cannot run analysis."
+                      echo "Available commands:"
+                      which node npm yarn npx || echo "None of node, npm, yarn, npx found"
+                      echo "Available in PATH:"
+                      echo $PATH
+                      exit 1
+                    fi
+                  '''
+                }
+              }
+            } catch(err) {
+              echo "Test Analysis Error: " + err
+              // Don't fail the build for analysis errors
+            }
+            
+            // Publish analysis report
+            try {
+              stage('Publish Analysis Report') {
+                publishHTML(target : [allowMissing: true,
+                  alwaysLinkToLastBuild: true,
+                  keepAll: true,
+                  reportDir: 'html',
+                  reportFiles: 'test-analysis-*.md',
+                  reportName: 'test-analysis-report',
+                  reportTitles: 'Test Analysis Report'])
+              }
+            } catch(err) {
+              echo "Analysis Report Publishing Error: " + err
+              // Don't fail the build for publishing errors
+            }
+            
             if ("${env.QASE_REPORT}".toLowerCase() == "true") {
                 try {
                   stage('Publish to TC Management') {
