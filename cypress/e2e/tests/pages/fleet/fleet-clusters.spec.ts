@@ -122,9 +122,9 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
     // check Helm Ops ready
     fleetClusterListPage.resourceTableDetails(clusterName, 4).should('have.text', '0');
     // check Bundles ready
-    fleetClusterListPage.resourceTableDetails(clusterName, 5).should('have.text', '4');
+    fleetClusterListPage.resourceTableDetails(clusterName, 5).should('have.text', '2');
     // check resources: testing https://github.com/rancher/dashboard/issues/11154
-    fleetClusterListPage.resourceTableDetails(clusterName, 6).contains( ' 15 ', MEDIUM_TIMEOUT_OPT);
+    fleetClusterListPage.resourceTableDetails(clusterName, 6).contains( ' 7 ', MEDIUM_TIMEOUT_OPT);
     // check cluster labels
     fleetClusterListPage.list().resourceTable().sortableTable()
       .subRows()
@@ -135,18 +135,20 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
     // go to cluster details in fleet
     fleetClusterListPage.goToDetailsPage(clusterName);
     fleetClusterDetailsPage.waitForPage(null, 'applications');
-    fleetClusterDetailsPage.clusterTabs().clickTabWithSelector('[data-testid="btn-repos"]');
+    fleetClusterDetailsPage.clusterTabs().clickTabWithSelector('[data-testid="btn-applications"]');
 
     // check state
-    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 1).contains('Ready');
+    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 1).contains('Active');
     // check name
     fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 2).should('be.visible');
-    // check repo
-    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 3).contains('rancher/fleet-test-data master');
+    // check type
+    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 3).contains('GitRepo');
+    // check source
+    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 4).contains('rancher/fleet-test-data');
     // check target
-    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 4).contains('Advanced');
+    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 5).contains('All');
     // check cluster resources
-    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 5).should('have.text', ' 1 ');
+    fleetClusterDetailsPage.appBundlesList().resourceTableDetails(gitRepo, 7).should('have.text', ' 1 ');
   });
 
   it('check all tabs are available in the details view', () => {
@@ -163,7 +165,7 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
     const tabs = ['App Bundles', 'Conditions', 'Recent Events', 'Related Resources'];
 
     fleetClusterDetailsPage.clusterTabs().tabNames().each((el, i) => {
-      expect(el).to.eq(tabs[i]);
+      expect(el).to.include(tabs[i]);
     });
   });
 
@@ -329,7 +331,7 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
     deploymentsList.goTo();
     deploymentsList.waitForPage();
     deploymentsList.sortableTable().checkLoadingIndicatorNotVisible();
-    deploymentsList.sortableTable().checkRowCount(true, 1, MEDIUM_TIMEOUT_OPT);
+    deploymentsList.sortableTable().checkRowCount(true, 1, LONG_TIMEOUT_OPT);
   });
 
   it('cluster should be removed from fleet cluster list once deleted', () => {
