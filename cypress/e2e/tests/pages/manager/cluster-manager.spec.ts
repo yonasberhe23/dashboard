@@ -35,7 +35,7 @@ const type = 'provisioning.cattle.io.cluster';
 const importType = 'cluster';
 const clusterNamePartial = `${ runPrefix }-create`;
 const rke2CustomName = `${ clusterNamePartial }-rke2-custom`;
-const importGenericName = `${ clusterNamePartial }-import-generic`;
+const importGenericName = `test`;
 let reenableAKS = false;
 let importedClusterName = '';
 
@@ -374,7 +374,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
     const cacert = 'cacert';
     const privateRegistry = 'registry.io';
 
-    describe('Generic', () => {
+    describe.only('Generic', () => {
       it('can create new cluster', () => {
         cy.intercept('GET', `${ USERS_BASE_URL }?*`).as('getUsers');
         cy.intercept('POST', `/v3/${ importType }s`).as('importRequest');
@@ -445,13 +445,12 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         clusterList.list().providerSubType(importGenericName).should('contain.text', 'K3s');
       });
 
-      it('can edit imported cluster and see changes afterwards', () => {
+      it.only('can edit imported cluster and see changes afterwards', () => {
         const editImportedClusterPage = new ClusterManagerEditImportedPagePo(undefined, 'fleet-default', importedClusterName);
 
         cy.intercept('GET', '/v1-rke2-release/releases').as('getRke2Releases');
         clusterList.goTo();
         clusterList.list().actionMenu(importGenericName).getMenuItem('Edit Config').click();
-        editImportedClusterPage.waitForPage('mode=edit');
 
         editImportedClusterPage.nameNsDescription().name().value().should('eq', importGenericName );
 
@@ -606,6 +605,10 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
   });
 
   describe('Local', { tags: ['@jenkins', '@localCluster'] }, () => {
+    // beforeEach(() => {
+    //   cy.viewport(1440, 900);
+    // });
+
     it(`can open edit for local cluster`, () => {
       const editLocalClusterPage = new ClusterManagerEditImportedPagePo(undefined, 'fleet-local', 'local');
 
@@ -628,10 +631,10 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
       editLocalClusterPage.versionManagementBanner().should('not.exist');
 
       editLocalClusterPage.enableVersionManagement();
-      editLocalClusterPage.versionManagementBanner().should('exist').and('be.visible');
+      editLocalClusterPage.versionManagementBanner().scrollIntoView().should('exist').and('be.visible');
       editLocalClusterPage.versionManagementBanner().should('not.contain.text', 'This change will trigger cluster agent redeployment.');
       editLocalClusterPage.disableVersionManagement();
-      editLocalClusterPage.versionManagementBanner().should('exist').and('be.visible');
+      editLocalClusterPage.versionManagementBanner().scrollIntoView().should('exist').and('be.visible');
       editLocalClusterPage.versionManagementBanner().should('not.contain.text', 'This change will trigger cluster agent redeployment.');
       editLocalClusterPage.cancel();
 

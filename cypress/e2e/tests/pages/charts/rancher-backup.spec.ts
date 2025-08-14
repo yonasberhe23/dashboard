@@ -44,6 +44,15 @@ describe('Charts', { tags: ['@charts', '@adminUser'] }, () => {
 
         installPage.waitForPage('repo-type=cluster&repo=rancher-charts&chart=rancher-backup');
 
+        // Wait for the newly created default storage class to be properly registered
+        // by ensuring it's available in the storage classes list
+        cy.getRancherResource('v1', 'storage.k8s.io.storageclasses', 'test-default-storage-class')
+          .should('exist');
+
+        // Wait for Kubernetes to process the storage class changes
+        // This gives time for the cluster to recognize the new default storage class
+        cy.wait(3000); // eslint-disable-line cypress/no-unnecessary-waiting
+
         // Scroll into view - scroll to bottom of view
         cy.get('.main-layout > .outlet > .outer-container').scrollTo('bottom');
 
@@ -62,6 +71,24 @@ describe('Charts', { tags: ['@charts', '@adminUser'] }, () => {
         const select = new LabeledSelectPo('[data-testid="backup-chart-select-existing-storage-class"]');
 
         select.checkExists();
+
+        // Wait for the storage class dropdown to be populated with the new default storage class
+        // This ensures the UI has updated to reflect the newly created default storage class
+        cy.get('[data-testid="backup-chart-select-existing-storage-class"]')
+          .should('contain', 'test-default-storage-class')
+          .and('not.contain', 'local-path');
+
+        // Wait for the dropdown to actually show the new storage class as selected
+        // This handles the case where the storage class exists but isn't yet recognized as default
+        cy.get('[data-testid="backup-chart-select-existing-storage-class"]').then(($el) => {
+          // Check if the new storage class is actually selected/visible as the default
+          const text = $el.text();
+
+          expect(text).to.contain('test-default-storage-class');
+          // The old default should no longer be the selected option
+          expect(text).to.not.contain('local-path');
+        });
+
         select.checkOptionSelected('test-default-storage-class');
 
         // Verify that changing tabs doesn't reset the last selected storage class option
