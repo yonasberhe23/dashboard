@@ -302,7 +302,7 @@ describe('Home Page', () => {
       // Hide the main banner graphic
       homePage.toggleBanner();
 
-      // Banner graphic should be visible
+      // Banner graphic should be hidden
       homePage.bannerGraphic().graphicBanner().should('not.exist');
 
       // Show the banner graphic

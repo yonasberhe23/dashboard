@@ -164,18 +164,24 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { testIsolation:
     const clusterDetails = new ClusterManagerDetailRke2AmazonEc2PagePo(undefined, this.rke2Ec2ClusterName);
     const tabbedPo = new TabbedPo('[data-testid="tabbed-block"]');
 
-    // check cluster details page > snapshots
+    // Ensure cluster is active before attempting to create snapshot
     ClusterManagerListPagePo.navTo();
     clusterList.waitForPage();
+    clusterList.list().state(this.rke2Ec2ClusterName).should('contain.text', 'Active');
+
+    // check cluster details page > snapshots
     clusterList.clickOnClusterName(this.rke2Ec2ClusterName);
     clusterDetails.waitForPage(null, 'machine-pools');
     clusterDetails.selectTab(tabbedPo, '[data-testid="btn-snapshots"]');
     clusterDetails.snapshotsList().checkTableIsEmpty();
 
+    // Wait for snapshot button to be enabled before clicking
+    clusterDetails.snapshotsList().resourceTable().snapshotNowButton().should('not.be.disabled');
+
     // create on demand snapshot
     clusterDetails.snapshotsList().clickOnSnapshotNow();
 
-    // wait for cluster to be active
+    // wait for cluster to be active after snapshot creation
     ClusterManagerListPagePo.navTo();
     clusterList.waitForPage();
     clusterList.list().state(this.rke2Ec2ClusterName).should('contain.text', 'Updating');

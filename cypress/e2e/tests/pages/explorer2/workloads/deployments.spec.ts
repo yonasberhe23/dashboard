@@ -59,17 +59,19 @@ describe('Deployments', { testIsolation: 'off', tags: ['@explorer2'] }, () => {
     });
 
     it('Should be able to scale the number of pods', () => {
+      cy.intercept('PUT', `/v1/apps.deployments/${ namespace }/${ deploymentId }`).as('scaleDeployment');
       const workloadDetailsPage = new WorkloadsDeploymentsDetailsPagePo(deploymentId);
 
       workloadDetailsPage.goTo();
-      workloadDetailsPage.waitForPage();
+      workloadDetailsPage.waitForPage(null, 'pods');
       workloadDetailsPage.mastheadTitle().should('contain', deploymentId);
       workloadDetailsPage.podsRunningTotal().should('contain', '1');
       workloadDetailsPage.podScaleUp().click();
-      workloadDetailsPage.gaugesPods().should('contain', 'Containercreating');
+      cy.wait('@scaleDeployment').its('response.statusCode').should('eq', 200);
       workloadDetailsPage.gaugesPods().should('contain', 'Running');
       workloadDetailsPage.podsRunningTotal().should('contain', '2', MEDIUM_TIMEOUT_OPT);
       workloadDetailsPage.podScaleDown().click();
+      cy.wait('@scaleDeployment').its('response.statusCode').should('eq', 200);
       workloadDetailsPage.podsRunningTotal().should('contain', '1', MEDIUM_TIMEOUT_OPT);
     });
 

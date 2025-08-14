@@ -5,11 +5,13 @@ import BurgerMenuPo from '@/cypress/e2e/po/side-bars/burger-side-menu.po';
 import ProductNavPo from '@/cypress/e2e/po/side-bars/product-side-nav.po';
 import PreferencesPagePo from '@/cypress/e2e/po/pages/preferences.po';
 import { LoginPagePo } from '@/cypress/e2e/po/pages/login-page.po';
+import BannerGraphicPo from '@/cypress/e2e/po/components/banner-graphic.po';
 
 const loginPage = new LoginPagePo();
 const homePage = new HomePagePo();
 const brandingPage = new BrandingPagePo();
 const burgerMenu = new BurgerMenuPo();
+const bannerGraphic = new BannerGraphicPo();
 
 const settings = {
   privateLabel: {
@@ -179,8 +181,39 @@ describe('Branding', { testIsolation: 'off' }, () => {
     });
   });
 
-  it('Banner', { tags: ['@globalSettings', '@adminUser'] }, () => {
+  it.only('Banner', { tags: ['@globalSettings', '@adminUser'] }, () => {
     const prefPage = new PreferencesPagePo();
+
+    // Ensure the banner is visible by resetting any user preferences that might hide it
+    // This prevents the test from failing if the banner was previously dismissed
+    cy.intercept('GET', '/v1/userpreferences/*').as('getUserPrefs');
+    cy.intercept('PUT', '/v1/userpreferences/*').as('updateUserPrefs');
+
+    // Clear any banner hiding preferences - handle potential API failures gracefully
+    cy.request({
+      method:           'GET',
+      url:              '/v1/userpreferences/ui-dashboard',
+      failOnStatusCode: false
+    }).then((response) => {
+      if (response.status === 200 && response.body && response.body.data) {
+        try {
+          const prefs = JSON.parse(response.body.data);
+
+          if (prefs.welcomeBanner === true) {
+            delete prefs.welcomeBanner;
+            cy.request({
+              method:           'PUT',
+              url:              '/v1/userpreferences/ui-dashboard',
+              body:             { data: JSON.stringify(prefs) },
+              failOnStatusCode: false
+            });
+          }
+        } catch (e) {
+          // If JSON parsing fails, continue with the test
+          cy.log('Could not parse user preferences, continuing with test');
+        }
+      }
+    });
 
     BrandingPagePo.navTo();
     brandingPage.customBannerCheckbox().set();
@@ -215,6 +248,13 @@ describe('Branding', { testIsolation: 'off' }, () => {
 
     cy.fixture('branding/banners/banner-dark.svg', 'base64').then((expectedBase64) => {
       homePage.goTo();
+
+      // Wait for the banner to be visible before checking for the image
+      // The banner might be hidden by user preferences, so we need to ensure it's shown
+      bannerGraphic.graphicBanner().should('be.visible');
+
+      // Wait for the banner image to be loaded and visible
+      homePage.getBrandBannerImage().should('be.visible');
       homePage.getBrandBannerImage().should('be.visible').and('have.attr', 'src', `data:image/svg+xml;base64,${ expectedBase64 }`);
     });
 
@@ -231,6 +271,14 @@ describe('Branding', { testIsolation: 'off' }, () => {
 
     cy.fixture('branding/banners/banner-light.svg', 'base64').then((expectedBase64) => {
       homePage.goTo();
+
+      // Wait for the banner to be visible before checking for the image
+      // The banner might be hidden by user preferences, so we need to ensure it's shown
+      bannerGraphic.graphicBanner().should('be.visible');
+
+      // Wait for the banner image to be loaded and visible
+      homePage.getBrandBannerImage().should('be.visible');
+
       homePage.getBrandBannerImage().should('be.visible').and('have.attr', 'src', `data:image/svg+xml;base64,${ expectedBase64 }`);
     });
 

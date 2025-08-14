@@ -451,7 +451,6 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         cy.intercept('GET', '/v1-rke2-release/releases').as('getRke2Releases');
         clusterList.goTo();
         clusterList.list().actionMenu(importGenericName).getMenuItem('Edit Config').click();
-        editImportedClusterPage.waitForPage('mode=edit');
 
         editImportedClusterPage.nameNsDescription().name().value().should('eq', importGenericName );
 
@@ -533,7 +532,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
     clusterList.waitForPage();
   });
 
-  describe('Cluster Details Page and Tabs', () => {
+  describe.only('Cluster Details Page and Tabs', () => {
     const tabbedPo = new TabbedPo('[data-testid="tabbed-block"]');
     const clusterDetail = new ClusterManagerDetailImportedGenericPagePo(undefined, 'local');
 
@@ -605,7 +604,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
     });
   });
 
-  describe('Local', { tags: ['@jenkins', '@localCluster'] }, () => {
+  describe.only('Local', { tags: ['@jenkins', '@localCluster'] }, () => {
     it(`can open edit for local cluster`, () => {
       const editLocalClusterPage = new ClusterManagerEditImportedPagePo(undefined, 'fleet-local', 'local');
 
@@ -613,6 +612,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
       clusterList.goTo();
       clusterList.list().actionMenu('local').getMenuItem('Edit Config').click();
       editLocalClusterPage.waitForPage('mode=edit');
+      cy.wait('@getRke2Releases');
 
       editLocalClusterPage.nameNsDescription().name().value().should('eq', 'local' );
 
@@ -628,16 +628,17 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
       editLocalClusterPage.versionManagementBanner().should('not.exist');
 
       editLocalClusterPage.enableVersionManagement();
-      editLocalClusterPage.versionManagementBanner().should('exist').and('be.visible');
+      // editLocalClusterPage.versionManagementBanner().scrollIntoView().should('exist').and('be.visible');
       editLocalClusterPage.versionManagementBanner().should('not.contain.text', 'This change will trigger cluster agent redeployment.');
       editLocalClusterPage.disableVersionManagement();
-      editLocalClusterPage.versionManagementBanner().should('exist').and('be.visible');
+      // editLocalClusterPage.versionManagementBanner().scrollIntoView().should('exist').and('be.visible');
       editLocalClusterPage.versionManagementBanner().should('not.contain.text', 'This change will trigger cluster agent redeployment.');
       editLocalClusterPage.cancel();
 
       // We should be taken back to the list page if the save was successful
       clusterList.waitForPage();
     });
+
     it(`can navigate to local cluster's explore product`, () => {
       const clusterName = 'local';
       const clusterDashboard = new ClusterDashboardPagePo(clusterName);

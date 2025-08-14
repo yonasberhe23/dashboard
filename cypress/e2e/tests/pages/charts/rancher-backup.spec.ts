@@ -44,6 +44,15 @@ describe('Charts', { tags: ['@charts', '@adminUser'] }, () => {
 
         installPage.waitForPage('repo-type=cluster&repo=rancher-charts&chart=rancher-backup');
 
+        // Wait for the newly created default storage class to be properly registered
+        // by ensuring it's available in the storage classes list
+        cy.getRancherResource('v1', 'storage.k8s.io.storageclasses', 'test-default-storage-class')
+          .should('exist');
+
+        // Wait for Kubernetes to process the storage class changes
+        // This gives time for the cluster to recognize the new default storage class
+        cy.wait(3000); // eslint-disable-line cypress/no-unnecessary-waiting
+
         // Scroll into view - scroll to bottom of view
         cy.get('.main-layout > .outlet > .outer-container').scrollTo('bottom');
 

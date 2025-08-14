@@ -54,6 +54,13 @@ export default class HomePagePo extends PagePo {
     const pageActionsPo = new PageActions();
 
     cy.intercept('PUT', 'v1/userpreferences/*').as('toggleBanner');
+
+    // Click the page actions button and wait for the dropdown to be available
+    cy.getId('page-actions-menu-action-button').should('be.visible').click();
+
+    // Wait for the dropdown menu to appear before trying to access it
+    cy.get('body').find('[dropdown-menu-collection]').should('be.visible');
+
     pageActionsPo.toggleBanner().click();
     cy.wait('@toggleBanner');
   }
