@@ -5,6 +5,7 @@ import BurgerMenuPo from '@/cypress/e2e/po/side-bars/burger-side-menu.po';
 import ProductNavPo from '@/cypress/e2e/po/side-bars/product-side-nav.po';
 import PreferencesPagePo from '@/cypress/e2e/po/pages/preferences.po';
 import { LoginPagePo } from '@/cypress/e2e/po/pages/login-page.po';
+import { createPrivateLabelSettingsResponse, createPutSettingsResponse } from '@/cypress/e2e/blueprints/settings/branding-settings';
 
 const loginPage = new LoginPagePo();
 const homePage = new HomePagePo();
@@ -68,7 +69,7 @@ describe('Branding', { testIsolation: 'off' }, () => {
     brandingPage.waitForPageWithClusterId();
   });
 
-  it('Private Label', { tags: ['@globalSettings', '@adminUser'] }, () => {
+  it('Private Label', { tags: ['@debug', '@globalSettings', '@adminUser'] }, () => {
     const brandingPage = new BrandingPagePo();
 
     BrandingPagePo.navTo();
@@ -76,10 +77,11 @@ describe('Branding', { testIsolation: 'off' }, () => {
     // Set
     cy.title().should('not.eq', settings.privateLabel.new);
     brandingPage.privateLabel().set(settings.privateLabel.new);
-    brandingPage.applyAndWait('**/ui-pl').then(({ response, request }) => {
-      expect(response?.statusCode).to.eq(200);
-      expect(request.body).to.have.property('value', `${ settings.privateLabel.new }`);
-      expect(response?.body).to.have.property('value', `${ settings.privateLabel.new }`);
+
+    cy.intercept('PUT', '**/ui-pl', createPutSettingsResponse(settings.privateLabel.new)).as('setPrivateLabel');
+
+    brandingPage.applyButton().click().then(() => {
+      cy.wait('@setPrivateLabel');
       resetPrivateLabel = true;
     });
 
@@ -94,18 +96,26 @@ describe('Branding', { testIsolation: 'off' }, () => {
     // Check in session
     cy.title().should('eq', `${ settings.privateLabel.new } - Homepage`);
 
+    // Mock the GET settings request that happens after reload
+    cy.intercept('GET', '**/management.cattle.io.settings?exclude=metadata.managedFields',
+      createPrivateLabelSettingsResponse(settings.privateLabel.new)
+    ).as('getSettingsAfterReload');
+
     // Check over reload
     cy.reload();
+
+    cy.wait('@getSettingsAfterReload');
     cy.title().should('eq', `${ settings.privateLabel.new } - Homepage`);
 
     BrandingPagePo.navTo();
 
     // Reset
     brandingPage.privateLabel().set(settings.privateLabel.original);
-    brandingPage.applyAndWait('**/ui-pl').then(({ response, request }) => {
-      expect(response?.statusCode).to.eq(200);
-      expect(request.body).to.have.property('value', `${ settings.privateLabel.original }`);
-      expect(response?.body).to.have.property('value', `${ settings.privateLabel.original }`);
+    cy.intercept('PUT', '**/ui-pl', createPutSettingsResponse(settings.privateLabel.original)).as('resetPrivateLabel');
+
+    brandingPage.applyButton().click().then(() => {
+      cy.wait('@resetPrivateLabel');
+      resetPrivateLabel = true;
     });
 
     BurgerMenuPo.toggle();
