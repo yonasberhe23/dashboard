@@ -152,9 +152,14 @@ describe('About Page', { testIsolation: 'off', tags: ['@generic', '@adminUser', 
     }
 
     it('should show prime panel on about page', () => {
+      // Set up interception before any navigation
       interceptVersionAndSetToPrime().as('rancherVersion');
-      cy.login();
-      aboutPage.goTo();
+
+      // Navigate to home page first to ensure proper setup
+      HomePagePo.goToAndWaitForGet();
+
+      // Navigate to about page
+      AboutPagePo.navTo();
       aboutPage.waitForPage();
 
       // Wait for the intercepted rancherversion request to complete

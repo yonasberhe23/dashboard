@@ -28,7 +28,6 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
   let removeGitRepo = false;
   let removeWorkspace = false;
   let disableFeature = false;
-  let clusterId = '';
   let clusterName = '';
   let gitRepo = '';
   let customWorkspace = '';
@@ -72,17 +71,6 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
         metadata: { labels: { foo: 'bar' } }
       }).then(() => {
         removeCluster = true;
-      });
-
-      // get clusterId
-      cy.getRancherResource('v3', 'clusters').then((resp: Cypress.Response<any>) => {
-        const body = resp.body;
-
-        body.data.forEach((item: any) => {
-          if (item['name'] === name) {
-            clusterId = item.id;
-          }
-        });
       });
     });
 
@@ -170,13 +158,15 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
   });
 
   it('adding git repo should add bundles on downstream cluster (deployments added)', () => {
-    const deploymentsList = new WorkloadsDeploymentsListPagePo(clusterId);
-    const deployments = 'nginx-keep';
+    cy.getClusterIdByName(clusterName).then((clusterId) => {
+      const deploymentsList = new WorkloadsDeploymentsListPagePo(clusterId);
+      const deployments = 'nginx-keep';
 
-    deploymentsList.goTo();
-    deploymentsList.waitForPage();
+      deploymentsList.goTo();
+      deploymentsList.waitForPage();
 
-    deploymentsList.details(deployments, 1).contains('Active', { timeout: 15000 });
+      deploymentsList.details(deployments, 1).contains('Active', { timeout: 15000 });
+    });
   });
 
   it('can Pause', () => {
@@ -321,17 +311,19 @@ describe('Fleet Clusters - bundle manifests are deployed from the BundleDeployme
   });
 
   it('removing git repo should remove bundles on downstream cluster (deployments removed)', () => {
-    const deploymentsList = new WorkloadsDeploymentsListPagePo(clusterId);
+    cy.getClusterIdByName(clusterName).then((clusterId) => {
+      const deploymentsList = new WorkloadsDeploymentsListPagePo(clusterId);
 
-    // delete gitrepo
-    cy.deleteRancherResource('v1', `fleet.cattle.io.gitrepos/${ namespace }`, gitRepo).then(() => {
-      removeGitRepo = false;
+      // delete gitrepo
+      cy.deleteRancherResource('v1', `fleet.cattle.io.gitrepos/${ namespace }`, gitRepo).then(() => {
+        removeGitRepo = false;
+      });
+
+      deploymentsList.goTo();
+      deploymentsList.waitForPage();
+      deploymentsList.sortableTable().checkLoadingIndicatorNotVisible();
+      deploymentsList.sortableTable().checkRowCount(true, 1, LONG_TIMEOUT_OPT);
     });
-
-    deploymentsList.goTo();
-    deploymentsList.waitForPage();
-    deploymentsList.sortableTable().checkLoadingIndicatorNotVisible();
-    deploymentsList.sortableTable().checkRowCount(true, 1, LONG_TIMEOUT_OPT);
   });
 
   it('cluster should be removed from fleet cluster list once deleted', () => {

@@ -75,12 +75,13 @@ describe('Branding', { testIsolation: 'off' }, () => {
 
     // Set
     cy.title().should('not.eq', settings.privateLabel.new);
-    brandingPage.privateLabel().set(settings.privateLabel.new);
+    brandingPage.privateLabel().self().clear().type(settings.privateLabel.new);
+
     brandingPage.applyAndWait('**/ui-pl').then(({ response, request }) => {
       expect(response?.statusCode).to.eq(200);
+      resetPrivateLabel = true;
       expect(request.body).to.have.property('value', `${ settings.privateLabel.new }`);
       expect(response?.body).to.have.property('value', `${ settings.privateLabel.new }`);
-      resetPrivateLabel = true;
     });
 
     // Visit the Home Page
@@ -101,7 +102,8 @@ describe('Branding', { testIsolation: 'off' }, () => {
     BrandingPagePo.navTo();
 
     // Reset
-    brandingPage.privateLabel().set(settings.privateLabel.original);
+    brandingPage.privateLabel().self().clear().type(settings.privateLabel.original);
+
     brandingPage.applyAndWait('**/ui-pl').then(({ response, request }) => {
       expect(response?.statusCode).to.eq(200);
       expect(request.body).to.have.property('value', `${ settings.privateLabel.original }`);
