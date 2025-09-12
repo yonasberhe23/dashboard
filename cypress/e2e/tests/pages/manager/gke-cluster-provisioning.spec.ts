@@ -33,17 +33,21 @@ describe('Deploy GKE cluster with default settings', { tags: ['@manager', '@admi
       serviceAccount = JSON.parse(decodedServiceAccountJson);
       // Now you can access the project_id
       gkeProjectId = serviceAccount.project_id;
-      /* eslint-disable no-console */
     } catch (error) {
       // Handle any error that occurs during decoding or parsing
-      console.error('Error decoding or parsing service account JSON:', error);
+      throw new Error(`Error decoding or parsing service account JSON: ${ error }`);
     }
   } else {
-    console.warn('gkeServiceAccount environment variable is undefined or empty.');
+    throw new Error('GKE_SERVICE_ACCOUNT environment variable is undefined or empty');
   }
 
   // Convert service account object to JSON string for input field
   const serviceAccountJsonString = serviceAccount ? JSON.stringify(serviceAccount) : '';
+
+  // Validate that we have the required service account data
+  if (!serviceAccountJsonString) {
+    throw new Error('GKE_SERVICE_ACCOUNT environment variable is not properly set or decoded');
+  }
 
   before(() => {
     cy.login();
