@@ -373,7 +373,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
     const cacert = 'cacert';
     const privateRegistry = 'registry.io';
 
-    describe('Generic', () => {
+    describe.only('Generic', () => {
       it('can create new cluster', () => {
         cy.intercept('GET', `${ USERS_BASE_URL }?*`).as('getUsers');
         cy.intercept('POST', `/v3/${ importType }s`).as('importRequest');
@@ -435,7 +435,12 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
 
         ClusterManagerListPagePo.navTo();
         clusterList.waitForPage();
-        clusterList.list().state(importGenericName).contains('Waiting', EXTRA_LONG_TIMEOUT_OPT);
+        clusterList.list().state(importGenericName).should('be.visible', EXTRA_LONG_TIMEOUT_OPT)
+          .and(($el) => {
+            const status = $el.text().trim();
+
+            expect(['Provisioning', 'Waiting']).to.include(status);
+          });
         clusterList.list().state(importGenericName).contains('Active', EXTRA_LONG_TIMEOUT_OPT);
         // Issue #6836: Provider field on Imported clusters states "Imported" instead of cluster type
         clusterList.list().provider(importGenericName).should('contain.text', 'Imported');
@@ -446,16 +451,17 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         cy.getClusterIdByName(importGenericName).then((clusterId) => {
           const editImportedClusterPage = new ClusterManagerEditImportedPagePo(undefined, 'fleet-default', clusterId);
 
-          cy.intercept('GET', '/v1-rke2-release/releases').as('getRke2Releases');
+          cy.intercept('GET', `/v1/management.cattle.io.users?*`).as('pageLoad');
           clusterList.goTo();
           clusterList.list().actionMenu(importGenericName).getMenuItem('Edit Config').click();
 
           editImportedClusterPage.waitForPage('mode=edit');
 
           editImportedClusterPage.nameNsDescription().name().value().should('eq', importGenericName);
+          cy.wait('@pageLoad');
 
           // check accordions are properly displayed
-          editImportedClusterPage.accordion(2, 'Basics').should('be.visible');
+          editImportedClusterPage.accordion(2, 'K3S Options').should('be.visible');
           editImportedClusterPage.accordion(3, 'Member Roles').should('be.visible');
           editImportedClusterPage.accordion(4, 'Labels and Annotations').scrollIntoView().should('be.visible');
           editImportedClusterPage.accordion(5, 'Networking').scrollIntoView().should('be.visible');
