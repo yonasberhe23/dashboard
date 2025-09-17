@@ -14,6 +14,17 @@ describe('Cluster Dashboard', { testIsolation: 'off', tags: ['@explorer2', '@adm
     ClusterDashboardPagePo.navTo();
   });
 
+  afterEach(() => {
+    // Ensure search dialog is closed after each test to prevent cascading failures
+    const dialog = new ResourceSearchDialog();
+
+    cy.get('body').then(($body) => {
+      if ($body.find('[data-testid="search-modal"]').length > 0) {
+        dialog.close();
+      }
+    });
+  });
+
   it('can show resource search dialog', () => {
     // Open the resource search
     clusterDashboard.clusterActionsHeader().resourceSearchButton().click();
@@ -47,7 +58,15 @@ describe('Cluster Dashboard', { testIsolation: 'off', tags: ['@explorer2', '@adm
     // Wait for less than 20 - then we know the results are updated for our search
     dialog.results().should('have.length.lt', 20);
     dialog.results().should('have.length.gt', 1);
-    dialog.results().first().should('have.text', 'SelfSubjectReviews (selfsubjectreviews.authentication.k8s.io)');
+
+    // Check that the first result is one of the expected authentication resources
+    // Different K8s versions may have different resources available
+    dialog.results().first().should('satisfy', ($el) => {
+      const text = $el.text();
+
+      return text === 'SelfSubjectReviews (selfsubjectreviews.authentication.k8s.io)' ||
+             text === 'TokenReviews (tokenreviews.authentication.k8s.io)';
+    });
 
     dialog.close();
 
