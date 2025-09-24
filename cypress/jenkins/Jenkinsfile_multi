@@ -73,7 +73,7 @@ node {
                                         string(name: 'QASE_REPORT', value: "${QASE_REPORT}"),
                                         string(name: 'RANCHER_IMAGE_TAG', value: val)]
                             echo "TAG: ${params}"
-                            build (job: 'ui-automation-job', parameters: params, propagate: false, wait: false)
+                            build (job: 'ui-automation-job-yonas', parameters: params, propagate: false, wait: false)
                         }
                         
                     }
