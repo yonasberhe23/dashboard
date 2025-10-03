@@ -15,7 +15,7 @@ const testDirs = [
   // 'cypress/e2e/tests/priority/**/*.spec.ts',
   // 'cypress/e2e/tests/components/**/*.spec.ts',
   // 'cypress/e2e/tests/setup/**/*.spec.ts',
-  'cypress/e2e/tests/pages/explorer/service-discovery/services.spec.ts',
+  'cypress/e2e/tests/pages/explorer/up-to-something.spec.ts',
   // 'cypress/e2e/tests/navigation/**/*.spec.ts',
   // 'cypress/e2e/tests/global-ui/**/*.spec.ts',
   // 'cypress/e2e/tests/features/**/*.spec.ts',
