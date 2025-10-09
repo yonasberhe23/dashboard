@@ -309,7 +309,7 @@ describe('Settings', { testIsolation: 'off' }, () => {
     settingsEdit.selectSettingsByLabel('System Store');
     settingsEdit.saveAndWait('agent-tls-mode');
     settingsPage.waitForPage();
-    settingsPage.settingsValue('agent-tls-mode').contains('System Store');
+    settingsPage.settingsValue('agent-tls-mode').should('have.text', 'System Store');
 
     // Reset
     SettingsPagePo.navTo();
@@ -319,10 +319,14 @@ describe('Settings', { testIsolation: 'off' }, () => {
     settingsEdit.waitForPage();
     settingsEdit.title().contains('Setting: agent-tls-mode').should('be.visible');
     settingsEdit.useDefaultButton().click();
-    settingsEdit.saveAndWait('agent-tls-mode');
+    settingsEdit.saveAndWait('agent-tls-mode').then(({ request, response }) => {
+      expect(response?.statusCode).to.eq(200);
+      expect(request.body).to.have.property('value', settingsOriginal['agent-tls-mode'].default);
+      expect(response?.body).to.have.property('value', settingsOriginal['agent-tls-mode'].default);
+    });
 
     settingsPage.waitForPage();
-    settingsPage.settingsValue('agent-tls-mode').contains('Strict');
+    settingsPage.settingsValue('agent-tls-mode').should('have.text', 'Strict');
 
     resetSettings.push('agent-tls-mode');
   });
