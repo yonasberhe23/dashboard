@@ -1,0 +1,1786 @@
+<html>
+<head>
+  <style>
+    body { font-family: monospace; }
+    p { margin: 0; padding: 0; }
+    pre { display: inline; margin: 0; }
+    h2 { margin: 0; font-size: 1.2em; }
+  </style>
+</head>
+
+<body>
+
+<h1>cypress/e2e/tests/pages/manager/repositories.spec.ts</h1>
+<h2>Cluster Management Helm Repositories -&gt; can disable/enable a repository</h2>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/uiplugins
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.setting</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.settings?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] principal</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v3/principals
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Loading management...</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of management.cattle.io.cluster is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket connecting (id=1, url=wss://yb213.qa.rancher.space/v1/subscribe)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] schema</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] schema</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/schemas?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v3/schemas
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket opened (state=connecting, id=1)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.feature</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] userpreference</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket connecting (id=2, url=wss://yb213.qa.rancher.space/v3/subscribe)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] count</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] namespace</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.fleetworkspace</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.features?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/userpreferences?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/counts?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/namespaces?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.fleetworkspaces?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket opened (state=connecting, id=2)</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">PUT https://yb213.qa.rancher.space/v1/userpreferences/user-fp4gv
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.cluster</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.clusters?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Done loading management; isRancher=true; isMultiCluster=false</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] catalog.cattle.io.app. Page: null. Size: null. Sort: </pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.rancherusernotification</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [rancher] authconfig azuread</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] provisioning.cattle.io.cluster</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-performance</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] provisioning.cattle.io.cluster</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] cluster.x-k8s.io.machine</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.node</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.nodepool</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-custom-links</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-issues</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-community-links</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.apps?pagesize=100000&amp;filter=metadata.name=rancher-csp-adapter,metadata.name=rancher-csp-billing-adapter&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.rancherusernotifications?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v3/authconfig/azuread
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/provisioning.cattle.io.clusters?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/cluster.x-k8s.io.machines?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.nodes?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.nodepools?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Reset store: ,
+                cluster</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of schema is not loaded yet</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of namespace is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] userpreference</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/userpreferences?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [rancher] authconfig azuread</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-performance</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] cluster</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] rke.cattle.io.etcdsnapshot</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] cluster.x-k8s.io.machine</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.node</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.nodepool</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] cluster.x-k8s.io.machinedeployment</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v3/clusters
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/rke.cattle.io.etcdsnapshots?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/cluster.x-k8s.io.machines?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.nodes?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.nodepools?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/cluster.x-k8s.io.machinedeployments?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">PUT https://yb213.qa.rancher.space/v1/userpreferences/user-fp4gv
+                Status: 200</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of management.cattle.io.podsecurityadmissionconfigurationtemplate is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] storage.k8s.io.storageclass</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/storage.k8s.io.storageclasses?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of catalog.cattle.io.clusterrepo is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] catalog.cattle.io.clusterrepo</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.podsecurityadmissionconfigurationtemplate</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/management.cattle.io.podsecurityadmissionconfigurationtemplates?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] secret. Page: null. Size: null. Sort: </pre></p>
+<p><pre style="color:yellow;">        cy:xhr❖</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/secrets?pagesize=100000&amp;filter=metadata.fields[1]=&quot;kubernetes.io/ssh-auth&quot;,metadata.fields[1]=&quot;kubernetes.io/basic-auth&quot;&amp;exclude=metadata.managedFields (142 ms)</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb213.qa.rancher.space/v1/secrets?pagesize=100000&amp;filter=metadata.fields[1]=%22kubernetes.io%2Fssh-auth%22,metadata.fields[1]=%22kubernetes.io%2Fbasic-auth%22&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">(request) POST https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos
+                Status: 201</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      null
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:observedGeneration&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: null,
+                    &quot;resourceVersion&quot;: &quot;526738&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;ClusterRepo generation is 1, but latest observed generation is 0&quot;,
+                      &quot;name&quot;: &quot;in-progress&quot;,
+                      &quot;transitioning&quot;: true
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      }
+                    ],
+                    &quot;observedGeneration&quot;: 0
+                  }
+                }</pre></p>
+<p><pre style="color:darkcyan;">     cons:info✱</pre> <pre>Ping [management] from dev</pre></p>
+<p><pre style="color:green;">    cy:request✔</pre> <pre style="color:grey;">GET https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200
+                Response body: {
+                  &quot;id&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                  &quot;type&quot;: &quot;catalog.cattle.io.clusterrepo&quot;,
+                  &quot;links&quot;: {
+                    &quot;chart&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=chart&quot;,
+                    &quot;icon&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=icon&quot;,
+                    &quot;index&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=index&quot;,
+                    &quot;info&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?link=info&quot;,
+                    &quot;patch&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;remove&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;self&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;update&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo&quot;,
+                    &quot;view&quot;: &quot;https://yb213.qa.rancher.space/apis/catalog.cattle.io/v1/clusterrepos/e2e-test-1760115776049-repo&quot;
+                  },
+                  &quot;actions&quot;: {
+                    &quot;install&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=install&quot;,
+                    &quot;upgrade&quot;: &quot;https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo?action=upgrade&quot;
+                  },
+                  &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                  &quot;kind&quot;: &quot;ClusterRepo&quot;,
+                  &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                      &quot;field.cattle.io/description&quot;: &quot;e2e-test-1760115776049-repo-description&quot;
+                    },
+                    &quot;creationTimestamp&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;fields&quot;: [
+                      &quot;e2e-test-1760115776049-repo&quot;,
+                      null,
+                      null,
+                      &quot;https://github.com/rancher/charts&quot;,
+                      &quot;release-v2.12&quot;,
+                      &quot;2025-10-10T17:03:04Z&quot;
+                    ],
+                    &quot;generation&quot;: 1,
+                    &quot;managedFields&quot;: [
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:metadata&quot;: {
+                            &quot;f:annotations&quot;: {
+                              &quot;.&quot;: {},
+                              &quot;f:field.cattle.io/description&quot;: {}
+                            }
+                          },
+                          &quot;f:spec&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:gitBranch&quot;: {},
+                            &quot;f:gitRepo&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:04Z&quot;
+                      },
+                      {
+                        &quot;apiVersion&quot;: &quot;catalog.cattle.io/v1&quot;,
+                        &quot;fieldsType&quot;: &quot;FieldsV1&quot;,
+                        &quot;fieldsV1&quot;: {
+                          &quot;f:status&quot;: {
+                            &quot;.&quot;: {},
+                            &quot;f:branch&quot;: {},
+                            &quot;f:commit&quot;: {},
+                            &quot;f:conditions&quot;: {},
+                            &quot;f:downloadTime&quot;: {},
+                            &quot;f:indexConfigMapName&quot;: {},
+                            &quot;f:indexConfigMapNamespace&quot;: {},
+                            &quot;f:observedGeneration&quot;: {},
+                            &quot;f:url&quot;: {}
+                          }
+                        },
+                        &quot;manager&quot;: &quot;rancher&quot;,
+                        &quot;operation&quot;: &quot;Update&quot;,
+                        &quot;subresource&quot;: &quot;status&quot;,
+                        &quot;time&quot;: &quot;2025-10-10T17:03:27Z&quot;
+                      }
+                    ],
+                    &quot;name&quot;: &quot;e2e-test-1760115776049-repo&quot;,
+                    &quot;relationships&quot;: [
+                      {
+                        &quot;toId&quot;: &quot;cattle-system/e2e-test-1760115776049-repo-1-4cebafae-dfbf-4245-a795-29c-11219&quot;,
+                        &quot;toType&quot;: &quot;configmap&quot;,
+                        &quot;rel&quot;: &quot;owner&quot;,
+                        &quot;state&quot;: &quot;active&quot;,
+                        &quot;message&quot;: &quot;Resource is always ready&quot;
+                      },
+                      {
+                        &quot;toId&quot;: &quot;cattle-system/e2e-test-1760115776049-repo-0-4cebafae-dfbf-4245-a795-29c-c07d9&quot;,
+                        &quot;toType&quot;: &quot;configmap&quot;,
+                        &quot;rel&quot;: &quot;owner&quot;,
+                        &quot;state&quot;: &quot;active&quot;,
+                        &quot;message&quot;: &quot;Resource is always ready&quot;
+                      }
+                    ],
+                    &quot;resourceVersion&quot;: &quot;526931&quot;,
+                    &quot;state&quot;: {
+                      &quot;error&quot;: false,
+                      &quot;message&quot;: &quot;Resource is current&quot;,
+                      &quot;name&quot;: &quot;active&quot;,
+                      &quot;transitioning&quot;: false
+                    },
+                    &quot;uid&quot;: &quot;4cebafae-dfbf-4245-a795-29c61c11598d&quot;
+                  },
+                  &quot;spec&quot;: {
+                    &quot;gitBranch&quot;: &quot;release-v2.12&quot;,
+                    &quot;gitRepo&quot;: &quot;https://github.com/rancher/charts&quot;
+                  },
+                  &quot;status&quot;: {
+                    &quot;branch&quot;: &quot;release-v2.12&quot;,
+                    &quot;commit&quot;: &quot;81c3c079071a6dbf52f5407a688aeca7ba9a49d0&quot;,
+                    &quot;conditions&quot;: [
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;FollowerDownloaded&quot;
+                      },
+                      {
+                        &quot;error&quot;: false,
+                        &quot;lastUpdateTime&quot;: &quot;2025-10-10T17:03:27Z&quot;,
+                        &quot;status&quot;: &quot;True&quot;,
+                        &quot;transitioning&quot;: false,
+                        &quot;type&quot;: &quot;Downloaded&quot;
+                      }
+                    ],
+                    &quot;downloadTime&quot;: &quot;2025-10-10T17:03:04Z&quot;,
+                    &quot;indexConfigMapName&quot;: &quot;e2e-test-1760115776049-repo-0-4cebafae-dfbf-4245-a795-29c-c07d9&quot;,
+                    &quot;indexConfigMapNamespace&quot;: &quot;cattle-system&quot;,
+                    &quot;observedGeneration&quot;: 1,
+                    &quot;url&quot;: &quot;https://github.com/rancher/charts&quot;
+                  }
+                }</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">PUT https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">PUT https://yb213.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/e2e-test-1760115776049-repo
+                Status: 200</pre></p>
+<br>
+
+</body>
+</html>

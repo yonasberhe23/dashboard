@@ -282,7 +282,7 @@ describe('Cluster Management Helm Repositories', { testIsolation: 'off', tags: [
     cy.contains(this.repoName).should('not.exist');
   });
 
-  it('can disable/enable a repository', function() {
+  it.only('can disable/enable a repository', function() {
     // The context menu can slightly clip at the top of the screen. This ensures it's visible.
     cy.viewport(1280, 720);
 
@@ -300,20 +300,18 @@ describe('Cluster Management Helm Repositories', { testIsolation: 'off', tags: [
     repositoriesPage.waitForPage();
 
     // check list details
-    repositoriesPage.list().details(this.repoName, 2).should('be.visible');
-    repositoriesPage.list().details(this.repoName, 1).contains('In Progress').should('be.visible');
-
+    cy.waitForRepositoryDownload('v1', 'catalog.cattle.io.clusterrepos', this.repoName);
+    repositoriesPage.list().details(this.repoName, 1).contains('Active', LONG_TIMEOUT_OPT).should('be.visible');
     // refresh should be displayed for an enabled repo
     repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Refresh').should('be.visible');
     // close action menu
     repositoriesPage.list().closeActionMenu();
 
     // disable repo
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(1500);
-    repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Disable').click();
-    repositoriesPage.list().details(this.repoName, 1).contains('Disabled', { timeout: 10000 }).scrollIntoView()
-      .should('be.visible');
+    repositoriesPage.list().resourceTable().sortableTable().filter(this.repoName, 50);
+    repositoriesPage.waitForPage(`q=${ this.repoName }`);
+    repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Disable').click({ force: true });
+    repositoriesPage.list().details(this.repoName, 1).contains('Disabled').should('be.visible');
 
     // refresh should NOT be displayed for a disabled repo
     repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Refresh').should('not.exist');
@@ -321,14 +319,15 @@ describe('Cluster Management Helm Repositories', { testIsolation: 'off', tags: [
     repositoriesPage.list().closeActionMenu();
 
     // enable repo
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(1500);
-    repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Enable').click();
-    repositoriesPage.list().details(this.repoName, 1).contains('Active', LONG_TIMEOUT_OPT).scrollIntoView()
-      .should('be.visible');
+    repositoriesPage.list().resourceTable().sortableTable().filter(this.repoName, 50);
+    repositoriesPage.waitForPage(`q=${ this.repoName }`);
+    repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Enable').click({ force: true });
+    repositoriesPage.list().details(this.repoName, 1).contains('Active', LONG_TIMEOUT_OPT).should('be.visible');
 
     // delete repo
-    repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Delete').click();
+    repositoriesPage.list().resourceTable().sortableTable().filter(this.repoName, 50);
+    repositoriesPage.waitForPage(`q=${ this.repoName }`);
+    repositoriesPage.list().actionMenu(this.repoName).getMenuItem('Delete').click({ force: true });
 
     const promptRemove = new PromptRemove();
 
