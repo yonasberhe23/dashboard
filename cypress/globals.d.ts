@@ -93,6 +93,7 @@ declare global {
       createAwsCloudCredentials(nsName: string, cloudCredName: string, defaultRegion: string, accessKey: string, secretKey: string): Chainable;
       createAmazonMachineConfig(instanceType: string, region: string, vpcId: string, zone: string, type: string, clusterName: string, namespace: string): Chainable;
       createAmazonRke2Cluster(params: CreateAmazonRke2ClusterParams): Chainable;
+      getKubernetesReleases(rkeType: 'rke2' | 'k3s'): Chainable;
       createAmazonRke2ClusterWithoutMachineConfig(params: CreateAmazonRke2ClusterWithoutMachineConfigParams): Chainable;
       createSecret(namespace: string, name: string, options?: { type?: string; metadata?: any; data?: any }): Chainable;
       createConfigMap(namespace: string, name: string, options?: { metadata?: any; data?: any }): Chainable;
