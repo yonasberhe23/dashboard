@@ -7,7 +7,7 @@ import RepositoriesPagePo from '@/cypress/e2e/po/pages/chart-repositories.po';
 import BannersPo from '@/cypress/e2e/po/components/banners.po';
 import ChartRepositoriesCreateEditPo from '@/cypress/e2e/po/edit/chart-repositories.po';
 import AppClusterRepoEditPo from '@/cypress/e2e/po/edit/catalog.cattle.io.clusterrepo.po';
-import { LONG_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
+import { LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
 import { CLUSTER_REPOS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
 import ResourceTablePo from '@/cypress/e2e/po/components/resource-table.po';
 import { GetOptions } from '@/cypress/e2e/po/components/component.po';
@@ -74,7 +74,7 @@ export default class ExtensionsPagePo extends PagePo {
     const appRepoList = new RepositoriesPagePo('local', 'apps');
 
     appRepoList.waitForPage();
-    appRepoList.list().checkVisible();
+    appRepoList.list().checkVisible(MEDIUM_TIMEOUT_OPT);
 
     appRepoList.create();
 
