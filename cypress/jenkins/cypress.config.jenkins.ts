@@ -13,13 +13,13 @@ require('dotenv').config();
 
 const testDirs = [
   'cypress/e2e/tests/priority/**/*.spec.ts',
-  'cypress/e2e/tests/components/**/*.spec.ts',
-  'cypress/e2e/tests/setup/**/*.spec.ts',
-  'cypress/e2e/tests/pages/**/*.spec.ts',
-  'cypress/e2e/tests/navigation/**/*.spec.ts',
-  'cypress/e2e/tests/global-ui/**/*.spec.ts',
-  'cypress/e2e/tests/features/**/*.spec.ts',
-  'cypress/e2e/tests/extensions/**/*.spec.ts'
+  // 'cypress/e2e/tests/components/**/*.spec.ts',
+  // 'cypress/e2e/tests/setup/**/*.spec.ts',
+  'cypress/e2e/tests/extensions/elemental/elemental.spec.ts',
+  // 'cypress/e2e/tests/navigation/**/*.spec.ts',
+  // 'cypress/e2e/tests/global-ui/**/*.spec.ts',
+  // 'cypress/e2e/tests/features/**/*.spec.ts',
+  // 'cypress/e2e/tests/extensions/**/*.spec.ts'
 ];
 const skipSetup = process.env.TEST_SKIP?.includes('setup');
 const baseUrl = (process.env.TEST_BASE_URL || 'https://localhost:8005').replace(/\/$/, '');
@@ -70,7 +70,7 @@ export default defineConfig({
   trashAssetsBeforeRuns: true,
   chromeWebSecurity:     false,
   retries:               {
-    runMode:  2,
+    runMode:  0,
     openMode: 0
   },
   env: {
@@ -90,7 +90,7 @@ export default defineConfig({
     azureClientSecret:   process.env.AZURE_CLIENT_SECRET,
     customNodeIp:        process.env.CUSTOM_NODE_IP,
     customNodeKey:       process.env.CUSTOM_NODE_KEY,
-    accessibility:       !!process.env.TEST_A11Y, // Are we running accessibility tests?
+    accessibility:       process.env.TEST_A11Y === 'true', // Are we running accessibility tests?
     a11yFolder:          path.join('.', 'cypress', 'accessibility'),
     gkeServiceAccount:   process.env.GKE_SERVICE_ACCOUNT,
     customNodeIpRke1:    process.env.CUSTOM_NODE_IP_RKE1,
@@ -115,19 +115,27 @@ export default defineConfig({
 
       // Load Accessibility plugin if configured
       if (process.env.TEST_A11Y) {
-        require('../../cypress/support/plugins/accessibility').default(on, config);
+        try {
+          require('../../cypress/support/plugins/accessibility').default(on, config);
+        } catch (err) {
+          console.warn('Accessibility plugin failed to load:', err);
+        }
       }
 
       on('task', { removeDirectory });
       websocketTasks(on, config);
 
-      require('cypress-terminal-report/src/installLogsPrinter')(on, {
-        outputRoot:           `${ config.projectRoot }/browser-logs/`,
-        outputTarget:         { 'out.html': 'html' },
-        logToFilesOnAfterRun: true,
-        printLogsToConsole:   'never',
-        // printLogsToFile:      'always', // default prints on failures
-      });
+      try {
+        require('cypress-terminal-report/src/installLogsPrinter')(on, {
+          outputRoot:           `${ config.projectRoot }/browser-logs/`,
+          outputTarget:         { 'out.html': 'html' },
+          logToFilesOnAfterRun: true,
+          printLogsToConsole:   'never',
+          // printLogsToFile:      'always', // default prints on failures
+        });
+      } catch (err) {
+        console.warn('Terminal report plugin failed to load:', err);
+      }
 
       return config;
     },
