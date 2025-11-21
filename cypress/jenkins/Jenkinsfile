@@ -8,13 +8,8 @@ if ("${env.branch}" != "null" && "${env.branch}" != "") {
   branch = "${env.branch}"
 }
 
-if ("${env.CORRAL_PACKAGES_REPO}" != "null" && "${env.CORRAL_PACKAGES_REPO}" != "") {
-      corralRepo = "${env.CORRAL_PACKAGES_REPO}"
-}
-
-if ("${env.CORRAL_PACKAGES_BRANCH}" != "null" && "${env.CORRAL_PACKAGES_BRANCH}" != "") {
-      corralBranch = "${env.CORRAL_PACKAGES_BRANCH}"
-}
+# QA_INFRA_REPO should be set to the path of qa-infra-automation repo
+QA_INFRA_REPO="${env.QA_INFRA_REPO:-${WORKSPACE}/qa-infra-automation}"
 
 node {
   wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm', 'defaultFg': 2, 'defaultBg':1]) {
@@ -40,20 +35,6 @@ node {
                         extensions: scm.extensions + [[$class: 'CleanCheckout']],
                         userRemoteConfigs: scm.userRemoteConfigs
                     ])
-            dir('./corral-packages') {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/${corralBranch}"]],
-                    extensions: scm.extensions + [[$class: 'CleanCheckout']],
-                    userRemoteConfigs: [[url: 'https://github.com/'+corralRepo]]
-                ])
-                sh 'git --no-pager branch'
-                def ciFilename = "dashboard-tests.yaml"
-                def ciConfigContents = env.CORRAL_PACKAGE_CONFIG
-                if (ciConfigContents != null) {
-                    writeFile file: "./packages/aws/"+ciFilename, text: ciConfigContents
-                }
-            }
             }
             try {
               stage('Run Tests') {
@@ -77,12 +58,28 @@ node {
             }
             if ("${env.CLEANUP}".toLowerCase() == "true") {
                 try {
-                  stage('Clean Test Environment') {  
-                    sh "corrals=\$(${WORKSPACE}/bin/corral list | grep -v \"NAME\" | grep -v \"-\" | cut -d' ' -f 2)" +
-                    "&& for corral in \$corrals; do ${WORKSPACE}/bin/corral delete \$corral; done"
+                  stage('Clean Test Environment') {
+                    // Cleanup is handled by Ansible playbook
+                    // If ansible-output.yaml exists, use it to determine what to clean up
+                    sh """
+                      if [ -f "${WORKSPACE}/ansible-output.yaml" ]; then
+                        echo "Cleaning up infrastructure created by Ansible..."
+                        # Call Ansible cleanup playbook if it exists
+                        if [ -f "${QA_INFRA_REPO}/ansible/dashboard-tests/cleanup-playbook.yml" ]; then
+                          ansible-playbook \\
+                            -i "${QA_INFRA_REPO}/ansible/dashboard-tests/inventory-template.yml" \\
+                            "${QA_INFRA_REPO}/ansible/dashboard-tests/cleanup-playbook.yml" \\
+                            -e "@${WORKSPACE}/ansible-output.yaml"
+                        else
+                          echo "Cleanup playbook not found. Manual cleanup may be required."
+                        fi
+                      else
+                        echo "No ansible-output.yaml found. Nothing to clean up."
+                      fi
+                    """
                   }
                 } catch(err) {
-                  echo "Error: " + err
+                  echo "Error during cleanup: " + err
                   currentBuild.result = 'FAILURE'
                 }
             }

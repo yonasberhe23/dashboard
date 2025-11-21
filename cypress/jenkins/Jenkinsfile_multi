@@ -12,12 +12,12 @@ if ("${env.branch}" != "null" && "${env.branch}" != "") {
   branch = "${env.branch}"
 }
 
-if ("${env.CORRAL_PACKAGES_REPO}" != "null" && "${env.CORRAL_PACKAGES_REPO}" != "") {
-      corralRepo = "${env.CORRAL_PACKAGES_REPO}"
+if ("${env.QA_INFRA_REPO}" != "null" && "${env.QA_INFRA_REPO}" != "") {
+      QA_INFRA_REPO = "${env.QA_INFRA_REPO}"
 }
 
-if ("${env.CORRAL_PACKAGES_BRANCH}" != "null" && "${env.CORRAL_PACKAGES_BRANCH}" != "") {
-      corralBranch = "${env.CORRAL_PACKAGES_BRANCH}"
+if ("${env.QA_INFRA_BRANCH}" != "null" && "${env.QA_INFRA_BRANCH}" != "") {
+      QA_INFRA_BRANCH = "${env.QA_INFRA_BRANCH}"
 }
 
 node {
@@ -45,10 +45,8 @@ node {
                         for ( String ct : all_cypress_tags ) {
                             params = null
                             params = [  string(name: 'JOB_TYPE', value: "${JOB_TYPE}"),
-                                        string(name: 'CORRAL_PACKAGES_BRANCH', value: "${CORRAL_PACKAGES_BRANCH}"),
-                                        string(name: 'CORRAL_PACKAGES_REPO', value: "${CORRAL_PACKAGES_REPO}"),
-                                        text(name: 'CORRAL_PACKAGE_CONFIG', value: "${CORRAL_PACKAGE_CONFIG}"),
-                                        string(name: 'CORRAL_VERSION', value: "${CORRAL_VERSION}"),
+                                        string(name: 'QA_INFRA_REPO', value: "${QA_INFRA_REPO}"),
+                                        string(name: 'QA_INFRA_BRANCH', value: "${QA_INFRA_BRANCH}"),
                                         string(name: 'AWS_SSH_USER', value: "${AWS_SSH_USER}"),
                                         string(name: 'AWS_AMI', value: "${AWS_AMI}"),
                                         string(name: 'AWS_REGION', value: "${AWS_REGION}"),

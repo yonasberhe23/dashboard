@@ -22,14 +22,6 @@ GO_DL_URL="https://go.dev/dl"
 GO_DL_VERSION="${GO_DL_VERSION:-1.20.5}"
 GO_PKG_FILENAME="go${GO_DL_VERSION}.${GOLANG_PGK_SUFFIX}.tar.gz"
 GO_DL_PACKAGE="${GO_DL_URL}/${GO_PKG_FILENAME}"
-CORRAL_PATH="${WORKSPACE}/bin"
-CORRAL="${CORRAL_PATH}/corral"
-CORRAL_VERSION="${CORRAL_VERSION:-1.1.1}"
-CORRAL_DOWNLOAD_URL="https://github.com/rancherlabs/corral/releases/download/"
-CORRAL_DOWNLOAD_BIN="${CORRAL_DOWNLOAD_URL}v${CORRAL_VERSION}/corral-${CORRAL_VERSION}-${MACHINE}"
-PATH="${CORRAL_PATH}:${PATH}"
-CORRAL_PACKAGES_REPO="${CORRAL_PACKAGES_REPO:-rancherlabs/corral-packages.git}"
-CORRAL_PACKAGES_BRANCH="${CORRAL_PACKAGES_BRANCH:-main}"
 DASHBOARD_REPO="${DASHBOARD_REPO:-rancher/dashboard.git}"
 DASHBOARD_BRANCH="${DASHBOARD_BRANCH:-master}"
 GITHUB_URL="https://github.com/"
@@ -46,10 +38,6 @@ mkdir -p "${WORKSPACE}/bin"
 wget "${GITHUB_URL}${YQ_BIN}" -O "${WORKSPACE}/bin/yq"
 chmod +x "${WORKSPACE}/bin/yq"
 
-if [ -f "${CORRAL}" ]; then rm "${CORRAL}"; fi
-curl -L -o "${CORRAL}" "${CORRAL_DOWNLOAD_BIN}"
-chmod +x "${CORRAL}"
-
 curl -L -o "${GO_PKG_FILENAME}" "${GO_DL_PACKAGE}"
 tar -C "${WORKSPACE}" -xzf "${GO_PKG_FILENAME}"
 
@@ -57,15 +45,24 @@ curl -sSL https://raw.githubusercontent.com/parleer/semver-bash/latest/semver -o
 chmod +x semver
 mv semver "${WORKSPACE}/bin"
 
+# Install Ansible and dependencies
+# Check if Ansible is already installed
+if ! command -v ansible-playbook &> /dev/null; then
+    echo "Installing Ansible..."
+    python3 -m pip install --user ansible kubernetes || python3 -m pip install --break-system-packages ansible kubernetes
+    export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
+# Install Ansible collections
+ansible-galaxy collection install cloud.terraform kubernetes.core || true
+
 ls -al "${WORKSPACE}"
 export PATH=$PATH:"${WORKSPACE}/go/bin:${WORKSPACE}/bin"
 export GOROOT="${WORKSPACE}/go"
 echo "${PATH}"
 
-
 ls -al "${WORKSPACE}/go"
 go version
-
 
 if [[ ! -d "${WORKSPACE}/.ssh" ]]; then mkdir -p "${WORKSPACE}/.ssh"; fi
 export PRIV_KEY="${WORKSPACE}/.ssh/jenkins_ecdsa"
@@ -74,30 +71,13 @@ if [ -f "${PRIV_KEY}" ]; then rm "${PRIV_KEY}"; fi
 ssh-keygen -t ecdsa -b 521 -N "" -f "${PRIV_KEY}"
 ls -al "${WORKSPACE}/.ssh/"
 
-corral config --public_key "${PRIV_KEY}.pub" --user_id jenkins
-corral config vars set corral_user_public_key "$(cat ${PRIV_KEY}.pub)"
-corral config vars set corral_user_id jenkins
-corral config vars set aws_ssh_user "${AWS_SSH_USER}"
-corral config vars set aws_access_key "${AWS_ACCESS_KEY_ID}"
-corral config vars set aws_secret_key "${AWS_SECRET_ACCESS_KEY}"
-corral config vars set aws_ami "${AWS_AMI}"
-corral config vars set aws_region "${AWS_REGION}"
-corral config vars set aws_security_group "${AWS_SECURITY_GROUP}"
-corral config vars set aws_subnet "${AWS_SUBNET}"
-corral config vars set aws_vpc "${AWS_VPC}"
-corral config vars set aws_volume_size "${AWS_VOLUME_SIZE}"
-corral config vars set aws_volume_type "${AWS_VOLUME_TYPE}"
-corral config vars set volume_type "${AWS_VOLUME_TYPE}"
-corral config vars set volume_iops "${AWS_VOLUME_IOPS}"
-corral config vars set azure_subscription_id "${AZURE_AKS_SUBSCRIPTION_ID}"
-corral config vars set azure_client_id "${AZURE_CLIENT_ID}"
-corral config vars set azure_client_secret "${AZURE_CLIENT_SECRET}"
-corral config vars set create_initial_clusters "${CREATE_INITIAL_CLUSTERS}"
-corral config vars set gke_service_account "${GKE_SERVICE_ACCOUNT}"
-corral config vars set percy_token "${PERCY_TOKEN}"
-
 create_initial_clusters() {
   shopt -u nocasematch
+  # Initialize variables
+  RANCHER_IMAGE="${RANCHER_IMAGE:-rancher/rancher}"
+  ENV_VAR_MAP="${ENV_VAR_MAP:-}"
+  RANCHER_CHART_URL_FINAL="${RANCHER_CHART_URL_FINAL:-}"
+  
   if [[ -n "${RANCHER_IMAGE_TAG}" ]]; then
     TARFILE="helm-v${HELM_VERSION}-linux-amd64.tar.gz"
     curl -L -o "${TARFILE}" "https://get.helm.sh/${TARFILE}"
@@ -107,15 +87,15 @@ create_initial_clusters() {
         RANCHER_CHART_URL=https://charts.rancher.com/server-charts/prime
         helm repo add rancher-prime "${RANCHER_CHART_URL}"
         helm repo update
-        corral config vars set rancher_image "registry.suse.com/rancher/rancher"
-        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|registry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
+        RANCHER_IMAGE="registry.suse.com/rancher/rancher"
+        ENV_VAR_MAP='["CATTLE_AGENT_IMAGE|registry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
       elif [[ "${RANCHER_HELM_REPO}" == "optimus_prime" ]]; then
         RANCHER_HELM_REPO=optimus
         RANCHER_CHART_URL=https://charts.optimus.rancher.io/server-charts/latest
         helm repo add rancher-optimus "${RANCHER_CHART_URL}"
         helm repo update
-        corral config vars set rancher_image "stgregistry.suse.com/rancher/rancher"
-        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
+        RANCHER_IMAGE="stgregistry.suse.com/rancher/rancher"
+        ENV_VAR_MAP='["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
       elif [[ "${RANCHER_HELM_REPO}" == "alpha" ]]; then
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/alpha
         helm repo add rancher-alpha "${RANCHER_CHART_URL}"
@@ -129,12 +109,10 @@ create_initial_clusters() {
         helm repo add rancher-latest "${RANCHER_CHART_URL}"
         helm repo update
       fi
-      corral config vars set rancher_chart_repo "${RANCHER_HELM_REPO}"
       if [[ "${RANCHER_HELM_REPO}" == "optimus" ]]; then
-        corral config vars set rancher_chart_url "${RANCHER_CHART_URL}"
+        RANCHER_CHART_URL_FINAL="${RANCHER_CHART_URL}"
       else
-        url_string=$(echo "${RANCHER_CHART_URL}" | grep -o '.*server-charts')
-        corral config vars set rancher_chart_url "${url_string}"
+        RANCHER_CHART_URL_FINAL=$(echo "${RANCHER_CHART_URL}" | grep -o '.*server-charts')
       fi
     fi
     version_string=$(echo "${RANCHER_IMAGE_TAG}" | cut -f1 -d"-")
@@ -143,69 +121,25 @@ create_initial_clusters() {
     else
       RANCHER_VERSION=$(helm search repo "rancher-${RANCHER_HELM_REPO}" --devel --versions | grep "${version_string}" | head -n 1 | cut -f2 | tr -d '[:space:]')
     fi
-    corral config vars set rancher_image_tag "${RANCHER_IMAGE_TAG}"
   fi
-  cd "${WORKSPACE}/corral-packages"
-  yq -i e ".variables.rancher_version += [\"${RANCHER_VERSION}\"] | .variables.rancher_version style=\"literal\"" packages/aws/rancher-k3s.yaml
-  yq -i e ".variables.kubernetes_version += [\"${K3S_KUBERNETES_VERSION}\"] | .variables.kubernetes_version style=\"literal\"" packages/aws/rancher-k3s.yaml
-  yq -i e ".variables.cert_manager_version += [\"${CERT_MANAGER_VERSION}\"] | .variables.kubernetes_version style=\"literal\"" packages/aws/rancher-k3s.yaml
-
-  echo $'manifest:\n  name: custom-node\ndescription: custom generated node\ntemplates:\n  - aws/nodes\nvariables:\n  instance_type:\n    - t3a.xlarge' > packages/aws/custom-node.yaml
-
-  yq -i e ".variables.kubernetes_version += [\"${K3S_KUBERNETES_VERSION}\"] | .variables.kubernetes_version style=\"literal\"" packages/aws/k3s.yaml
-  cat packages/aws/rancher-k3s.yaml
-  ls -al packages/aws/
-  cat packages/aws/dashboard-tests.yaml
-  cat packages/aws/custom-node.yaml
-
+  
+  # Generate random prefix for hostnames
   prefix_random=$(cat /dev/urandom | env LC_ALL=C tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-
-  corral config vars set bootstrap_password "${BOOTSTRAP_PASSWORD:-password}"
-  corral config vars set aws_route53_zone "${AWS_ROUTE53_ZONE}"
-  corral config vars set server_count "${SERVER_COUNT:-3}"
-  corral config vars set agent_count "${AGENT_COUNT:-0}"
-  corral config vars delete rancher_host
+  
   if [[ "${JOB_TYPE}" == "recurring" ]]; then
     RANCHER_HOST="jenkins-${prefix_random}.${AWS_ROUTE53_ZONE}"
   fi
-
-  K3S_KUBERNETES_VERSION="${K3S_KUBERNETES_VERSION//+/-}"
-  make init
-  make build
-  ls -al dist
-  corral config vars set node_count 1
-  corral config vars set aws_hostname_prefix "jenkins-${prefix_random}-c"
-  corral config vars delete instance_type
-  corral config vars set bastion_ip ""
-
-  echo "Custom Node for RKE2 Cluster"
-  corral create --skip-cleanup --recreate --debug customnode \
-    "dist/aws-t3a.xlarge"
-  corral config vars set custom_node_ip "$(corral vars customnode first_node_ip)"
-  corral config vars set custom_node_key "$(corral vars customnode corral_private_key | base64 -w 0)"
-
-  echo "Custom Node for RKE1 Cluster"
-  corral create --skip-cleanup --recreate --debug customnoderke1 \
-    "dist/aws-t3a.xlarge"
-  corral config vars set custom_node_ip_rke1 "$(corral vars customnoderke1 first_node_ip)"
-  corral config vars set custom_node_key_rke1 "$(corral vars customnoderke1 corral_private_key | base64 -w 0)"
   
-  corral config vars set instance_type "${AWS_INSTANCE_TYPE}"
-  corral config vars set aws_hostname_prefix "jenkins-${prefix_random}"
-  echo "Corral Package string: ${K3S_KUBERNETES_VERSION}-${RANCHER_VERSION//v}-${CERT_MANAGER_VERSION}"
-  corral config vars set aws_hostname_prefix "jenkins-${prefix_random}-i"
-  corral config vars set server_count 1
-  corral create --skip-cleanup --recreate --debug importcluster \
-    "dist/aws-k3s-${K3S_KUBERNETES_VERSION}"
-  corral config vars set imported_kubeconfig $(corral vars importcluster kubeconfig)
-  corral config vars set aws_hostname_prefix "jenkins-${prefix_random}"
-  corral config vars set server_count "${SERVER_COUNT:-3}"
-  if [[ "${JOB_TYPE}" == "recurring" ]]; then
-    corral create --skip-cleanup --recreate --debug rancher \
-      "dist/aws-k3s-rancher-${K3S_KUBERNETES_VERSION}-${RANCHER_VERSION//v}-${CERT_MANAGER_VERSION}"
-  fi
+  # Note: Custom nodes and import cluster creation will be handled by Ansible playbook
+  # The Ansible playbook will use the variables set in the vars file to create these resources
+  export CREATE_INITIAL_CLUSTERS_FLAG="yes"
+  export RANCHER_IMAGE
+  export ENV_VAR_MAP
+  export RANCHER_CHART_URL_FINAL
+  export prefix_random
+  export RANCHER_HOST
+  export RANCHER_VERSION
 }
-
 
 if [[ "${JOB_TYPE}" == "recurring" ]]; then 
   RANCHER_TYPE="recurring"
@@ -223,12 +157,10 @@ fi
 
 echo "Rancher type: ${RANCHER_TYPE}"
 
-if semver lt "${RANCHER_VERSION}" "2.9.99" && [[ "${RANCHER_IMAGE_TAG}" != "head" ]]; then NODEJS_VERSION="16.20.2"; fi
+# Set default RANCHER_VERSION if not already set
+RANCHER_VERSION="${RANCHER_VERSION:-v2.10.3}"
 
-corral config vars set rancher_type "${RANCHER_TYPE}"
-corral config vars set nodejs_version "${NODEJS_VERSION}"
-corral config vars set dashboard_repo "${DASHBOARD_REPO}"
-corral config vars set dashboard_branch "${DASHBOARD_BRANCH}"
+if semver lt "${RANCHER_VERSION}" "2.9.99" && [[ "${RANCHER_IMAGE_TAG}" != "head" ]]; then NODEJS_VERSION="16.20.2"; fi
 
 # Disable vai where it doesn't exist or is turn off by default
 case "${RANCHER_IMAGE_TAG}" in
@@ -237,39 +169,105 @@ case "${RANCHER_IMAGE_TAG}" in
         ;;
     *)
 esac
-corral config vars set cypress_tags "${CYPRESS_TAGS}"
-corral config vars set cypress_version "${CYPRESS_VERSION}"
-corral config vars set yarn_version "${YARN_VERSION}"
-corral config vars set kubectl_version "${KUBECTL_VERSION}"
 
-if [[ -n "${RANCHER_USERNAME}" ]]; then
-   corral config vars set rancher_username "${RANCHER_USERNAME}"
+# === ANSIBLE SECTION ===
+# Set kubeconfig file path (required by playbook)
+KUBECONFIG_FILE="${KUBECONFIG_FILE:-${WORKSPACE}/kubeconfig.yaml}"
+
+# Generate Ansible vars file from environment variables
+cat > "${WORKSPACE}/ansible-vars.yaml" <<EOF
+# Generated by init.sh from dashboard repo
+job_type: ${JOB_TYPE:-recurring}
+rancher_type: ${RANCHER_TYPE:-local}
+rancher_version: ${RANCHER_VERSION:-v2.10.3}
+rancher_image_tag: ${RANCHER_IMAGE_TAG:-}
+rancher_image: ${RANCHER_IMAGE:-rancher/rancher}
+rancher_hostname: ${RANCHER_HOST:-}
+rancher_bootstrap_password: ${BOOTSTRAP_PASSWORD:-password}
+rancher_password: ${RANCHER_PASSWORD:-password}
+rancher_username: ${RANCHER_USERNAME:-}
+rancher_chart_repo: ${RANCHER_HELM_REPO:-latest}
+rancher_chart_url: ${RANCHER_CHART_URL_FINAL:-}
+env_var_map: ${ENV_VAR_MAP:-}
+kubeconfig_file: ${KUBECONFIG_FILE}
+k3s_kubernetes_version: ${K3S_KUBERNETES_VERSION:-v1.32.1+k3s1}
+cert_manager_version: ${CERT_MANAGER_VERSION:-1.13.0}
+dashboard_repo: ${DASHBOARD_REPO:-rancher/dashboard.git}
+dashboard_branch: ${DASHBOARD_BRANCH:-master}
+nodejs_version: ${NODEJS_VERSION:-14.19.1}
+yarn_version: ${YARN_VERSION:-1.22.19}
+cypress_version: ${CYPRESS_VERSION:-13.2.0}
+kubectl_version: ${KUBECTL_VERSION:-v1.29.8}
+cypress_tags: ${CYPRESS_TAGS:-@adminUser}
+chrome_version: ${CHROME_VERSION:-}
+workspace_path: ${WORKSPACE}
+go_version: ${GO_DL_VERSION}
+create_initial_clusters: ${CREATE_INITIAL_CLUSTERS_FLAG:-${CREATE_INITIAL_CLUSTERS:-no}}
+server_count: ${SERVER_COUNT:-3}
+agent_count: ${AGENT_COUNT:-0}
+# Cloud provider credentials
+aws_access_key_id: ${AWS_ACCESS_KEY_ID:-}
+aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY:-}
+aws_ssh_user: ${AWS_SSH_USER:-ubuntu}
+aws_ami: ${AWS_AMI:-}
+aws_region: ${AWS_REGION:-}
+aws_security_group: ${AWS_SECURITY_GROUP:-}
+aws_subnet: ${AWS_SUBNET:-}
+aws_vpc: ${AWS_VPC:-}
+aws_volume_size: ${AWS_VOLUME_SIZE:-}
+aws_volume_type: ${AWS_VOLUME_TYPE:-}
+aws_volume_iops: ${AWS_VOLUME_IOPS:-}
+aws_route53_zone: ${AWS_ROUTE53_ZONE:-}
+aws_instance_type: ${AWS_INSTANCE_TYPE:-}
+aws_hostname_prefix: jenkins-${prefix_random}
+azure_client_id: ${AZURE_CLIENT_ID:-}
+azure_client_secret: ${AZURE_CLIENT_SECRET:-}
+azure_aks_subscription_id: ${AZURE_AKS_SUBSCRIPTION_ID:-}
+gke_service_account: ${GKE_SERVICE_ACCOUNT:-}
+percy_token: ${PERCY_TOKEN:-}
+EOF
+
+# Call Ansible playbook instead of Corral
+# QA_INFRA_REPO should be set to the path of qa-infra-automation repo
+# If not set, assume it's in the workspace or current directory
+QA_INFRA_REPO="${QA_INFRA_REPO:-${WORKSPACE}/qa-infra-automation}"
+
+# If QA_INFRA_REPO doesn't exist, try current directory
+if [ ! -d "${QA_INFRA_REPO}" ]; then
+    if [ -d "${PWD}/qa-infra-automation" ]; then
+        QA_INFRA_REPO="${PWD}/qa-infra-automation"
+    elif [ -d "${PWD}/../qa-infra-automation" ]; then
+        QA_INFRA_REPO="${PWD}/../qa-infra-automation"
+    else
+        echo "Error: QA_INFRA_REPO not found at ${QA_INFRA_REPO}"
+        echo "Please set QA_INFRA_REPO environment variable or ensure qa-infra-automation repo is accessible"
+        exit 1
+    fi
 fi
 
-if [[ -n "${RANCHER_PASSWORD}" ]]; then
-   corral config vars set rancher_password "${RANCHER_PASSWORD}"
+# Determine inventory file
+# If using Terraform, the inventory-template.yml will use Terraform inventory
+# Otherwise, you may need a static inventory file
+INVENTORY_FILE="${INVENTORY_FILE:-${QA_INFRA_REPO}/ansible/ui-dashboard-tests/inventory-template.yml}"
+
+# Run Ansible playbook
+ansible-playbook \
+  -i "${INVENTORY_FILE}" \
+  "${QA_INFRA_REPO}/ansible/ui-dashboard-tests/ui-dashboard-tests-playbook.yml" \
+  -e "@${WORKSPACE}/ansible-vars.yaml" \
+  -e "workspace_path=${WORKSPACE}"
+
+echo "Ansible playbook execution completed"
+
+# Extract Rancher configuration from output files (if needed for downstream jobs)
+if [ -f "${WORKSPACE}/output/rancher-config.yaml" ]; then
+  RANCHER_URL=$(yq e '.rancher_url' "${WORKSPACE}/output/rancher-config.yaml" 2>/dev/null || echo "")
+  RANCHER_HOST=$(yq e '.rancher_host' "${WORKSPACE}/output/rancher-config.yaml" 2>/dev/null || echo "")
+  export RANCHER_URL
+  export RANCHER_HOST
+  echo "Rancher URL: ${RANCHER_URL}"
+  echo "Rancher Host: ${RANCHER_HOST}"
 fi
 
-if [[ -n "${RANCHER_HOST}" ]]; then
-   corral config vars set rancher_host "${RANCHER_HOST}"
-fi
-
-if [[ -n "${CHROME_VERSION}" ]]; then
-   corral config vars set chrome_version "${CHROME_VERSION}"
-fi
-
-cd "${WORKSPACE}/corral-packages"
-make init
-make build
-echo "${PWD}"
-chmod -R 766 "${WORKSPACE}/corral-packages"
-corral config vars set node_count 1
-corral config vars set bastion_ip ""
-corral config vars delete instance_type
-corral config vars set aws_hostname_prefix "jenkins-${prefix_random}-ci"
-corral create --skip-cleanup --recreate --debug ci dist/aws-dashboard-tests-t3a.xlarge
-corral config vars -o yaml
-corral vars ci corral_private_key -o yaml
-NODE_EXTERNAL_IP="$(corral vars ci first_node_ip)"
 cd "${WORKSPACE}"
 echo "${PWD}"
