@@ -5,7 +5,7 @@ import ClusterManagerDetailRke2AmazonEc2PagePo from '@/cypress/e2e/po/detail/pro
 import PromptRemove from '@/cypress/e2e/po/prompts/promptRemove.po';
 import LoadingPo from '@/cypress/e2e/po/components/loading.po';
 import TabbedPo from '@/cypress/e2e/po/components/tabbed.po';
-import { MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
+import { LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
 import { USERS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
 
 // will only run this in jenkins pipeline where cloud credentials are stored
@@ -154,16 +154,118 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { testIsolation:
     clusterList.list().name(this.rke2Ec2ClusterName).click();
     clusterDetails.waitForPage(null, 'machine-pools');
     clusterDetails.resourceDetail().title().should('contain', this.rke2Ec2ClusterName);
-    clusterDetails.machinePoolsList().details(`${ this.rke2Ec2ClusterName }-pool1-`, 1).should('contain', 'Running');
 
     // check cluster details page > recent events
-    ClusterManagerListPagePo.navTo();
-    clusterList.waitForPage();
-    clusterList.goToDetailsPage(this.rke2Ec2ClusterName, '.cluster-link a');
-    clusterDetails.waitForPage(null, 'machine-pools');
     clusterDetails.selectTab(tabbedPo, '[data-testid="btn-events"]');
     clusterDetails.waitForPage(null, 'events');
     clusterDetails.recentEventsList().checkTableIsEmpty();
+  });
+
+  it('can scale up a machine pool', function() {
+    // testing https://github.com/rancher/dashboard/issues/13285
+    const clusterDetails = new ClusterManagerDetailRke2AmazonEc2PagePo(undefined, this.rke2Ec2ClusterName);
+
+    ClusterManagerListPagePo.navTo();
+    clusterList.waitForPage();
+
+    // Navigate to cluster details page > machine pools
+    clusterList.list().name(this.rke2Ec2ClusterName).click();
+    clusterDetails.waitForPage(null, 'machine-pools');
+    clusterDetails.resourceDetail().title().should('contain', this.rke2Ec2ClusterName);
+    clusterDetails.machinePoolsList().details(`${ this.rke2Ec2ClusterName }-pool1-`, 1).should('contain', 'Running');
+
+    // Verify scaling buttons are present in the machine pools section
+    clusterDetails.machinePoolsList().resourceTable().sortableTable().groupByButtons(1)
+      .click();
+
+    // Check for scale up button (it should be enabled)
+    clusterDetails.machinePoolsList().scaleUpButton(`${ this.rke2Ec2ClusterName }-pool1`, 'plus')
+      .should('be.visible')
+      .and('be.enabled');
+
+    // Hover scale up button - tooltip should read "Scale Pool Up"
+    clusterDetails.machinePoolsList().scaleButtonTooltip(`${ this.rke2Ec2ClusterName }-pool1`, 'plus')
+      .waitForTooltipWithText('Scale Pool Up');
+    clusterDetails.machinePoolsList().scaleButtonTooltip(`${ this.rke2Ec2ClusterName }-pool1`, 'plus')
+      .hideTooltip();
+
+    // Check for scale down button (it should be disabled initially)
+    clusterDetails.machinePoolsList().scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .should('be.visible')
+      .and('be.disabled');
+
+    // Hover scale down button - tooltip should read "Scale Pool Down"
+    clusterDetails.machinePoolsList().scaleButtonTooltip(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .waitForTooltipWithText('Scale Pool Down');
+    clusterDetails.machinePoolsList().scaleButtonTooltip(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .hideTooltip();
+
+    cy.intercept('PUT', ` /v1/provisioning.cattle.io.clusters/fleet-default/${ this.rke2Ec2ClusterName }`).as('scaleUpMachineDeployment');
+    // Scale up the machine pool
+    clusterDetails.machinePoolsList().scaleUpButton(`${ this.rke2Ec2ClusterName }-pool1`, 'plus')
+      .click();
+
+    cy.wait('@scaleUpMachineDeployment').its('response.statusCode').should('eq', 200);
+
+    // Verify the machine pool is scaled up to 2
+    clusterDetails.machinePoolsList().machinePoolCount(`${ this.rke2Ec2ClusterName }-pool1`, /^2$/, { timeout: 700000 });
+    clusterDetails.machinePoolsList().resourceTable().sortableTable().checkRowCount(false, 2, LONG_TIMEOUT_OPT);
+
+    // Verify the scale down button is now enabled (since we have 2 nodes)
+    clusterDetails.machinePoolsList().scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .should('be.enabled');
+
+    // Verify the cluster is updating -> active
+    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Updating');
+    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Active', { timeout: 700000 });
+    clusterDetails.machinePoolsList().resourceTable().sortableTable().checkRowCount(false, 2, MEDIUM_TIMEOUT_OPT);
+  });
+
+  it('can scale down a machine pool', function() {
+    // testing https://github.com/rancher/dashboard/issues/13285
+    const clusterDetails = new ClusterManagerDetailRke2AmazonEc2PagePo(undefined, this.rke2Ec2ClusterName);
+
+    ClusterManagerListPagePo.navTo();
+    clusterList.waitForPage();
+
+    // Navigate to cluster details page > machine pools
+    clusterList.list().name(this.rke2Ec2ClusterName).click();
+    clusterDetails.waitForPage(null, 'machine-pools');
+    clusterDetails.resourceDetail().title().should('contain', this.rke2Ec2ClusterName);
+
+    // Verify we have 2 nodes to start with (from the previous scale up test)
+    clusterDetails.machinePoolsList().resourceTable().sortableTable().groupByButtons(1)
+      .click();
+
+    clusterDetails.machinePoolsList().machinePoolCount(`${ this.rke2Ec2ClusterName }-pool1`, 2, MEDIUM_TIMEOUT_OPT);
+
+    // Verify the scale down button is enabled
+    clusterDetails.machinePoolsList().scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .should('be.visible')
+      .and('be.enabled');
+
+    cy.intercept('PUT', ` /v1/provisioning.cattle.io.clusters/fleet-default/${ this.rke2Ec2ClusterName }`).as('scaleDownMachineDeployment');
+
+    // Scale down the machine pool
+    clusterDetails.machinePoolsList().scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .click();
+
+    // Handle the scale down confirmation dialog (if it appears)
+    clusterDetails.machinePoolsList().confirmScaleDownIfModalAppears(`${ this.rke2Ec2ClusterName }-pool1`);
+
+    cy.wait('@scaleDownMachineDeployment').its('response.statusCode').should('eq', 200);
+
+    // Verify the machine pool is scaled down to 1
+    clusterDetails.machinePoolsList().machinePoolCount(`${ this.rke2Ec2ClusterName }-pool1`, /^1$/, MEDIUM_TIMEOUT_OPT);
+
+    // Verify the cluster is updating -> active
+    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Updating');
+    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Active', { timeout: 700000 });
+    clusterDetails.machinePoolsList().resourceTable().sortableTable().checkRowCount(false, 1, { timeout: 700000 });
+
+    // Verify the scale down button is now disabled (can't scale below 1)
+    clusterDetails.machinePoolsList().scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`, 'minus')
+      .should('be.disabled');
   });
 
   it('can create snapshot', function() {
