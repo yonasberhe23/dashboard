@@ -15,7 +15,7 @@ const testDirs = [
   'cypress/e2e/tests/priority/**/*.spec.ts',
   // 'cypress/e2e/tests/components/**/*.spec.ts',
   // 'cypress/e2e/tests/setup/**/*.spec.ts',
-  'cypress/e2e/tests/pages/manager/cluster-provisioning-amazon-ec2-rke2.spec.ts',
+  // 'cypress/e2e/tests/pages/manager/cluster-provisioning-amazon-ec2-rke2.spec.ts',
   // 'cypress/e2e/tests/navigation/**/*.spec.ts',
   // 'cypress/e2e/tests/global-ui/**/*.spec.ts',
   // 'cypress/e2e/tests/features/**/*.spec.ts',
