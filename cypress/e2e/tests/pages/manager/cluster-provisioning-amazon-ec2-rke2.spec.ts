@@ -9,6 +9,7 @@ import TabbedPo from '@/cypress/e2e/po/components/tabbed.po';
 import { LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT, VERY_LONG_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
 import { USERS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
 import { promptModal } from '@/cypress/e2e/po/prompts/shared/modalInstances.po';
+import * as jsyaml from 'js-yaml';
 
 // will only run this in jenkins pipeline where cloud credentials are stored
 describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manager', '@adminUser', '@standardUser', '@jenkins'] }, () => {
@@ -406,5 +407,156 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     }
 
     cy.setUserPreference({ 'scale-pool-prompt': null });
+  });
+});
+
+// testing https://github.com/rancher/dashboard/issues/15329
+describe('Edit as YAML', { tags: ['@manager', '@adminUser', '@standardUser', '@jenkins'] }, () => {
+  const clusterList = new ClusterManagerListPagePo();
+  const loadingPo = new LoadingPo('.loading-indicator');
+  let yamlTestClusterId = '';
+  let yamlTestCloudCredId = '';
+
+  before(() => {
+    cy.login();
+    HomePagePo.goTo();
+  });
+
+  beforeEach(() => {
+    cy.createE2EResourceName('rke2ec2cluster-yaml').as('yamlTestClusterName');
+    cy.createE2EResourceName('ec2cloudcredential-yaml').as('yamlTestCloudCredName');
+  });
+
+  it('can create cluster after switching to Edit as YAML and making changes', function() {
+    const createRKE2ClusterPage = new ClusterManagerCreateRke2AmazonPagePo();
+    const cloudCredForm = createRKE2ClusterPage.cloudCredentialsForm();
+
+    cy.intercept('GET', '/v1-rke2-release/releases').as('getRke2Releases');
+
+    // Create a unique cluster name for this test
+    cy.createE2EResourceName('rke2ec2cluster-yaml').as('yamlTestClusterName');
+    cy.createE2EResourceName('ec2cloudcredential-yaml').as('yamlTestCloudCredName');
+
+    // Navigate to cluster creation
+    ClusterManagerListPagePo.navTo();
+    clusterList.waitForPage();
+    clusterList.createCluster();
+    createRKE2ClusterPage.selectCreate(0);
+    loadingPo.checkNotExists();
+    createRKE2ClusterPage.rke2PageTitle().should('include', 'Create Amazon EC2');
+    createRKE2ClusterPage.waitForPage('type=amazonec2&rkeType=rke2');
+
+    // Create amazon ec2 cloud credential
+    cloudCredForm.nameNsDescription().name().set(this.yamlTestCloudCredName);
+    cloudCredForm.accessKey().set(Cypress.env('awsAccessKey'));
+    cloudCredForm.secretKey().set(Cypress.env('awsSecretKey'), true);
+    cloudCredForm.defaultRegion().toggle();
+    cloudCredForm.defaultRegion().clickOptionWithLabel('us-west-1');
+    cloudCredForm.saveButton().expectToBeEnabled();
+
+    cy.intercept('GET', `${ USERS_BASE_URL }?*`).as('pageLoad');
+
+    cloudCredForm.saveCreateForm().cruResource().saveAndWaitForRequests('POST', '/v3/cloudcredentials').then((req) => {
+      expect(req.response?.statusCode).to.equal(201);
+      yamlTestCloudCredId = req.response?.body.id;
+    });
+
+    cy.wait('@pageLoad').its('response.statusCode').should('eq', 200);
+    loadingPo.checkNotExists();
+    createRKE2ClusterPage.waitForPage('type=amazonec2&rkeType=rke2', 'basic');
+
+    // Fill out cluster configuration
+    createRKE2ClusterPage.nameNsDescription().name().set(this.yamlTestClusterName);
+    createRKE2ClusterPage.nameNsDescription().description().set(`${ this.yamlTestClusterName }-description`);
+
+    // Get kubernetes version from the UI dropdown
+    cy.wait('@getRke2Releases').its('response.statusCode').should('eq', 200);
+    createRKE2ClusterPage.basicsTab().kubernetesVersions().toggle();
+    createRKE2ClusterPage.basicsTab().kubernetesVersions().getOptions().then(($options) => {
+      // Ensure we have at least 2 options (index 0 is header, index 1 is first version)
+      expect($options.length).to.be.gt(1);
+
+      // Get the second RKE2 version (index 2) for cluster creation
+      const k8sVersion = Cypress.$($options[2]).text().trim();
+
+      // Set the k8s version
+      createRKE2ClusterPage.basicsTab().kubernetesVersions().clickOptionWithLabel(k8sVersion);
+    });
+
+    // Set the network
+    createRKE2ClusterPage.machinePoolTab().networks().toggle();
+    createRKE2ClusterPage.machinePoolTab().networks().clickOptionWithLabel('default');
+
+    // Click Edit as YAML
+    createRKE2ClusterPage.resourceDetail().createEditView().editClusterAsYaml();
+    promptModal().checkVisible();
+    cy.intercept('POST', '/v1/rke-machine-config.cattle.io.amazonec2configs/*').as('saveConfig');
+    promptModal().clickActionButton('Save and Continue');
+    cy.wait('@saveConfig').its('response.statusCode').should('eq', 201);
+
+    // createRKE2ClusterPage.waitForPage('type=custom&rkeType=rke2', 'basic');
+
+    // createRKE2ClusterPage.resourceDetail().resourceYaml().codeMirror().value()
+    //   .then((val) => {
+    //     // convert yaml into json to update values
+    //     const json: any = jsyaml.load(val);
+
+    //     json.metadata.name = customClusterName;
+    //     json.metadata.namespace = nsName;
+
+    //     createRKE2ClusterPage.resourceDetail().resourceYaml().codeMirror().set(jsyaml.dump(json));
+    //   });
+
+    // Make any kind of edit to the YAML
+    createRKE2ClusterPage.resourceDetail().resourceYaml().codeMirror().value()
+      .then((yamlValue) => {
+        // Parse the YAML, make a change, and set it back
+        const yamlObj: any = jsyaml.load(yamlValue);
+
+        // Make a simple change - add or modify a label
+        if (!yamlObj.metadata) {
+          yamlObj.metadata = {};
+        }
+        if (!yamlObj.metadata.labels) {
+          yamlObj.metadata.labels = {};
+        }
+        yamlObj.metadata.labels['test-edit-yaml'] = 'true';
+
+        // Set the modified YAML back
+        const modifiedYaml = jsyaml.dump(yamlObj);
+
+        createRKE2ClusterPage.resourceDetail().resourceYaml().codeMirror().set(modifiedYaml);
+      });
+
+    // Click Create - this should succeed (bug is fixed)
+    cy.intercept('POST', 'v1/provisioning.cattle.io.clusters').as('createRke2ClusterYaml');
+
+    // Click Create button
+    createRKE2ClusterPage.resourceDetail().createEditView().saveClusterAsYaml().click();
+
+    // Wait for the request and verify it succeeds
+    cy.wait('@createRke2ClusterYaml', { timeout: 10000 }).then(({ response }) => {
+      expect(response?.statusCode).to.eq(201);
+      expect(response?.body).to.have.property('kind', 'Cluster');
+      expect(response?.body.metadata).to.have.property('name', this.yamlTestClusterName);
+      yamlTestClusterId = response?.body.id;
+    });
+
+    // Verify no error banner is shown
+    createRKE2ClusterPage.resourceDetail().createEditView().errorBanner().should('not.exist');
+
+    // Verify cluster appears in the cluster list
+    clusterList.waitForPage();
+    clusterList.list().name(this.yamlTestClusterName).should('be.visible');
+  });
+
+  after('clean up', () => {
+    // Clean up the test cluster and cloud credential
+    if (yamlTestClusterId) {
+      cy.deleteRancherResource('v1', 'provisioning.cattle.io.clusters', yamlTestClusterId, false);
+    }
+    if (yamlTestCloudCredId) {
+      cy.deleteRancherResource('v3', 'cloudCredentials', yamlTestCloudCredId, false);
+    }
   });
 });

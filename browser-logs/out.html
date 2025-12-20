@@ -1,0 +1,200 @@
+<html>
+<head>
+  <style>
+    body { font-family: monospace; }
+    p { margin: 0; padding: 0; }
+    pre { display: inline; margin: 0; }
+    h2 { margin: 0; font-size: 1.2em; }
+  </style>
+</head>
+
+<body>
+
+<h1>cypress/e2e/tests/pages/manager/cluster-provisioning-amazon-ec2-rke2.spec.ts</h1>
+<h2>Edit as YAML -&gt; can create cluster after switching to Edit as YAML and making changes</h2>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.setting</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.settings?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] user</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/users?me=true
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] principal</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/principals
+                Status: 200</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of schema is not loaded yet</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of schema is not loaded yet</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of namespace is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Loading management...</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of count is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket connecting (id=1, url=wss://yb2131.qa.rancher.space/v1/subscribe)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] schema</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] schema</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/schemas?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/schemas
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket opened (state=connecting, id=1)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.feature</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] userpreference</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket connecting (id=2, url=wss://yb2131.qa.rancher.space/v3/subscribe)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] count</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] namespace</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.fleetworkspace</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.features?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/userpreferences?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/counts?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/namespaces?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.fleetworkspaces?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket opened (state=connecting, id=2)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket closed (id=2, code=1006, reason=, clean=false)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket closed. Attempting to reconnect (state=reconnecting, id=0)</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">PUT https://yb2131.qa.rancher.space/v1/userpreferences/user-x4k4g
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.cluster local</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.clusters/local?exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Done loading management; isRancher=true; isMultiCluster=false</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] catalog.cattle.io.app. Page: null. Size: null. Sort: </pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.rancherusernotification</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [rancher] authconfig azuread</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] authprovider</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-custom-links</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-issues</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting ui-community-links</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.cluster</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] cluster.x-k8s.io.machine</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.node</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.nodepool</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/catalog.cattle.io.apps?pagesize=100000&amp;filter=metadata.name=rancher-csp-adapter,metadata.name=rancher-csp-billing-adapter&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.rancherusernotifications?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/authconfig/azuread
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3-public/authProviders
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.clusters?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/cluster.x-k8s.io.machines?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.nodes?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.nodepools?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] management.cattle.io.cluster. Page: 1. Size: 10. Sort: spec.internal, status.connected, spec.displayName</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.clusters?page=1&amp;pagesize=10&amp;sort=-spec.internal,-status.connected,spec.displayName&amp;filter=metadata.labels[provider.cattle.io]!=harvester&amp;filter=status.provider!=harvester&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket connecting (id=3, url=wss://yb2131.qa.rancher.space/v3/subscribe)</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Reset store: ,
+                cluster</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of schema is not loaded yet</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>All of namespace is not loaded yet</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] userpreference</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/userpreferences?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] provisioning.cattle.io.cluster</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/provisioning.cattle.io.clusters?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] catalog.cattle.io.app. Page: null. Size: null. Sort: </pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.rancherusernotification</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [rancher] authconfig azuread</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] authprovider</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] provisioning.cattle.io.cluster</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] cluster</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] rke.cattle.io.etcdsnapshot</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] cluster.x-k8s.io.machine</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.node</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.nodepool</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] cluster.x-k8s.io.machinedeployment</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/clusters
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/rke.cattle.io.etcdsnapshots?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/cluster.x-k8s.io.machinedeployments?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] provisioning.cattle.io.cluster. Page: 1. Size: undefined. Sort: </pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/provisioning.cattle.io.clusters?page=1&amp;pagesize=100000&amp;filter=status.clusterName=local&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">PUT https://yb2131.qa.rancher.space/v1/userpreferences/user-x4k4g
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] management.cattle.io.cluster. Page: 1. Size: 10. Sort: spec.internal, status.connected, spec.displayName</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.clusters?page=1&amp;pagesize=10&amp;sort=-spec.internal,-status.connected,spec.displayName&amp;filter=metadata.labels[provider.cattle.io]!=harvester&amp;filter=status.provider!=harvester&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find Page: [management] provisioning.cattle.io.cluster. Page: 1. Size: undefined. Sort: </pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/provisioning.cattle.io.clusters?page=1&amp;pagesize=100000&amp;filter=status.clusterName=local&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Socket opened (state=connecting, id=3)</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>[ui-context] invalid value: {}</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] catalog.cattle.io.clusterrepo</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.nodedriver</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.kontainerdriver</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>[ui-context] invalid value: {}</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/catalog.cattle.io.clusterrepos?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.nodedrivers?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.kontainerdrivers?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">     cons:info✱</pre> <pre>Loading index for repo,
+                rancher-charts,
+                (49504b3b-8b5c-469b-843f-4fb7314d3da4)</pre></p>
+<p><pre style="color:darkcyan;">     cons:info✱</pre> <pre>Loading index for repo,
+                rancher-partner-charts,
+                (822ccb47-33cf-4b0f-b6f8-10e336453866)</pre></p>
+<p><pre style="color:darkcyan;">     cons:info✱</pre> <pre>Loading index for repo,
+                rancher-rke2-charts,
+                (5bcc7058-0bbd-4bf5-8381-c53ccc9b1965)</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/rancher-charts?link=index
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/rancher-partner-charts?link=index
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/rancher-rke2-charts?link=index
+                Status: 200</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>[ui-context] invalid value: {}</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>[ui-context] invalid value: {}</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.podsecurityadmissionconfigurationtemplate</pre></p>
+<p><pre style="color:yellow;">     cons:warn❖</pre> <pre>[ui-context] invalid value: {}</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">(getRke2Releases) GET https://yb2131.qa.rancher.space/v1-rke2-release/releases
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1-k3s-release/releases
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.podsecurityadmissionconfigurationtemplates?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/schemaDefinitions/rke-machine-config.cattle.io.amazonec2config
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/catalog.cattle.io.clusterrepos/rancher-rke2-charts?link=info&amp;chartName=rke2-calico&amp;version=v3.30.401
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://updates.rancher.io/rancher/community/updates?dcv=v1&amp;s=0d882098bc8c42dc4004476e793058f8&amp;u=47547a651cfe1258c50591a8fe8e560b&amp;uuid=823b5744-3435-4e88-9e58-73c6d9d723f3&amp;svt=dev&amp;v=v2.13.1&amp;dev=false&amp;p=false&amp;cc=1&amp;lkv=v1.34.2&amp;lcp=rke2&amp;lnc=3&amp;xkn=&amp;xcc=0&amp;bl=en-US&amp;bs=1000x660&amp;ss=1920x1080&amp;ff-usc=true
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting system-default-registry</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting cluster-agent-default-priority-class</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [management] management.cattle.io.setting cluster-agent-default-pod-disruption-budget</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Global: 1, Kubelet Only: 0, Other: 0</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] cloudcredential</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/cloudcredentials
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [rancher] clusterroletemplatebinding</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.roletemplate</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find All: [management] management.cattle.io.user</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>Find: [rancher] cloudcredential cattle-global-data:cc-jw8m2</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v3/clusterroletemplatebindings
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.roletemplates?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:lightgrey;">        cy:xhr➟</pre> <pre style="color:lightgrey;">GET https://yb2131.qa.rancher.space/v1/management.cattle.io.users?pagesize=100000&amp;exclude=metadata.managedFields
+                Status: 200</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>resize,
+                100%,
+                100%</pre></p>
+<p><pre style="color:darkcyan;">      cons:log✱</pre> <pre>resize,
+                100%,
+                100%</pre></p>
+<br>
+
+</body>
+</html>
