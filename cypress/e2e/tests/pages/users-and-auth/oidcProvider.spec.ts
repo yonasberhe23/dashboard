@@ -4,7 +4,7 @@ import PromptRemove from '@/cypress/e2e/po/prompts/promptRemove.po';
 import { promptModal } from '@/cypress/e2e/po/prompts/shared/modalInstances.po';
 import OIDCClientDetailPo from '@/cypress/e2e/po/detail/management.cattle.io.oidcclient.po';
 
-describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalSettings', '@adminUser'] }, () => {
+describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@debug', '@globalSettings', '@adminUser'] }, () => {
   const OIDC_CREATE_DATA = {
     APP_NAME: 'some-app-name',
     APP_DESC: 'some-app-desc',
