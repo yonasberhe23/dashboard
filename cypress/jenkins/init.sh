@@ -103,27 +103,39 @@ create_initial_clusters() {
     curl -L -o "${TARFILE}" "https://get.helm.sh/${TARFILE}"
     tar -C "${WORKSPACE}/bin" --strip-components=1 -xzf "${TARFILE}"
     if [[ -n "${RANCHER_HELM_REPO}" ]]; then
+      # Prime - production
       if [[ "${RANCHER_HELM_REPO}" == "prime" ]]; then
         RANCHER_CHART_URL=https://charts.rancher.com/server-charts/prime
         helm repo add rancher-prime "${RANCHER_CHART_URL}"
         helm repo update
         corral config vars set rancher_image "registry.suse.com/rancher/rancher"
         corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|registry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
+      # Prime - staging
       elif [[ "${RANCHER_HELM_REPO}" == "optimus_prime" ]]; then
         RANCHER_HELM_REPO=optimus
         RANCHER_CHART_URL=https://charts.optimus.rancher.io/server-charts/latest
-        helm repo add rancher-optimus "${RANCHER_CHART_URL}"
+        helm repo add rancher-latest "${RANCHER_CHART_URL}"
+        helm repo update
+        corral config vars set rancher_image "stgregistry.suse.com/rancher/rancher"
+        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
+      elif [[ "${RANCHER_HELM_REPO}" == "alpha_prime" ]]; then
+        # Prime alpha - staging
+        RANCHER_CHART_URL=https://charts.optimus.rancher.io/server-charts/alpha
+        helm repo add rancher-alpha "${RANCHER_CHART_URL}"
         helm repo update
         corral config vars set rancher_image "stgregistry.suse.com/rancher/rancher"
         corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
       elif [[ "${RANCHER_HELM_REPO}" == "alpha" ]]; then
+        # Community alpha - staging
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/alpha
-        helm repo add rancher-alpha "${RANCHER_CHART_URL}"
+        helm repo add rancher-com-alpha "${RANCHER_CHART_URL}"
         helm repo update
+      # Community - production
       elif [[ "${RANCHER_HELM_REPO}" == "stable" ]]; then
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/stable
         helm repo add rancher-stable "${RANCHER_CHART_URL}"
         helm repo update
+      # Community - staging
       else
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/latest
         helm repo add rancher-latest "${RANCHER_CHART_URL}"
