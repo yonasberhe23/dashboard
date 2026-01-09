@@ -102,49 +102,145 @@ create_initial_clusters() {
     TARFILE="helm-v${HELM_VERSION}-linux-amd64.tar.gz"
     curl -L -o "${TARFILE}" "https://get.helm.sh/${TARFILE}"
     tar -C "${WORKSPACE}/bin" --strip-components=1 -xzf "${TARFILE}"
+    
+    # ============================================================================
+    # Configure Helm Repositories and Chart URLs
+    # ============================================================================
+    # Determines which Helm chart repository to use based on RANCHER_HELM_REPO:
+    # - Prime repos (prime, optimus_prime, alpha_prime): Use production rancher-prime chart
+    # - Community repos (alpha, stable, latest): Use respective community chart repos
+    # Sets up chart URLs, repo names, and image registries for corral configuration
+    # ============================================================================
     if [[ -n "${RANCHER_HELM_REPO}" ]]; then
       if [[ "${RANCHER_HELM_REPO}" == "prime" ]]; then
+      # Prime - production
         RANCHER_CHART_URL=https://charts.rancher.com/server-charts/prime
-        helm repo add rancher-prime "${RANCHER_CHART_URL}"
+        HELM_REPO_NAME=rancher-prime
+        helm repo add "${HELM_REPO_NAME}" "${RANCHER_CHART_URL}"
         helm repo update
         corral config vars set rancher_image "registry.suse.com/rancher/rancher"
-        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|registry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
       elif [[ "${RANCHER_HELM_REPO}" == "optimus_prime" ]]; then
-        RANCHER_HELM_REPO=optimus
-        RANCHER_CHART_URL=https://charts.optimus.rancher.io/server-charts/latest
-        helm repo add rancher-optimus "${RANCHER_CHART_URL}"
+        # Prime - staging (RC versions)
+        RANCHER_CHART_URL=https://charts.rancher.com/server-charts/prime
+        HELM_REPO_NAME=rancher-prime
+        helm repo add "${HELM_REPO_NAME}" "${RANCHER_CHART_URL}"
+        helm repo add rancher-latest https://charts.optimus.rancher.io/server-charts/latest || true
         helm repo update
         corral config vars set rancher_image "stgregistry.suse.com/rancher/rancher"
-        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG}', RANCHER_PRIME|true, CATTLE_UI_BRAND|suse"]'
+        RANCHER_CHART_REPO_FOR_CORRAL="prime"
+      elif [[ "${RANCHER_HELM_REPO}" == "alpha_prime" ]]; then
+        # Prime alpha - staging
+        RANCHER_CHART_URL=https://charts.rancher.com/server-charts/prime
+        HELM_REPO_NAME=rancher-prime
+        helm repo add "${HELM_REPO_NAME}" "${RANCHER_CHART_URL}"
+        helm repo add rancher-alpha https://charts.optimus.rancher.io/server-charts/alpha || true
+        helm repo update
+        corral config vars set rancher_image "stgregistry.suse.com/rancher/rancher"
+        RANCHER_CHART_REPO_FOR_CORRAL="prime"
       elif [[ "${RANCHER_HELM_REPO}" == "alpha" ]]; then
+        # Community alpha - staging
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/alpha
-        helm repo add rancher-alpha "${RANCHER_CHART_URL}"
+        HELM_REPO_NAME=rancher-com-alpha
+        helm repo add "${HELM_REPO_NAME}" "${RANCHER_CHART_URL}"
         helm repo update
       elif [[ "${RANCHER_HELM_REPO}" == "stable" ]]; then
+        # Community - production
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/stable
-        helm repo add rancher-stable "${RANCHER_CHART_URL}"
+        HELM_REPO_NAME=rancher-community
+        helm repo add "${HELM_REPO_NAME}" "${RANCHER_CHART_URL}"
         helm repo update
       else
+        # Community - staging
         RANCHER_CHART_URL=https://releases.rancher.com/server-charts/latest
-        helm repo add rancher-latest "${RANCHER_CHART_URL}"
+        HELM_REPO_NAME=rancher-com-rc
+        helm repo add "${HELM_REPO_NAME}" "${RANCHER_CHART_URL}"
         helm repo update
       fi
-      corral config vars set rancher_chart_repo "${RANCHER_HELM_REPO}"
-      if [[ "${RANCHER_HELM_REPO}" == "optimus" ]]; then
-        corral config vars set rancher_chart_url "${RANCHER_CHART_URL}"
+      if [[ -n "${RANCHER_CHART_REPO_FOR_CORRAL:-}" ]]; then
+        corral config vars set rancher_chart_repo "${RANCHER_CHART_REPO_FOR_CORRAL}"
       else
-        url_string=$(echo "${RANCHER_CHART_URL}" | grep -o '.*server-charts')
-        corral config vars set rancher_chart_url "${url_string}"
+        corral config vars set rancher_chart_repo "${RANCHER_HELM_REPO}"
+      fi
+      # Extract base URL (up to server-charts)
+      url_string=$(echo "${RANCHER_CHART_URL}" | grep -o '.*server-charts')
+      corral config vars set rancher_chart_url "${url_string}"
+    fi
+    
+    # ============================================================================
+    # Resolve Rancher Chart Version
+    # ============================================================================
+    # Searches the configured Helm repository to find the matching chart version:
+    # - For prime: Finds version matching the image tag (partial version like "v2.13")
+    # - For optimus_prime/alpha_prime: Extracts major.minor version from the partial image tag 
+    #   (e.g., "2.13" from "v2.13") to find the highest matching production chart version (e.g., "2.13.1")
+    # - For head tags: Gets the latest available version from the repo
+    # ============================================================================
+    version_string=$(echo "${RANCHER_IMAGE_TAG}" | cut -f1 -d"-")
+    if [[ -n "${HELM_REPO_NAME}" ]]; then
+      if [[ "${RANCHER_IMAGE_TAG}" == "head" ]]; then
+        RANCHER_VERSION=$(helm search repo "${HELM_REPO_NAME}" --devel --versions | sed -n '1!p' | head -1 | cut -f2 | tr -d '[:space:]')
+      else
+        if [[ "${RANCHER_HELM_REPO}" == "alpha_prime" ]] || [[ "${RANCHER_HELM_REPO}" == "optimus_prime" ]]; then
+          major_minor=$(echo "${version_string}" | sed 's/^v//' | cut -d. -f1-2)
+          RANCHER_VERSION=$(helm search repo "${HELM_REPO_NAME}" --devel --versions | grep "^${HELM_REPO_NAME}/rancher" | grep "${major_minor}" | head -n 1 | cut -f2 | tr -d '[:space:]')
+        else
+          RANCHER_VERSION=$(helm search repo "${HELM_REPO_NAME}" --devel --versions | grep "${version_string}" | head -n 1 | cut -f2 | tr -d '[:space:]')
+        fi
       fi
     fi
-    version_string=$(echo "${RANCHER_IMAGE_TAG}" | cut -f1 -d"-")
-    if [[ "${RANCHER_IMAGE_TAG}" == "head" ]]; then
-      RANCHER_VERSION=$(helm search repo "rancher-${RANCHER_HELM_REPO}" --devel --versions | sed -n '1!p' | head -1 | cut -f2 | tr -d '[:space:]')
+    
+    # ============================================================================
+    # Determine Image Tags and Registry Configuration
+    # ============================================================================
+    # Sets the correct image tag and registry for each repo type:
+    # - prime (production): Uses chart version (from Step 2) with 'v' prefix from production registry
+    # - optimus_prime (RC): Searches rancher-latest repo to find the highest matching RC image version (e.g., "2.13.1-rc1")
+    # - alpha_prime (alpha): Searches rancher-alpha repo to find the highest matching alpha image version (e.g., "2.13.2-alpha1")
+    # - Community repos: Uses RANCHER_IMAGE_TAG as-is (including -head tags)
+    # Configures environment variables (CATTLE_AGENT_IMAGE, RANCHER_VERSION_TYPE) for corral
+    # ============================================================================
+    if [[ "${RANCHER_HELM_REPO}" == "prime" ]] || [[ "${RANCHER_HELM_REPO}" == "optimus_prime" ]] || [[ "${RANCHER_HELM_REPO}" == "alpha_prime" ]]; then
+      if [[ "${RANCHER_HELM_REPO}" == "alpha_prime" ]]; then
+        found_version=$(helm search repo rancher-alpha --devel --versions | grep -E "^rancher-alpha/(rancher|rancher-prime)" | grep "${version_string}" | head -n 1 | cut -f2 | tr -d '[:space:]')
+        if [[ -n "${found_version}" ]]; then
+          RANCHER_IMAGE_TAG_FOR_CORRAL="v${found_version}"
+        else
+          echo "Error: Could not find alpha version for ${RANCHER_IMAGE_TAG} in rancher-alpha repo"
+          exit 1
+        fi
+        corral config vars set rancher_image_tag "${RANCHER_IMAGE_TAG_FOR_CORRAL}"
+        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG_FOR_CORRAL}', RANCHER_VERSION_TYPE|prime"]'
+      elif [[ "${RANCHER_HELM_REPO}" == "optimus_prime" ]]; then
+        found_version=$(helm search repo rancher-latest --devel --versions | grep "^rancher-latest/rancher-prime" | grep "${version_string}" | head -n 1 | cut -f2 | tr -d '[:space:]')
+        if [[ -n "${found_version}" ]]; then
+          RANCHER_IMAGE_TAG_FOR_CORRAL="v${found_version}"
+        else
+          echo "Error: Could not find RC version for ${RANCHER_IMAGE_TAG} in rancher-latest repo"
+          exit 1
+        fi
+        corral config vars set rancher_image_tag "${RANCHER_IMAGE_TAG_FOR_CORRAL}"
+        corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|stgregistry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG_FOR_CORRAL}', RANCHER_VERSION_TYPE|prime"]'
+      else
+        RANCHER_IMAGE_TAG_FOR_CORRAL="v${RANCHER_VERSION}"
+        corral config vars set rancher_image_tag "${RANCHER_IMAGE_TAG_FOR_CORRAL}"
+        if [[ "${RANCHER_HELM_REPO}" == "prime" ]]; then
+          corral config vars set env_var_map '["CATTLE_AGENT_IMAGE|registry.suse.com/rancher/rancher-agent:'${RANCHER_IMAGE_TAG_FOR_CORRAL}', RANCHER_VERSION_TYPE|prime"]'
+        fi
+      fi
     else
-      RANCHER_VERSION=$(helm search repo "rancher-${RANCHER_HELM_REPO}" --devel --versions | grep "${version_string}" | head -n 1 | cut -f2 | tr -d '[:space:]')
+      corral config vars set rancher_image_tag "${RANCHER_IMAGE_TAG}"
     fi
-    corral config vars set rancher_image_tag "${RANCHER_IMAGE_TAG}"
   fi
+  
+  # ============================================================================
+  # Provision AWS Infrastructure and Install Rancher
+  # ============================================================================
+  # Updates corral package configurations with versions, then creates AWS infrastructure:
+  # - Updates rancher-k3s.yaml with Rancher, Kubernetes, and cert-manager versions
+  # - Creates custom nodes for RKE1 and RKE2 clusters
+  # - Creates imported K3s cluster for testing
+  # - Creates Rancher installation on K3s cluster (for recurring jobs)
+  # ============================================================================
   cd "${WORKSPACE}/corral-packages"
   yq -i e ".variables.rancher_version += [\"${RANCHER_VERSION}\"] | .variables.rancher_version style=\"literal\"" packages/aws/rancher-k3s.yaml
   yq -i e ".variables.kubernetes_version += [\"${K3S_KUBERNETES_VERSION}\"] | .variables.kubernetes_version style=\"literal\"" packages/aws/rancher-k3s.yaml
@@ -245,6 +341,7 @@ RANCHER_VERSION=${RANCHER_VERSION}
 RANCHER_IMAGE_TAG=${RANCHER_IMAGE_TAG}
 RANCHER_CHART_URL=${RANCHER_CHART_URL}
 RANCHER_HELM_REPO=${RANCHER_HELM_REPO}
+HELM_REPO_NAME=${HELM_REPO_NAME:-}
 CYPRESS_TAGS=${CYPRESS_TAGS}
 EOF
 corral config vars set cypress_version "${CYPRESS_VERSION}"
