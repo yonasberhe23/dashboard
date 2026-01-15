@@ -4,6 +4,8 @@
 def upstream = !currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')
 def buildtype = upstream ? "RecurringRun" : "AdHoc"
 def branch = "master"
+def testExecutionResult = null
+
 if ("${env.branch}" != "null" && "${env.branch}" != "") {
   branch = "${env.branch}"
 }
@@ -30,8 +32,8 @@ node {
                         string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
                         string(credentialsId: 'GKE_SERVICE_ACCOUNT', variable: 'GKE_SERVICE_ACCOUNT'),
                         string(credentialsId: 'PERCY_TOKEN', variable: 'PERCY_TOKEN'),
-                        string(credentialsId: 'UI_SLACK_BOT_TOKEN', variable: 'UI_SLACK_BOT_TOKEN'),
-                        string(credentialsId: 'UI_SLACK_CHANNEL', variable: 'UI_SLACK_CHANNEL')
+                        string(credentialsId: 'UI_SLACK_BOT_TOKEN_TEST', variable: 'UI_SLACK_BOT_TOKEN_TEST'),
+                        string(credentialsId: 'UI_SLACK_CHANNEL_TEST', variable: 'UI_SLACK_CHANNEL_TEST')
                         ]) {
         withEnv(paramsMap) {
             stage('Checkout') {
@@ -71,11 +73,13 @@ node {
             try {
               stage('Grab Results') {
                   sh "cypress/jenkins/scpget.sh dashboard/results.xml"
-                  sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html"
+                  sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html || true"
               }
             } catch(err) {
                 echo "Error: " + err
-                currentBuild.result = 'FAILURE'
+                if (!fileExists('results.xml')) {
+                    currentBuild.result = 'FAILURE'
+                }
             }
             if ("${env.CLEANUP}".toLowerCase() == "true") {
                 try {
@@ -90,20 +94,40 @@ node {
             }
             try {
               stage('Test Report') {
-                  step([$class: 'JUnitResultArchiver', testResults: '**/results.xml'])
-                  sh "pwd && ls -al && ls -al cypress"
-                  publishHTML(target : [allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    // The path is relative to ${WORKSPACE}
-                    reportDir: 'html',
-                    reportFiles: 'index.html',
-                    reportName: 'html-report',
-                    reportTitles: 'Report'])
+                  def hasTestResults = false
+                  if (fileExists('results.xml')) {
+                      def resultsContent = readFile('results.xml').trim()
+                      hasTestResults = resultsContent.contains('<testcase')
+                  }
+                  
+                  if (hasTestResults) {
+                      step([$class: 'JUnitResultArchiver', testResults: '**/results.xml'])
+                      testExecutionResult = currentBuild.result
+                  } else {
+                      testExecutionResult = null
+                  }
+                  try {
+                      publishHTML(target : [allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        // The path is relative to ${WORKSPACE}
+                        reportDir: 'html',
+                        reportFiles: 'index.html',
+                        reportName: 'html-report',
+                        reportTitles: 'Report'])
+                  } catch(htmlErr) {
+                      echo "Warning: Failed to publish HTML report: ${htmlErr}"
+                  }
               }
             }
             catch(err) {
-              echo "Error: " + err
+              echo "Error in Test Report stage: " + err
+              if (testExecutionResult == null && fileExists('results.xml')) {
+                  def resultsContent = readFile('results.xml').trim()
+                  if (resultsContent.contains('<testcase')) {
+                      testExecutionResult = 'FAILURE'
+                  }
+              }
               currentBuild.result = 'FAILURE'
             }
             if ("${env.QASE_REPORT}".toLowerCase() == "true") {
@@ -121,16 +145,11 @@ node {
                 }
             }
             
-            // Send Slack notification on failure or unstable builds
-            if (currentBuild.result == 'FAILURE' || currentBuild.result == 'UNSTABLE') {
+
+            if (testExecutionResult == 'FAILURE' || testExecutionResult == 'UNSTABLE') {
                 if ("${env.SLACK_NOTIFICATION}".toLowerCase() != "false") {
-                    echo "Sending Slack notification for ${currentBuild.result} build"
-                    sh "cypress/jenkins/slack-notification.sh ${currentBuild.result}"
-                } else {
-                    echo "Slack notification disabled (see jenkins-job-builder/qa-ui-tests.yml)"
+                    sh "cypress/jenkins/slack-notification.sh ${testExecutionResult}"
                 }
-            } else {
-                echo "Build successful, no Slack notification needed"
             }
         }
       }
