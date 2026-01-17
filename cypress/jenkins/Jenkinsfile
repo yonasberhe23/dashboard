@@ -79,7 +79,7 @@ node {
                 echo "Error: " + err
                 if (!fileExists('results.xml')) {
                     currentBuild.result = 'FAILURE'
-                }
+                }  
             }
             if ("${env.CLEANUP}".toLowerCase() == "true") {
                 try {
@@ -106,18 +106,14 @@ node {
                   } else {
                       testExecutionResult = null
                   }
-                  try {
-                      publishHTML(target : [allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        // The path is relative to ${WORKSPACE}
-                        reportDir: 'html',
-                        reportFiles: 'index.html',
-                        reportName: 'html-report',
-                        reportTitles: 'Report'])
-                  } catch(htmlErr) {
-                      echo "Warning: Failed to publish HTML report: ${htmlErr}"
-                  }
+                  publishHTML(target : [allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    // The path is relative to ${WORKSPACE}
+                    reportDir: 'html',
+                    reportFiles: 'index.html',
+                    reportName: 'html-report',
+                    reportTitles: 'Report'])
               }
             }
             catch(err) {
