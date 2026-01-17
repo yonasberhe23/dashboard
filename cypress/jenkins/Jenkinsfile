@@ -73,13 +73,11 @@ node {
             try {
               stage('Grab Results') {
                   sh "cypress/jenkins/scpget.sh dashboard/results.xml"
-                  sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html || true"
+                  sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html"
               }
             } catch(err) {
                 echo "Error: " + err
-                if (!fileExists('results.xml')) {
-                    currentBuild.result = 'FAILURE'
-                }
+                currentBuild.result = 'FAILURE'
             }
             if ("${env.CLEANUP}".toLowerCase() == "true") {
                 try {
@@ -102,30 +100,40 @@ node {
                   
                   if (hasTestResults) {
                       step([$class: 'JUnitResultArchiver', testResults: '**/results.xml'])
-                      testExecutionResult = currentBuild.result
+                      // Check XML directly for test failures rather than relying on currentBuild.result
+                      // which might be affected by previous stage failures
+                      def resultsContent = readFile('results.xml').trim()
+                      if (resultsContent.contains('<failure')) {
+                          testExecutionResult = 'UNSTABLE'
+                      } else {
+                          testExecutionResult = 'SUCCESS'
+                      }
                   } else {
                       testExecutionResult = null
                   }
-                  try {
-                      publishHTML(target : [allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        // The path is relative to ${WORKSPACE}
-                        reportDir: 'html',
-                        reportFiles: 'index.html',
-                        reportName: 'html-report',
-                        reportTitles: 'Report'])
-                  } catch(htmlErr) {
-                      echo "Warning: Failed to publish HTML report: ${htmlErr}"
-                  }
+                  publishHTML(target : [allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    // The path is relative to ${WORKSPACE}
+                    reportDir: 'html',
+                    reportFiles: 'index.html',
+                    reportName: 'html-report',
+                    reportTitles: 'Report'])
               }
             }
             catch(err) {
               echo "Error in Test Report stage: " + err
+              // Only set testExecutionResult if it's null and tests actually ran
+              // Check XML to determine if tests passed or failed, not just assume FAILURE
               if (testExecutionResult == null && fileExists('results.xml')) {
                   def resultsContent = readFile('results.xml').trim()
                   if (resultsContent.contains('<testcase')) {
-                      testExecutionResult = 'FAILURE'
+                      // Tests ran - check if they failed or passed
+                      if (resultsContent.contains('<failure')) {
+                          testExecutionResult = 'UNSTABLE'
+                      } else {
+                          testExecutionResult = 'SUCCESS'
+                      }
                   }
               }
               currentBuild.result = 'FAILURE'
