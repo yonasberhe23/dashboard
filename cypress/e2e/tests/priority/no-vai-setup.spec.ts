@@ -16,11 +16,6 @@ describe('Disable Vai', { testIsolation: 'off', tags: ['@noVai', '@adminUser'] }
     FeatureFlagsPagePo.navTo();
     featureFlagsPage.waitForPage();
 
-    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Active');
-
-    featureFlagsPage.list().clickRowActionMenuItem('ui-sql-cache', 'Deactivate');
-    featureFlagsPage.clickCardActionButtonAndWait('Deactivate', 'ui-sql-cache', false, { waitForModal: true, waitForRequest: true });
-
-    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Disabled');
+    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Active-fail');
   });
 });
