@@ -32,8 +32,8 @@ node {
                         string(credentialsId: 'AZURE_CLIENT_SECRET', variable: 'AZURE_CLIENT_SECRET'),
                         string(credentialsId: 'GKE_SERVICE_ACCOUNT', variable: 'GKE_SERVICE_ACCOUNT'),
                         string(credentialsId: 'PERCY_TOKEN', variable: 'PERCY_TOKEN'),
-                        string(credentialsId: 'UI_SLACK_BOT_TOKEN', variable: 'UI_SLACK_BOT_TOKEN'),
-                        string(credentialsId: 'UI_SLACK_CHANNEL', variable: 'UI_SLACK_CHANNEL')
+                        string(credentialsId: 'UI_SLACK_BOT_TOKEN_TEST', variable: 'UI_SLACK_BOT_TOKEN_TEST'),
+                        string(credentialsId: 'UI_SLACK_CHANNEL_TEST', variable: 'UI_SLACK_CHANNEL_TEST')
                         ]) {
         withEnv(paramsMap) {
             try {

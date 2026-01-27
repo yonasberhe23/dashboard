@@ -82,8 +82,8 @@ send_jenkins_e2e_failure_notification() {
     local cypress_tags=$(read_notification_value "CYPRESS_TAGS")
     
     # Get Slack bot token and channel from Secrets Manager
-    local slack_bot_token="${UI_SLACK_BOT_TOKEN:-}"
-    local slack_channel="${UI_SLACK_CHANNEL:-}"
+    local slack_bot_token="${UI_SLACK_BOT_TOKEN_TEST:-}"
+    local slack_channel="${UI_SLACK_CHANNEL_TEST:-}"
     
     # Only send notifications for failures
     if [ "$build_status" != "FAILURE" ] && [ "$build_status" != "UNSTABLE" ]; then
