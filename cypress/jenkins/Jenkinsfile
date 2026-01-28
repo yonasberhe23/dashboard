@@ -71,12 +71,6 @@ node {
                   throw err
                 }
               }
-              if ("${env.CLEANUP}".toLowerCase() == "true") {
-                stage('Clean Test Environment') {  
-                  sh "corrals=\$(${WORKSPACE}/bin/corral list | grep -v \"NAME\" | grep -v \"-\" | cut -d' ' -f 2)" +
-                  "&& for corral in \$corrals; do ${WORKSPACE}/bin/corral delete \$corral; done"
-                }
-              }
             } catch (err) {
               echo "Pipeline aborted early: ${err}"
               currentBuild.result = 'FAILURE'
@@ -85,6 +79,12 @@ node {
                 // Safe to run even if init.sh failed (scp fails gracefully)
                 sh "cypress/jenkins/scpget.sh dashboard/results.xml || true"
                 sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html"
+              }
+              if ("${env.CLEANUP}".toLowerCase() == "true") {
+                stage('Clean Test Environment') {  
+                  sh "corrals=\$(${WORKSPACE}/bin/corral list | grep -v \"NAME\" | grep -v \"-\" | cut -d' ' -f 2)" +
+                  "&& for corral in \$corrals; do ${WORKSPACE}/bin/corral delete \$corral; done"
+                }
               }
               try {
                 stage('Test Report') {

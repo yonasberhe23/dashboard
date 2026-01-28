@@ -16,6 +16,6 @@ describe('Disable Vai', { testIsolation: 'off', tags: ['@noVai', '@adminUser'] }
     FeatureFlagsPagePo.navTo();
     featureFlagsPage.waitForPage();
 
-    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Active-fail');
+    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Active');
   });
 });
