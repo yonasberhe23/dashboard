@@ -64,9 +64,7 @@ node {
                 try {
                   sh 'pwd'
                   sh 'ls -al cypress/jenkins'
-                  // TESTING: Temporarily fail immediately to verify finally block executes
-                  sh 'exit 1'
-                  // sh 'cypress/jenkins/init.sh'
+                  sh 'cypress/jenkins/init.sh'
                 } catch (err) {
                   echo "Error: " + err
                   currentBuild.result = 'FAILURE'
@@ -82,6 +80,9 @@ node {
                 sh "cypress/jenkins/scpget.sh dashboard/results.xml || true"
                 sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html"
               }
+              // TEST ONLY: simulate scenario where tests did not run / results.xml is missing
+              // Remove this after validating the behavior.
+              sh 'rm -f results.xml'
               if ("${env.CLEANUP}".toLowerCase() == "true") {
                 stage('Clean Test Environment') {  
                   sh "corrals=\$(${WORKSPACE}/bin/corral list | grep -v \"NAME\" | grep -v \"-\" | cut -d' ' -f 2)" +
