@@ -64,7 +64,9 @@ node {
                 try {
                   sh 'pwd'
                   sh 'ls -al cypress/jenkins'
-                  sh 'cypress/jenkins/init.sh'
+                  // TESTING: Temporarily fail immediately to verify finally block executes
+                  sh 'exit 1'
+                  // sh 'cypress/jenkins/init.sh'
                 } catch (err) {
                   echo "Error: " + err
                   currentBuild.result = 'FAILURE'
