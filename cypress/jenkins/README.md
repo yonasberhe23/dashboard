@@ -55,6 +55,15 @@ Some environment have default values thus making them optional others like the f
 
 *For more variables or variables updates take a look at the [init.sh](./init.sh) script.*
 
+## Post-Run Validation (qa-tasks#2159)
+
+After each test run, the pipeline runs [validate-build-images.sh](./validate-build-images.sh) to verify that the correct Rancher images exist in the expected registries. The script uses **skopeo** to inspect image metadata without pulling images and **jq** to parse the output.
+
+- **Requirements on Jenkins agent:** `skopeo`, `jq` must be installed.
+- **Input:** Reads `notification_values.txt` (written by init.sh) or env vars `RANCHER_HELM_REPO`, `RANCHER_IMAGE_TAG`, `RANCHER_VERSION`.
+- **Checks:** Registry matches expected source for `RANCHER_HELM_REPO`, image tag matches expected version, image creation date is within `VALIDATE_MAX_AGE_DAYS` (default 365).
+- **Optional env:** `VALIDATE_MAX_AGE_DAYS` (days; 0 to disable age check), `WORKSPACE` (path to workspace).
+
 Folder structure:
 
 - `WORKSPACE`

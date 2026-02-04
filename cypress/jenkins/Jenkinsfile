@@ -80,6 +80,10 @@ node {
                 sh "cypress/jenkins/scpget.sh dashboard/results.xml || true"
                 sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html"
               }
+              stage('Post-Run Validation') {
+                // Verify correct Rancher images exist in expected registries (qa-tasks#2159)
+                sh "cypress/jenkins/validate-build-images.sh"
+              }
               if ("${env.CLEANUP}".toLowerCase() == "true") {
                 stage('Clean Test Environment') {  
                   sh "corrals=\$(${WORKSPACE}/bin/corral list | grep -v \"NAME\" | grep -v \"-\" | cut -d' ' -f 2)" +
