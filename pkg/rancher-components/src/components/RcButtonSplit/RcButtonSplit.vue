@@ -13,7 +13,7 @@
  *  </rc-button-split>
  */
 import { RcButton } from '@components/RcButton';
-import { RcDropdown, RcDropdownTrigger } from '@components/RcDropdown';
+import { RcDropdown, RcDropdownItem, RcDropdownTrigger } from '@components/RcDropdown';
 import RcIcon from '@components/RcIcon/RcIcon.vue';
 import { ButtonVariant, ButtonSize } from '@components/RcButton/types';
 import type { Placement } from 'floating-vue';
@@ -26,6 +26,8 @@ withDefaults(defineProps<{
   placement?: Placement;
   // eslint-disable-next-line vue/require-default-prop
   distance?: number;
+  // eslint-disable-next-line vue/require-default-prop
+  items?: Record<string, string>;
 }>(), {
   variant:   'primary',
   size:      'medium',
@@ -35,6 +37,7 @@ withDefaults(defineProps<{
 const emit = defineEmits<{
   click: [event: MouseEvent];
   'update:open': [open: boolean];
+  select: [id: string];
 }>();
 </script>
 
@@ -80,6 +83,13 @@ const emit = defineEmits<{
     </div>
 
     <template #dropdownCollection>
+      <RcDropdownItem
+        v-for="(label, id) in items"
+        :key="id"
+        @click="emit('select', id)"
+      >
+        {{ label }}
+      </RcDropdownItem>
       <slot name="dropdownCollection" />
     </template>
   </RcDropdown>

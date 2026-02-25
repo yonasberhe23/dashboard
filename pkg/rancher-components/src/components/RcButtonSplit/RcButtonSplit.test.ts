@@ -169,4 +169,57 @@ describe('rcButtonSplit.vue', () => {
 
     expect(wrapper.find('.rc-button-split-action').classes()).toContain('btn-medium');
   });
+
+  describe('items prop', () => {
+    const items = {
+      draft:    'Save as Draft',
+      template: 'Save as Template',
+      discard:  'Discard Changes',
+    };
+
+    it('renders an RcDropdownItem for each entry in items', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { items } });
+
+      const dropdownItems = wrapper.findAllComponents({ name: 'RcDropdownItem' });
+
+      expect(dropdownItems).toHaveLength(3);
+    });
+
+    it('renders each item\'s label text', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { items } });
+
+      const dropdownItems = wrapper.findAllComponents({ name: 'RcDropdownItem' });
+
+      expect(dropdownItems[0].text()).toContain('Save as Draft');
+      expect(dropdownItems[1].text()).toContain('Save as Template');
+      expect(dropdownItems[2].text()).toContain('Discard Changes');
+    });
+
+    it('emits select with the item key when a prop item is clicked', async() => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { items } });
+
+      await wrapper.findAllComponents({ name: 'RcDropdownItem' })[0].trigger('click');
+
+      expect(wrapper.emitted('select')).toHaveLength(1);
+      expect(wrapper.emitted('select')![0]).toStrictEqual(['draft']);
+    });
+
+    it('does not emit select when no items prop is provided', async() => {
+      const wrapper = mount(RcButtonSplit, globalConfig);
+
+      expect(wrapper.emitted('select')).toBeUndefined();
+    });
+
+    it('renders both prop items and dropdownCollection slot content when both are supplied', () => {
+      const wrapper = mount(RcButtonSplit, {
+        ...globalConfig,
+        props: { items: { draft: 'Save as Draft' } },
+        slots: { dropdownCollection: '<div class="slot-item">Slot Item</div>' },
+      });
+
+      expect(wrapper.findAllComponents({ name: 'RcDropdownItem' })).toHaveLength(1);
+      expect(wrapper.find('.slot-item').exists()).toBe(true);
+      expect(wrapper.find('.slot-item').text()).toStrictEqual('Slot Item');
+    });
+  });
 });

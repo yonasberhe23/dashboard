@@ -26,6 +26,10 @@ const meta: Meta<typeof RcButtonSplit> = {
       control:     { type: 'select' },
       description: 'Placement of the dropdown menu relative to the trigger.',
     },
+    items: {
+      control:     { type: 'object' },
+      description: 'Convenience prop for populating dropdown items. Each key is emitted as the select event payload; each value is the display text.',
+    },
   },
 };
 
@@ -123,6 +127,31 @@ export const AllSizes: Story = {
   parameters: {
     controls: { disabled: true },
     docs:     { canvas: { sourceState: 'none' } },
+  },
+};
+
+export const WithItems: Story = {
+  render: (args: any) => ({
+    components: { RcButtonSplit },
+    setup() {
+      const onSelect = (id: string) => console.log('Selected item key:', id); // eslint-disable-line no-console
+
+      return { args, onSelect };
+    },
+    template: `
+      <RcButtonSplit v-bind="args" @select="onSelect">
+        Save
+      </RcButtonSplit>
+    `,
+  }),
+  args: {
+    variant: 'primary',
+    size:    'medium',
+    items:   {
+      draft:    'Save as Draft',
+      template: 'Save as Template',
+      discard:  'Discard Changes',
+    },
   },
 };
 
