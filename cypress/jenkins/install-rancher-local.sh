@@ -16,9 +16,16 @@
 #   --hostname         Hostname for Rancher ingress (default: localhost)
 #   --bootstrap-pass   Bootstrap password (default: admin)
 #   --replicas         Number of Rancher replicas (default: 1)
+#   --k3s-version      k3s version for the k3d node image, e.g. v1.35.2+k3s1 (default: k3d default)
+#   --k3s-image        Full container image for k3d nodes, e.g. rancher/k3s:v1.35.2-k3s1 (overrides --k3s-version)
 #   -h, --help         Show this help message
 
 set -e
+
+# Prefer Homebrew binaries on macOS (e.g. arm64 kubectl over x86_64 in /usr/local/bin)
+if [[ -d /opt/homebrew/bin ]]; then
+  export PATH="/opt/homebrew/bin:${PATH}"
+fi
 
 # ============================================================================
 # Defaults
@@ -30,6 +37,7 @@ HELM_REPO_URL="${HELM_REPO_URL:-https://releases.rancher.com/server-charts/alpha
 RANCHER_HOSTNAME="${RANCHER_HOSTNAME:-localhost}"
 BOOTSTRAP_PASSWORD="${BOOTSTRAP_PASSWORD:-admin}"
 REPLICAS="${REPLICAS:-1}"
+K3S_IMAGE="${K3S_IMAGE:-}"
 
 # ============================================================================
 # Argument parsing
@@ -43,6 +51,13 @@ while [[ $# -gt 0 ]]; do
     --hostname)        RANCHER_HOSTNAME="$2"; shift 2 ;;
     --bootstrap-pass)  BOOTSTRAP_PASSWORD="$2"; shift 2 ;;
     --replicas)        REPLICAS="$2";        shift 2 ;;
+    --k3s-image)       K3S_IMAGE="$2";       shift 2 ;;
+    --k3s-version)
+      _k3s_ver="$2"
+      _k3s_ver="${_k3s_ver//+/-}"
+      K3S_IMAGE="rancher/k3s:${_k3s_ver}"
+      shift 2
+      ;;
     -h|--help)
       sed -n '/^# Usage:/,/^$/p' "$0"
       exit 0
@@ -95,12 +110,23 @@ log "Step 1: Creating k3d cluster '${CLUSTER_NAME}'..."
 if k3d cluster list 2>/dev/null | grep -q "^${CLUSTER_NAME}"; then
   warn "Cluster '${CLUSTER_NAME}' already exists. Skipping creation."
 else
-  k3d cluster create "${CLUSTER_NAME}" \
-    --api-port 6550 \
-    --port "443:443@loadbalancer" \
-    --port "80:80@loadbalancer" \
-    --k3s-arg "--disable=traefik@server:0" \
-    --wait
+  if [[ -n "${K3S_IMAGE}" ]]; then
+    log "Using k3d node image: ${K3S_IMAGE}"
+    k3d cluster create "${CLUSTER_NAME}" \
+      --image "${K3S_IMAGE}" \
+      --api-port 6550 \
+      --port "443:443@loadbalancer" \
+      --port "80:80@loadbalancer" \
+      --k3s-arg "--disable=traefik@server:0" \
+      --wait
+  else
+    k3d cluster create "${CLUSTER_NAME}" \
+      --api-port 6550 \
+      --port "443:443@loadbalancer" \
+      --port "80:80@loadbalancer" \
+      --k3s-arg "--disable=traefik@server:0" \
+      --wait
+  fi
   log "Cluster '${CLUSTER_NAME}' created."
 fi
 
@@ -226,12 +252,22 @@ echo "============================================================"
 echo "  Rancher Installation Complete"
 echo "============================================================"
 echo "  Cluster:        k3d-${CLUSTER_NAME}"
+if [[ -n "${K3S_IMAGE}" ]]; then
+  echo "  k3d node image: ${K3S_IMAGE}"
+fi
 echo "  Chart repo:     ${HELM_REPO} (${HELM_REPO_URL})"
 echo "  Chart version:  ${RANCHER_VERSION}"
 echo "  App version:    v${RANCHER_VERSION}"
 echo "  Hostname:       ${RANCHER_HOSTNAME}"
 echo "  Bootstrap pass: ${BOOTSTRAP_PASSWORD}"
 echo ""
-echo "  Access Rancher at: https://${RANCHER_HOSTNAME}/dashboard"
-echo "  (Accept the self-signed certificate warning in your browser)"
+echo "  How to access Rancher:"
+echo "  1. Open in browser: https://${RANCHER_HOSTNAME}/dashboard"
+echo "  2. Accept the self-signed certificate warning (Advanced -> Proceed)"
+echo "  3. Log in with:"
+echo "     Username: admin"
+echo "     Password: ${BOOTSTRAP_PASSWORD}"
+echo ""
+echo "  To retrieve the bootstrap password later:"
+echo "     kubectl get secret -n cattle-system bootstrap-secret -o go-template='{{.data.bootstrapPassword|base64decode}}{{ \"\\n\" }}'"
 echo "============================================================"
