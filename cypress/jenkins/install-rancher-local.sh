@@ -20,6 +20,11 @@
 
 set -e
 
+# Prefer Homebrew binaries on macOS (e.g. arm64 kubectl over x86_64 in /usr/local/bin)
+if [[ -d /opt/homebrew/bin ]]; then
+  export PATH="/opt/homebrew/bin:${PATH}"
+fi
+
 # ============================================================================
 # Defaults
 # ============================================================================
@@ -232,6 +237,13 @@ echo "  App version:    v${RANCHER_VERSION}"
 echo "  Hostname:       ${RANCHER_HOSTNAME}"
 echo "  Bootstrap pass: ${BOOTSTRAP_PASSWORD}"
 echo ""
-echo "  Access Rancher at: https://${RANCHER_HOSTNAME}/dashboard"
-echo "  (Accept the self-signed certificate warning in your browser)"
+echo "  How to access Rancher:"
+echo "  1. Open in browser: https://${RANCHER_HOSTNAME}/dashboard"
+echo "  2. Accept the self-signed certificate warning (Advanced -> Proceed)"
+echo "  3. Log in with:"
+echo "     Username: admin"
+echo "     Password: ${BOOTSTRAP_PASSWORD}"
+echo ""
+echo "  To retrieve the bootstrap password later:"
+echo "     kubectl get secret -n cattle-system bootstrap-secret -o go-template='{{.data.bootstrapPassword|base64decode}}{{ \"\\n\" }}'"
 echo "============================================================"
