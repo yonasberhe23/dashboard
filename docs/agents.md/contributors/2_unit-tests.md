@@ -25,5 +25,5 @@ Please see [Rancher UI Internal Documentation - Testing - Unit Tests](https://ex
 
 ### Running Unit Tests
 
-- To run all tests: `yarn test`
-- To run a single test file: `yarn test <full-path-to-test-file>`
+- To run all tests: `yarn test:ci`
+- To run a single test file: `yarn test:ci <full-path-to-test-file>`
