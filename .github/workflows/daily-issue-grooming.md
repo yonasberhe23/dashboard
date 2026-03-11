@@ -10,6 +10,7 @@ permissions:
 
 engine: copilot
 timeout-minutes: 30
+description: "AI-assisted daily grooming of new and in-triage issues"
 
 tools:
   github:
