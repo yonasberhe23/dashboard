@@ -19,6 +19,7 @@ tools:
 safe-outputs:
   add-comment:
     max: 100
+    hide-older-comments: true
     target: "*"
   add-labels:
     allowed:
