@@ -22,7 +22,7 @@ safe-outputs:
     target: "*"
   add-labels:
     allowed:
-      - groomed
+      - bot/ready-for-triage
       - needs-info
     max: 100
     target: "*"
@@ -43,7 +43,7 @@ defined at the bottom of these instructions.
 
 1. List all open issues in this repository that were **created in the last 24 hours**.
 2. Skip any entry that is a pull request.
-3. Skip any issue that already carries the label `groomed` or `needs-info`.
+3. Skip any issue that already carries the label `bot/ready-for-triage` or `needs-info`.
 4. For each remaining issue, evaluate it against the **Grooming Decision Model** below.
 
    - If `is_groomed` is **true**:
@@ -61,7 +61,7 @@ defined at the bottom of these instructions.
        _This analysis was generated automatically based on the repository's grooming checklist._
        </details>
        ```
-     - Apply the label `groomed`.
+     - Apply the label `bot/ready-for-triage`.
 
    - If `is_groomed` is **false**:
      - Post a comment using this exact format:
@@ -115,7 +115,7 @@ Keep track of every issue number you process in Queue A so Queue B can skip them
        </details>
        ```
      - Remove the label `needs-info`.
-     - Apply the label `groomed`.
+     - Apply the label `bot/ready-for-triage`.
 
    - If `is_groomed` is **false**:
      - Post a comment using this exact format:
