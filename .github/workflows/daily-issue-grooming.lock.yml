@@ -23,7 +23,7 @@
 #
 # AI-assisted daily grooming of new and in-triage issues
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"33a86e7ea9c64a14f001632bf117f8c7273353ae29db32bdd49b4ecd889604dd","compiler_version":"v0.50.1"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"6cd6627ac639a7afdf23b98eee1a02c20fde026d67f59f9e5e9859aef0108668","compiler_version":"v0.50.1"}
 
 name: "Daily Issue Grooming"
 "on":
@@ -982,7 +982,6 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       contents: read
-      discussions: write
       issues: write
       pull-requests: write
     outputs:
@@ -1075,7 +1074,6 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       contents: read
-      discussions: write
       issues: write
       pull-requests: write
     timeout-minutes: 15

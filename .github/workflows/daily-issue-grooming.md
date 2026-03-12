@@ -21,6 +21,7 @@ safe-outputs:
   add-comment:
     max: 100
     hide-older-comments: true
+    discussions: false
     target: "*"
   add-labels:
     allowed:
