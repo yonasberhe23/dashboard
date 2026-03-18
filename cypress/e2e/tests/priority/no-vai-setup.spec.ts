@@ -16,11 +16,31 @@ describe('Disable Vai', { testIsolation: 'off', tags: ['@noVai', '@adminUser'] }
     FeatureFlagsPagePo.navTo();
     featureFlagsPage.waitForPage();
 
-    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Active');
+    const key = 'ui-sql-cache';
 
-    featureFlagsPage.list().clickRowActionMenuItem('ui-sql-cache', 'Deactivate');
-    featureFlagsPage.clickCardActionButtonAndWait('Deactivate', 'ui-sql-cache', false, { waitForModal: true, waitForRequest: true });
+    featureFlagsPage.self().should('not.contain', key);
+    cy.isVaiCacheEnabled().should('eq', true);
 
-    featureFlagsPage.list().details('ui-sql-cache', 0).should('include.text', 'Disabled');
+    cy.getRancherResource('v1', 'management.cattle.io.features', key).then((resp) => {
+      const resource = resp.body;
+
+      delete resource.links;
+      delete resource.metadata.creationTimestamp;
+      delete resource.metadata.generation;
+      delete resource.metadata.state;
+
+      resource.spec.value = false;
+
+      // Causes Rancher to restart
+      cy.setRancherResource('v1', 'management.cattle.io.features', key, JSON.stringify(resource));
+
+      // Wait for Rancher to start restarting....
+      cy.waitForRancherResource('v1', 'management.cattle.io.features', key, (resp: any) => resp.status > 399, 20, { failOnStatusCode: false });
+
+      // Wait for Rancher to be ready again... and also check it's set
+      cy.waitForRancherResource('v1', 'management.cattle.io.features', key, (resp) => {
+        return resp?.body?.spec?.value === false;
+      }, 20, { failOnStatusCode: false });
+    });
   });
 });
