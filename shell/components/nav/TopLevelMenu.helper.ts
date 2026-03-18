@@ -250,7 +250,6 @@ export class TopLevelMenuHelperPagination extends BaseTopLevelMenuHelper impleme
   async destroy() {
     this.clustersPinnedWrapper.onDestroy();
     this.clustersOthersWrapper.onDestroy();
-    this.provClusterWrapper.onDestroy();
   }
 
   /**

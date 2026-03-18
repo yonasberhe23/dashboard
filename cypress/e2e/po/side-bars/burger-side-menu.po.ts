@@ -53,7 +53,7 @@ export default class BurgerMenuPo extends ComponentPo {
    * Get cluster navigation item by label
    * @returns {Cypress.Chainable}
    */
-  static burgerMenuGetNavClusterbyLabel(label: string): Cypress.Chainable {
+  static burgerMenuGetNavClusterByLabel(label: string): Cypress.Chainable {
     return this.sideMenu().find('.option .cluster-name').contains(label);
   }
 
@@ -63,7 +63,7 @@ export default class BurgerMenuPo extends ComponentPo {
   static checkIfClusterMenuLinkIsHighlighted(name: string, isHighlightedAssertion = true) {
     const assertion = isHighlightedAssertion ? 'have.class' : 'not.have.class';
 
-    return this.burgerMenuGetNavClusterbyLabel(name).parent().parent().should(assertion, 'active-menu-link');
+    return this.burgerMenuGetNavClusterByLabel(name).parent().parent().should(assertion, 'active-menu-link');
   }
 
   /**
