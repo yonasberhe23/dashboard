@@ -56,8 +56,8 @@ describe('Side Menu: main', () => {
 
       // we cannot assert text truncation because it always adds to the HTML the full content
       // truncation (text-overflow: ellipsis) is just a CSS gimmick thing that adds the ... visually
-      burgerMenuPo.getClusterDescription().should('include', longClusterDescription);
-      burgerMenuPo.showClusterDescriptionTooltip();
+      burgerMenuPo.getClusterDescription('local').should('include', longClusterDescription);
+      burgerMenuPo.showClusterDescriptionTooltip('local');
       burgerMenuPo.getClusterDescriptionTooltipContent().should('include.text', 'local').and('be.visible');
       burgerMenuPo.getClusterDescriptionTooltipContent().should('include.text', longClusterDescription).and('be.visible');
     });

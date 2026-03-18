@@ -173,12 +173,16 @@ export default class BurgerMenuPo extends ComponentPo {
     return this.clusterPinnedList().first().find('.pin').click();
   }
 
-  getClusterDescription(): Cypress.Chainable {
-    return this.clusterNotPinnedList().first().find('.description').invoke('text');
+  getClusterIcon(clusterName = 'local'): Cypress.Chainable {
+    return this.self().find('.cluster-name').contains(clusterName).parent();
   }
 
-  showClusterDescriptionTooltip(): Cypress.Chainable {
-    return this.clusterNotPinnedList().first().find('.description').trigger('mouseenter');
+  getClusterDescription(clusterName = 'local'): Cypress.Chainable {
+    return this.getClusterIcon(clusterName).find('.description').invoke('text');
+  }
+
+  showClusterDescriptionTooltip(clusterName = 'local'): Cypress.Chainable {
+    return this.getClusterIcon(clusterName).find('.description').trigger('mouseenter');
   }
 
   getClusterDescriptionTooltipContent(): Cypress.Chainable {

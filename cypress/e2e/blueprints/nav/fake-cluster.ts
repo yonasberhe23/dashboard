@@ -2530,7 +2530,7 @@ export function generateFakeClusterDataAndIntercepts({
   // add extra cluster to the nav list to test https://github.com/rancher/dashboard/issues/10452
   cy.intercept('GET', `/v1/management.cattle.io.clusters?*`, (req) => {
     req.continue((res) => {
-      const localIndex = res.body.data.findIndex((item) => item.id.includes('/local'));
+      const localIndex = res.body.data.findIndex((item) => item.id.includes('local'));
 
       if (localIndex >= 0) {
         const localCluster = res.body.data[localIndex];
