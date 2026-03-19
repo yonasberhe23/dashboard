@@ -2,6 +2,7 @@ import { ChartPage } from '@/cypress/e2e/po/pages/explorer/charts/chart.po';
 import HomePagePo from '@/cypress/e2e/po/pages/home.po';
 import { InstallChartPage } from '@/cypress/e2e/po/pages/explorer/charts/install-charts.po';
 import { MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
+import { runTestWhenChartAvailable } from '@/cypress/support/commands/rancher-api-commands';
 import TabbedPo from '@/cypress/e2e/po/components/tabbed.po';
 import LabeledSelectPo from '@/cypress/e2e/po/components/labeled-select.po';
 import ChartInstalledAppsListPagePo from '@/cypress/e2e/po/pages/chart-installed-apps.po';
@@ -27,6 +28,7 @@ describe('Charts Wizard', { testIsolation: 'off', tags: ['@charts', '@adminUser'
 
   before(() => {
     cy.login();
+    cy.setUserPreference({ 'show-pre-release': true }, true); // Show pre-release versions so charts with only -rc versions appear on Charts page
     HomePagePo.goTo();
   });
 
@@ -77,43 +79,45 @@ describe('Charts Wizard', { testIsolation: 'off', tags: ['@charts', '@adminUser'
     const chartName = 'Rancher Backups';
     const customRegistry = 'my.custom.registry:5000';
 
-    it('should persist custom registry when changing chart version', () => {
-      const installedAppsPage = new ChartInstalledAppsListPagePo('local', 'apps');
+    it('should persist custom registry when changing chart version', function() {
+      runTestWhenChartAvailable('rancher-charts', 'rancher-backup', this, () => {
+        const installedAppsPage = new ChartInstalledAppsListPagePo('local', 'apps');
 
-      // We need to install the chart first to have the versions selector show up later when we come back to the install page
-      ChartPage.navTo(null, chartName);
-      chartPage.waitForChartHeader(chartName, MEDIUM_TIMEOUT_OPT);
-      chartPage.goToInstall();
-      installChartPage.nextPage();
+        // We need to install the chart first to have the versions selector show up later when we come back to the install page
+        ChartPage.navTo(null, chartName);
+        chartPage.waitForChartHeader(chartName, MEDIUM_TIMEOUT_OPT);
+        chartPage.goToInstall();
+        installChartPage.nextPage();
 
-      cy.intercept('POST', '/v1/catalog.cattle.io.clusterrepos/rancher-charts?action=install').as('installApp');
-      installChartPage.installChart();
-      namespacePicker.toggle();
-      namespacePicker.clickOptionByLabel('All Namespaces');
-      namespacePicker.isChecked('All Namespaces');
-      namespacePicker.closeDropdown();
-      installedAppsPage.waitForInstallCloseTerminal('installApp', ['rancher-backup', 'rancher-backup-crd']);
+        cy.intercept('POST', '/v1/catalog.cattle.io.clusterrepos/rancher-charts?action=install').as('installApp');
+        installChartPage.installChart();
+        namespacePicker.toggle();
+        namespacePicker.clickOptionByLabel('All Namespaces');
+        namespacePicker.isChecked('All Namespaces');
+        namespacePicker.closeDropdown();
+        installedAppsPage.waitForInstallCloseTerminal('installApp', ['rancher-backup', 'rancher-backup-crd']);
 
-      ChartPage.navTo(null, chartName);
-      chartPage.waitForChartHeader(chartName, MEDIUM_TIMEOUT_OPT);
-      chartPage.goToInstall();
+        ChartPage.navTo(null, chartName);
+        chartPage.waitForChartHeader(chartName, MEDIUM_TIMEOUT_OPT);
+        chartPage.goToInstall();
 
-      // The version selector should now be visible
-      installChartPage.chartVersionSelector().self().should('be.visible');
+        // The version selector should now be visible
+        installChartPage.chartVersionSelector().self().should('be.visible');
 
-      installChartPage.customRegistryCheckbox().set();
+        installChartPage.customRegistryCheckbox().set();
 
-      // Enter custom registry
-      installChartPage.customRegistryInput().self().should('be.visible');
-      installChartPage.customRegistryInput().set(customRegistry);
+        // Enter custom registry
+        installChartPage.customRegistryInput().self().should('be.visible');
+        installChartPage.customRegistryInput().set(customRegistry);
 
-      // Change chart version
-      installChartPage.chartVersionSelector().toggle();
-      installChartPage.chartVersionSelector().clickOption(2);
+        // Change chart version
+        installChartPage.chartVersionSelector().toggle();
+        installChartPage.chartVersionSelector().clickOption(2);
 
-      // Verify custom registry is still there
-      installChartPage.customRegistryCheckbox().isChecked();
-      installChartPage.customRegistryInput().self().should('have.value', customRegistry);
+        // Verify custom registry is still there
+        installChartPage.customRegistryCheckbox().isChecked();
+        installChartPage.customRegistryInput().self().should('have.value', customRegistry);
+      });
     });
 
     after('clean up', () => {
@@ -125,5 +129,9 @@ describe('Charts Wizard', { testIsolation: 'off', tags: ['@charts', '@adminUser'
       cy.createRancherResource('v1', `catalog.cattle.io.apps/${ chartNamespace }/${ chartCrd }?action=uninstall`, '{}');
       cy.updateNamespaceFilter('local', 'none', '{"local":["all://user"]}');
     });
+  });
+
+  after(() => {
+    cy.setUserPreference({ 'show-pre-release': false });
   });
 });
