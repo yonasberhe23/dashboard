@@ -584,6 +584,8 @@ Cypress.Commands.add('waitForRancherResource', (prefix, resourceType, resourceId
   const url = `${ Cypress.env('api') }/${ prefix }/${ resourceType }/${ resourceId }`;
 
   const retry = () => {
+    cy.log('waitForRancherResource: ', retries, url);
+
     return cy.request({
       method:  'GET',
       url,
@@ -591,7 +593,9 @@ Cypress.Commands.add('waitForRancherResource', (prefix, resourceType, resourceId
         'x-api-csrf': token.value,
         Accept:       'application/json'
       },
-      failOnStatusCode: config?.failOnStatusCode === undefined ? true : !!config?.failOnStatusCode,
+      failOnStatusCode:      config?.failOnStatusCode === undefined ? true : config?.failOnStatusCode,
+      retryOnNetworkFailure: config?.retryOnNetworkFailure === undefined ? true : config?.retryOnNetworkFailure,
+      timeout:               config?.timeout
     })
       .then((resp) => {
         if (!testFn(resp)) {
