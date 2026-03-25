@@ -246,6 +246,7 @@ create_test_clusters() {
 # Create Rancher server
 # ============================================================================
 create_rancher_server() {
+  clean_corral config vars set instance_type "${AWS_INSTANCE_TYPE}"
   clean_corral config vars set aws_hostname_prefix "jenkins-${prefix_random}"
   clean_corral config vars set server_count "${SERVER_COUNT:-3}"
   clean_corral create --skip-cleanup --recreate --debug rancher "dist/aws-k3s-rancher-${K3S_KUBERNETES_VERSION}-${RANCHER_VERSION//v}-${CERT_MANAGER_VERSION}"
