@@ -778,11 +778,18 @@ export default {
                     @onInput="onInputMarkdownMultiline(i, $event)"
                     @onFocus="onFocusMarkdownMultiline(i, $event)"
                   />
+                  <div
+                    v-else-if="valueConcealed"
+                    class="concealed-value conceal"
+                    data-testid="concealed-value"
+                    :aria-label="t('generic.ariaLabel.value', {index: i+1})"
+                  >
+                    &#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;
+                  </div>
                   <TextAreaAutoGrow
                     v-else-if="valueMultiline && row[valueName] !== undefined"
                     v-model:value="row[valueName]"
                     data-testid="value-multiline"
-                    :class="{'conceal': valueConcealed}"
                     :disabled="disabled"
                     :mode="mode"
                     :placeholder="_valuePlaceholder"
@@ -939,6 +946,12 @@ export default {
       }
       &.value textarea {
         padding: 10px 10px 10px 10px;
+      }
+
+      .concealed-value {
+        padding: 10px;
+        min-height: 40px;
+        user-select: none;
       }
 
       .text-monospace:not(.conceal) {

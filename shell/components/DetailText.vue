@@ -187,10 +187,9 @@ export default {
     >{{ body }}</span>
 
     <CodeMirror
-      v-else-if="jsonStr"
+      v-else-if="jsonStr && !concealed"
       :options="{mode:{name:'javascript', json:true}, lineNumbers:false, foldGutter:false, readOnly:true}"
       :value="jsonStr"
-      :class="{'conceal': concealed}"
       aria-live="polite"
     />
 
@@ -199,9 +198,16 @@ export default {
       :class="{'conceal-wrapper': concealed}"
     >
       <span
+        v-if="concealed"
+        data-testid="detail-top_html"
+        class="conceal"
+        aria-live="polite"
+      >&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span>
+      <span
+        v-else
         v-clean-html="bodyHtml"
         data-testid="detail-top_html"
-        :class="{'conceal': concealed, 'monospace': monospace && !isBinary}"
+        :class="{'monospace': monospace && !isBinary}"
         aria-live="polite"
       />
     </div>
