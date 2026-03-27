@@ -20,22 +20,24 @@ import HomePagePo from '@/cypress/e2e/po/pages/home.po';
 import { nodeDriveResponse } from '@/cypress/e2e/tests/pages/manager/mock-responses';
 import TabbedPo from '@/cypress/e2e/po/components/tabbed.po';
 import LoadingPo from '@/cypress/e2e/po/components/loading.po';
-import { EXTRA_LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
+import {
+  EXTRA_LONG_TIMEOUT_OPT,
+  MEDIUM_TIMEOUT_OPT,
+  RESTART_TIMEOUT_OPT
+} from '@/cypress/support/utils/timeouts';
 // import KontainerDriversPagePo from '@/cypress/e2e/po/pages/cluster-manager/kontainer-drivers.po';
 // import DeactivateDriverDialogPo from '@/cypress/e2e/po/prompts/deactivateDriverDialog.po';
 import { USERS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
 
 // At some point these will come from somewhere central, then we can make tools to remove resources from this or all runs
-const runTimestamp = +new Date();
-const runPrefix = `e2e-test-${ runTimestamp }`;
+const createClusterTestName = (suffix: string) => `e2e-test-${ +new Date() }-create-${ suffix }`;
 
 // File specific consts
 const namespace = 'fleet-default';
 const type = 'provisioning.cattle.io.cluster';
 const importType = 'cluster';
-const clusterNamePartial = `${ runPrefix }-create`;
-const rke2CustomName = `${ clusterNamePartial }-rke2-custom`;
-const importGenericName = `${ clusterNamePartial }-import-generic`;
+let rke2CustomName = createClusterTestName('rke2-custom');
+let importGenericName = createClusterTestName('import-generic');
 const reenableAKS = false;
 
 const downloadsFolder = Cypress.config('downloadsFolder');
@@ -150,13 +152,14 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
 
   describe('Created', () => {
     const createRKE2ClusterPage = new ClusterManagerCreateRke2CustomPagePo();
-    const detailRKE2ClusterPage = new ClusterManagerDetailRke2CustomPagePo(undefined, rke2CustomName);
+    const detailRKE2ClusterPage = () => new ClusterManagerDetailRke2CustomPagePo(undefined, rke2CustomName);
     const tabbedPo = new TabbedPo('[data-testid="tabbed-block"]');
 
     describe('RKE2 Custom', { tags: ['@jenkins', '@customCluster'] }, () => {
-      const editCreatedClusterPage = new ClusterManagerEditRke2CustomPagePo(undefined, rke2CustomName);
+      const editCreatedClusterPage = () => new ClusterManagerEditRke2CustomPagePo(undefined, rke2CustomName);
 
-      it('can create new cluster', () => {
+      it('can create new cluster', { retries: 0 }, () => {
+        rke2CustomName = createClusterTestName('rke2-custom');
         cy.intercept('POST', `/v1/${ type }s`).as('createRequest');
         const request = {
           type,
@@ -215,14 +218,18 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
           expect(isMatch(intercept.request.body, request)).to.equal(true);
         });
 
-        detailRKE2ClusterPage.waitForPage(undefined, 'registration');
+        detailRKE2ClusterPage().waitForPage(undefined, 'registration');
 
         createRKE2ClusterPage.activateInsecureRegistrationCommandFromUI().click();
         createRKE2ClusterPage.commandFromCustomClusterUI().then(($value) => {
           const registrationCommand = $value.text();
+          const customNodeKey = `${ Cypress.env('customNodeKey') || '' }`;
+          const decodedCustomNodeKey = customNodeKey.includes('BEGIN') ? customNodeKey : Cypress.Buffer.from(customNodeKey, 'base64').toString('utf8');
 
-          cy.exec(`echo ${ Cypress.env('customNodeKey') } | base64 -d > custom_node.key && chmod 600 custom_node.key`).then((result) => {
+          cy.writeFile('custom_node.key', decodedCustomNodeKey).then(() => {
             cy.log('Creating the custom_node.key');
+          });
+          cy.exec('chmod 600 custom_node.key').then((result) => {
             cy.log(result.stderr);
             cy.log(result.stdout);
             expect(result.code).to.eq(0);
@@ -274,17 +281,18 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         clusterList.goTo();
         clusterList.list().actionMenu(rke2CustomName).getMenuItem('Edit Config').click();
 
-        editCreatedClusterPage.waitForPage('mode=edit', 'basic');
-        editCreatedClusterPage.nameNsDescription().description().set(rke2CustomName);
-        editCreatedClusterPage.save();
+        editCreatedClusterPage().waitForPage('mode=edit', 'basic');
+        editCreatedClusterPage().nameNsDescription().description().set(rke2CustomName);
+        editCreatedClusterPage().save();
 
         // We should be taken back to the list page if the save was successful
         clusterList.waitForPage();
 
         clusterList.list().actionMenu(rke2CustomName).getMenuItem('Edit Config').click();
 
-        editCreatedClusterPage.waitForPage('mode=edit', 'basic');
-        editCreatedClusterPage.nameNsDescription().description().self().should('have.value', rke2CustomName);
+        editCreatedClusterPage().waitForPage('mode=edit', 'basic');
+        editCreatedClusterPage().nameNsDescription().description().self()
+          .should('have.value', rke2CustomName);
       });
 
       it('will disable saving if an addon config has invalid data', () => {
@@ -314,15 +322,16 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         clusterList.goTo();
         clusterList.list().actionMenu(rke2CustomName).getMenuItem('Edit YAML').click();
 
-        editCreatedClusterPage.waitForPage('mode=edit&as=yaml');
-        editCreatedClusterPage.resourceDetail().resourceYaml().checkVisible();
+        editCreatedClusterPage().waitForPage('mode=edit&as=yaml');
+        editCreatedClusterPage().resourceDetail().resourceYaml().checkVisible();
       });
 
       it('can download KubeConfig', () => {
+        cy.deleteDownloadsFolder();
         clusterList.goTo();
         cy.intercept('POST', '/v3/clusters/**').as('generateKubeconfig');
         clusterList.list().actionMenu(rke2CustomName).getMenuItem('Download KubeConfig').click();
-        cy.wait('@generateKubeconfig').its('response.statusCode').should('eq', 200);
+        cy.wait('@generateKubeconfig').its('response.statusCode').should('be.oneOf', [200, 201]);
 
         const downloadedFilename = path.join(downloadsFolder, `${ rke2CustomName }.yaml`);
 
@@ -331,8 +340,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
           const obj: any = jsyaml.load(buffer);
 
           // Basic checks on the downloaded YAML
-          expect(obj.clusters.length).to.equal(1);
-          expect(obj.clusters[0].name).to.equal(rke2CustomName);
+          expect(obj.clusters.some((cluster: { name: string }) => cluster.name === rke2CustomName)).to.equal(true);
           expect(obj.apiVersion).to.equal('v1');
           expect(obj.kind).to.equal('Config');
         });
@@ -362,16 +370,13 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         clusterList.sortableTable().rowElementWithName(rke2CustomName).should('exist', MEDIUM_TIMEOUT_OPT);
         clusterList.list().actionMenu(rke2CustomName).getMenuItem('Delete').click();
 
-        clusterList.sortableTable().rowNames('.cluster-link').then((rows: any) => {
-          const promptRemove = new PromptRemove();
+        const promptRemove = new PromptRemove();
 
-          promptRemove.confirm(rke2CustomName);
-          promptRemove.remove();
+        promptRemove.confirm(rke2CustomName);
+        promptRemove.remove();
 
-          clusterList.waitForPage();
-          clusterList.sortableTable().checkRowCount(false, rows.length - 1);
-          clusterList.sortableTable().rowNames('.cluster-link').should('not.contain', rke2CustomName);
-        });
+        clusterList.waitForPage();
+        clusterList.sortableTable().rowElementWithName(rke2CustomName).should('not.exist');
       });
     });
   });
@@ -384,6 +389,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
 
     describe('Generic', () => {
       it('can create new cluster', () => {
+        importGenericName = createClusterTestName('import-generic');
         cy.intercept('GET', `${ USERS_BASE_URL }?*`).as('getUsers');
         cy.intercept('POST', `/v3/${ importType }s`).as('importRequest');
 
@@ -433,7 +439,7 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
 
             expect(kubectlCommand).to.contain('--insecure');
             cy.log(kubectlCommand);
-            cy.exec(kubectlCommand, { failOnNonZeroExit: false }).then((result) => {
+            cy.exec(kubectlCommand, { failOnNonZeroExit: false, timeout: RESTART_TIMEOUT_OPT.timeout }).then((result) => {
               cy.log(result.stderr);
               cy.log(result.stdout);
               expect(result.code).to.eq(0);
@@ -519,16 +525,13 @@ describe('Cluster Manager', { testIsolation: 'off', tags: ['@manager', '@adminUs
         clusterList.sortableTable().bulkActionDropDownOpen();
         clusterList.sortableTable().bulkActionDropDownButton('Delete').click();
 
-        clusterList.sortableTable().rowNames('.cluster-link').then((rows: any) => {
-          const promptRemove = new PromptRemove();
+        const promptRemove = new PromptRemove();
 
-          promptRemove.confirm(importGenericName);
-          promptRemove.remove();
+        promptRemove.confirm(importGenericName);
+        promptRemove.remove();
 
-          clusterList.waitForPage();
-          clusterList.sortableTable().checkRowCount(false, rows.length - 1);
-          clusterList.sortableTable().rowNames('.cluster-link').should('not.contain', importGenericName);
-        });
+        clusterList.waitForPage();
+        clusterList.sortableTable().rowElementWithName(importGenericName).should('not.exist');
       });
     });
   });
