@@ -1,25 +1,25 @@
 #!groovy
 
-
 def upstream = !currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')
-def buildtype = upstream ? "RecurringRun" : "AdHoc"
-def branch = "master"
+def buildtype = upstream ? 'RecurringRun' : 'AdHoc'
+def branch = 'master'
 def testExecutionResult = null
+def testExitCode = null
 
-if ("${env.branch}" != "null" && "${env.branch}" != "") {
+if ("${env.branch}" != 'null' && "${env.branch}" != '') {
   branch = "${env.branch}"
 }
 
-if ("${env.CORRAL_PACKAGES_REPO}" != "null" && "${env.CORRAL_PACKAGES_REPO}" != "") {
+if ("${env.CORRAL_PACKAGES_REPO}" != 'null' && "${env.CORRAL_PACKAGES_REPO}" != '') {
       corralRepo = "${env.CORRAL_PACKAGES_REPO}"
 }
 
-if ("${env.CORRAL_PACKAGES_BRANCH}" != "null" && "${env.CORRAL_PACKAGES_BRANCH}" != "") {
+if ("${env.CORRAL_PACKAGES_BRANCH}" != 'null' && "${env.CORRAL_PACKAGES_BRANCH}" != '') {
       corralBranch = "${env.CORRAL_PACKAGES_BRANCH}"
 }
 
-node {
-  wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm', 'defaultFg': 2, 'defaultBg':1]) {
+node('harvester-vpn-1') {
+  ansiColor('xterm') {
     withFolderProperties {
       paramsMap = []
       params.each {
@@ -36,8 +36,18 @@ node {
                         string(credentialsId: 'UI_SLACK_BOT_TOKEN', variable: 'UI_SLACK_BOT_TOKEN'),
                         string(credentialsId: 'UI_SLACK_CHANNEL', variable: 'UI_SLACK_CHANNEL')
                         ]) {
-        withEnv(paramsMap) {
+        withEnv(paramsMap + ['TERM=xterm']) {
             try {
+              stage('Pre-Clean') {
+                sh """#!/bin/bash
+                  set +x
+                  sudo rm -rf "\${HOME}/dashboard" 2>/dev/null || true
+                  rm -f "\${HOME}/.env" 2>/dev/null || true
+                  rm -rf "\${HOME}/.corral" 2>/dev/null || true
+                  docker rm -f \$(docker ps -aq --filter ancestor=dashboard-test) 2>/dev/null || true
+                  docker rmi -f dashboard-test 2>/dev/null || true
+                """
+              }
               stage('Checkout') {
                 deleteDir()
                 checkout([
@@ -51,36 +61,34 @@ node {
                         $class: 'GitSCM',
                         branches: [[name: "*/${corralBranch}"]],
                         extensions: scm.extensions + [[$class: 'CleanCheckout']],
-                        userRemoteConfigs: [[url: 'https://github.com/'+corralRepo]]
+                        userRemoteConfigs: [[url: 'https://github.com/' + corralRepo]]
                     ])
                     sh 'git --no-pager branch'
-                    def ciFilename = "dashboard-tests.yaml"
+                    def ciFilename = 'dashboard-tests.yaml'
                     def ciConfigContents = env.CORRAL_PACKAGE_CONFIG
                     if (ciConfigContents != null) {
-                        writeFile file: "./packages/aws/"+ciFilename, text: ciConfigContents
+                        writeFile file: './packages/aws/' + ciFilename, text: ciConfigContents
                     }
                 }
               }
               stage('Run Tests') {
-                try {
-                  sh 'cypress/jenkins/init.sh'
-                } catch (err) {
-                  echo "Error: " + err
+                testExitCode = sh(script: 'cypress/jenkins/init.sh', returnStatus: true)
+                if (testExitCode != 0) {
+                  echo "init.sh exited with code ${testExitCode}"
                   currentBuild.result = 'UNSTABLE'
-                  throw err
                 }
               }
             } catch (err) {
-              echo "Pipeline aborted early: ${err}"
+              echo "Pipeline error: ${err}"
               currentBuild.result = 'UNSTABLE'
             } finally {
               stage('Grab Results') {
-                // Safe to run even if init.sh failed (scp fails gracefully)
-                sh "cypress/jenkins/scpget.sh dashboard/results.xml || true"
-                sh "cypress/jenkins/scpget.sh dashboard/cypress/reports/html/* html || true"
+                // Safe to run even if init.sh failed
+                sh 'cp ${HOME}/dashboard/results.xml . || true'
+                sh 'mkdir -p html && cp -r ${HOME}/dashboard/cypress/reports/html/* html/ || true'
               }
-              if ("${env.CLEANUP}".toLowerCase() == "true") {
-                stage('Clean Test Environment') {  
+              if ("${env.CLEANUP}".toLowerCase() == 'true') {
+                stage('Clean Test Environment') {
                   sh """#!/bin/bash
                     export PATH=\$PATH:${WORKSPACE}/bin
                     source cypress/jenkins/utils.sh
@@ -90,11 +98,25 @@ node {
                   """
                 }
               }
+              stage('Cleanup Executor') {
+                sh """#!/bin/bash
+                  set +x
+                  # Remove credentials file
+                  rm -f "\${HOME}/.env" || true
+                  # Remove cloned dashboard (may have root-owned files from Docker)
+                  sudo rm -rf "\${HOME}/dashboard" || true
+                  # Remove corral config to prevent stale vars leaking between runs
+                  rm -rf "\${HOME}/.corral" || true
+                  # Remove stale Docker containers and image
+                  docker rm -f \$(docker ps -aq --filter ancestor=dashboard-test) 2>/dev/null || true
+                  docker rmi -f dashboard-test 2>/dev/null || true
+                """
+              }
               try {
                 stage('Test Report') {
                     if (fileExists('results.xml')) {
                         junit testResults: '**/results.xml', allowEmptyResults: true
-                        
+
                         def resultsContent = readFile('results.xml').trim()
                         if (resultsContent.contains('<failure')) {
                             testExecutionResult = 'FAILURE'
@@ -116,8 +138,8 @@ node {
                       reportTitles: 'Report'])
                 }
               }
-              catch(err) {
-                echo "Error in Test Report stage: " + err
+              catch (err) {
+                echo 'Error in Test Report stage: ' + err
                 // Only set testExecutionResult if it's null and tests actually ran
                 // Check XML to determine if tests passed or failed, not just assume FAILURE
                 if (testExecutionResult == null && fileExists('results.xml')) {
@@ -133,11 +155,11 @@ node {
                 }
                 currentBuild.result = 'UNSTABLE'
               }
-              
+
               // test failure -> FAILURE (Slack: FAILED)
               // pipeline/env failure -> UNSTABLE
               if (currentBuild.result == 'UNSTABLE' || testExecutionResult == 'FAILURE') {
-                  if ("${env.SLACK_NOTIFICATION}".toLowerCase() != "false") {
+                  if ("${env.SLACK_NOTIFICATION}".toLowerCase() != 'false') {
                       withEnv(["SLACK_BUILD_STATUS=${testExecutionResult == 'FAILURE' ? 'FAILURE' : 'UNSTABLE'}"]) {
                           sh 'cypress/jenkins/slack-notification.sh $SLACK_BUILD_STATUS'
                       }
@@ -145,7 +167,7 @@ node {
               }
             }
         }
-      }
+                        }
     }
   }
 }
