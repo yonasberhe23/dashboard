@@ -5,8 +5,19 @@ import RcIcon from '@components/RcIcon/RcIcon.vue';
 import { ButtonVariant, ButtonSize } from '@components/RcButton/types';
 
 const meta: Meta<typeof RcButtonSplit> = {
-  component: RcButtonSplit,
-  argTypes:  {
+  component:  RcButtonSplit,
+  parameters: {
+    layout: 'centered',
+    docs:   {
+      description: {
+        component: `RcButtonSplit surfaces a primary action and attaches a 
+          dropdown of related alternatives, reducing visual clutter while 
+          keeping expert options one click away. Use when one action is clearly 
+          the default and additional options are variations of that same task.`
+      }
+    }
+  },
+  argTypes: {
     variant: {
       options:     ['primary', 'secondary', 'tertiary', 'link', 'ghost'] as ButtonVariant[],
       control:     { type: 'select' },
@@ -25,6 +36,10 @@ const meta: Meta<typeof RcButtonSplit> = {
       options:     ['bottom-end', 'bottom-start', 'top-end', 'top-start'],
       control:     { type: 'select' },
       description: 'Placement of the dropdown menu relative to the trigger.',
+    },
+    distance: {
+      control:     { type: 'number' },
+      description: 'Controls the distance between the dropdown menu and its trigger, in pixels.',
     },
     items: {
       control:     { type: 'object' },
