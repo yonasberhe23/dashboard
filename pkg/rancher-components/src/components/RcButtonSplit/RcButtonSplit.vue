@@ -15,7 +15,7 @@
 import { RcButton } from '@components/RcButton';
 import { RcDropdown, RcDropdownItem, RcDropdownTrigger } from '@components/RcDropdown';
 import RcIcon from '@components/RcIcon/RcIcon.vue';
-import { ButtonVariant, ButtonSize } from '@components/RcButton/types';
+import { ButtonVariant, ButtonSize, IconProps } from '@components/RcButton/types';
 import type { Placement } from 'floating-vue';
 
 withDefaults(defineProps<{
@@ -28,7 +28,7 @@ withDefaults(defineProps<{
   distance?: number;
   // eslint-disable-next-line vue/require-default-prop
   items?: Record<string, string>;
-}>(), {
+} & IconProps>(), {
   variant:   'primary',
   size:      'medium',
   placement: 'bottom-end',
@@ -53,6 +53,8 @@ const emit = defineEmits<{
         class="rc-button-split-action"
         :variant="variant"
         :size="size"
+        :left-icon="leftIcon"
+        :right-icon="rightIcon"
         @click="emit('click', $event)"
       >
         <template

@@ -3,6 +3,7 @@ import { RcButtonSplit } from '@components/RcButtonSplit';
 import { RcDropdownItem, RcDropdownSeparator } from '@components/RcDropdown';
 import RcIcon from '@components/RcIcon/RcIcon.vue';
 import { ButtonVariant, ButtonSize } from '@components/RcButton/types';
+import { RcIconTypeToClass } from '@components/RcIcon/types';
 
 const meta: Meta<typeof RcButtonSplit> = {
   component:  RcButtonSplit,
@@ -44,6 +45,16 @@ const meta: Meta<typeof RcButtonSplit> = {
     items: {
       control:     { type: 'object' },
       description: 'Convenience prop for populating dropdown items. Each key is emitted as the select event payload; each value is the display text.',
+    },
+    leftIcon: {
+      options:     ['', ...Object.keys(RcIconTypeToClass)],
+      control:     { type: 'select' },
+      description: 'Icon to display on the left side of the action button text.',
+    },
+    rightIcon: {
+      options:     ['', ...Object.keys(RcIconTypeToClass)],
+      control:     { type: 'select' },
+      description: 'Icon to display on the right side of the action button text.',
     },
   },
 };
@@ -167,6 +178,56 @@ export const WithItems: Story = {
       template: 'Save as Template',
       discard:  'Discard Changes',
     },
+  },
+};
+
+export const WithIcons: Story = {
+  render: (args: any) => ({
+    components: {
+      RcButtonSplit,
+      RcDropdownItem,
+    },
+    setup() {
+      return { args };
+    },
+    template: `
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+        <RcButtonSplit variant="primary" size="medium" left-icon="plus">
+          Create
+          <template #dropdownCollection>
+            <RcDropdownItem>Create from Template</RcDropdownItem>
+            <RcDropdownItem>Import</RcDropdownItem>
+          </template>
+        </RcButtonSplit>
+
+        <RcButtonSplit variant="secondary" size="medium" left-icon="download">
+          Download
+          <template #dropdownCollection>
+            <RcDropdownItem>Download v1</RcDropdownItem>
+            <RcDropdownItem>Download v2</RcDropdownItem>
+          </template>
+        </RcButtonSplit>
+
+        <RcButtonSplit variant="tertiary" size="medium" right-icon="chevron-right">
+          Next Step
+          <template #dropdownCollection>
+            <RcDropdownItem>Skip to End</RcDropdownItem>
+          </template>
+        </RcButtonSplit>
+
+        <RcButtonSplit variant="primary" size="medium" left-icon="upload" right-icon="chevron-right">
+          Deploy
+          <template #dropdownCollection>
+            <RcDropdownItem>Deploy to Staging</RcDropdownItem>
+            <RcDropdownItem>Deploy to Production</RcDropdownItem>
+          </template>
+        </RcButtonSplit>
+      </div>
+    `,
+  }),
+  parameters: {
+    controls: { disabled: true },
+    docs:     { canvas: { sourceState: 'none' } },
   },
 };
 
