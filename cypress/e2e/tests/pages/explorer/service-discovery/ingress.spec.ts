@@ -29,7 +29,12 @@ describe('Ingresses', { testIsolation: 'off', tags: ['@explorer', '@adminUser'] 
     // testing https://github.com/rancher/dashboard/issues/11086
     cy.get('@consoleWarn').should('not.be.calledWith', warnMsg);
 
-    cy.title().should('eq', 'Rancher - local - Ingresses');
+    cy.getRancherVersion().then((version) => {
+      const expectedTitle = version.RancherPrime === 'true' ? 'Rancher Prime - local - Ingresses' : 'Rancher - local - Ingresses';
+
+      cy.log(`Expected title is: ${ expectedTitle }`);
+      cy.title().should('eq', expectedTitle);
+    });
   });
 
   it('can open "Edit as YAML"', () => {
@@ -74,8 +79,6 @@ describe('Ingresses', { testIsolation: 'off', tags: ['@explorer', '@adminUser'] 
 
     it('can select rules and certificates in Create mode', () => {
       cy.viewport(1440, 900);
-
-      cy.log('!!!!!!!!!!!!!!!!!!', namespace);
 
       ingressListPagePo.goTo();
       ingressListPagePo.waitForPage();
@@ -123,7 +126,7 @@ describe('Ingresses', { testIsolation: 'off', tags: ['@explorer', '@adminUser'] 
       ingressCreatePagePo.setSecretNameValueByLabel(1, secretsNamesList[1]);
       ingressCreatePagePo.setHostValueByIndex(1, 'bar1');
 
-      ingressCreatePagePo.resourceDetail().createEditView().saveAndWaitForRequests('POST', 'v1/networking.k8s.io.ingresses')
+      ingressCreatePagePo.resourceDetail().createEditView().saveAndWaitForRequests('POST', '/v1/networking.k8s.io.ingresses')
         .then(({ response }) => {
           expect(response?.statusCode).to.eq(201);
           expect(response?.body.metadata).to.have.property('name', ingressName);
