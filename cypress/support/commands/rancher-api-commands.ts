@@ -1246,15 +1246,13 @@ Cypress.Commands.add('setUserPreference', (prefs: any, verify = false, retries =
           return Object.entries(prefs).every(([key, value]) => {
             const actual = responseData[key];
 
-            return actual === value || String(actual) === String(value);
+            return String(actual) === String(value);
           });
         }, retries)
           .then((success) => {
-            if (!success) {
-              return cy.log(`setUserPreference: Failed to verify preferences ${ JSON.stringify(prefs) } after ${ retries } retries (non-fatal)`).then(() => putResp);
-            }
+            const msg = success ? `Successfully verified preferences ${ JSON.stringify(prefs) }` : `Failed to verify preferences ${ JSON.stringify(prefs) } after ${ retries } retries (non-fatal)`;
 
-            return cy.log('setUserPreference: Successfully verified preferences', prefs).then(() => putResp);
+            return cy.log(`setUserPreference: ${ msg }`).then(() => putResp);
           });
       });
   });

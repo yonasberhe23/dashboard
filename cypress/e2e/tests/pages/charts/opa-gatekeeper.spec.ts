@@ -60,9 +60,9 @@ describe('Charts', { testIsolation: 'off', tags: ['@charts', '@adminUser'] }, ()
             chartPage.goToInstall();
             installChartPage.nextPage().editYaml();
 
-            cy.get('#wizard-footer-controls').should('be.visible');
+            installChartPage.footerControls().should('be.visible');
 
-            cy.get('#wizard-footer-controls').then(($el) => {
+            installChartPage.footerControls().then(($el) => {
               const elementRect = $el[0].getBoundingClientRect();
               const viewportHeight = Cypress.config('viewportHeight');
               const pageHeight = Cypress.$(cy.state('window')).height();
