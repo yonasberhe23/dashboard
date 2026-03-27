@@ -213,6 +213,67 @@ describe('Ingresses', { testIsolation: 'off', tags: ['@explorer', '@adminUser'] 
       ingressListPagePo.list().resourceTable().sortableTable().rowWithName(ingressName)
         .checkVisible();
     });
+
+    it('can create an Ingress targeting a headless service and wait for Active state', () => {
+      const headlessServiceName = Cypress._.uniqueId(`headless-svc-${ Date.now().toString() }`);
+      const ingressHeadlessName = Cypress._.uniqueId(`ingress-headless-${ Date.now().toString() }`);
+
+      cy.createService(namespace, headlessServiceName, {
+        spec: {
+          clusterIP: 'None',
+          ports:     [{
+            name:       'myport',
+            port:       8080,
+            protocol:   'TCP',
+            targetPort: 80
+          }],
+          type: 'ClusterIP'
+        }
+      });
+
+      ingressListPagePo.goTo();
+      ingressListPagePo.waitForPage();
+      ingressListPagePo.list().resourceTable().sortableTable().checkVisible();
+
+      ingressListPagePo.baseResourceList().masthead().create();
+
+      const ingressCreatePagePo = new IngressCreateEditPo();
+
+      ingressCreatePagePo.waitForPage(null, 'rules');
+      ingressCreatePagePo.resourceDetail().createEditView().nameNsDescription().name()
+        .set(ingressHeadlessName);
+      ingressCreatePagePo.resourceDetail().createEditView().nameNsDescription().namespace()
+        .toggle();
+      ingressCreatePagePo.resourceDetail().createEditView().nameNsDescription().namespace()
+        .clickOptionWithLabel(namespace);
+
+      ingressCreatePagePo.setRuleRequestHostValue(0, 'example-headless.com');
+      ingressCreatePagePo.setPathTypeByLabel(0, 'ImplementationSpecific');
+      ingressCreatePagePo.setTargetServiceValueByLabel(0, headlessServiceName);
+      ingressCreatePagePo.setPortValueByLabel(0, '8080');
+
+      ingressCreatePagePo.resourceDetail().createEditView().saveAndWaitForRequests('POST', 'v1/networking.k8s.io.ingresses')
+        .then(({ response }) => {
+          expect(response?.statusCode).to.eq(201);
+          expect(response?.body.metadata).to.have.property('name', ingressHeadlessName);
+
+          expect(response?.body.spec.rules[0]).to.have.property('host', 'example-headless.com');
+          const path = response?.body.spec.rules[0].http.paths[0];
+
+          expect(path).to.have.property('pathType', 'ImplementationSpecific');
+          expect(path.backend.service).to.deep.include({
+            name: headlessServiceName,
+            port: { number: 8080 }
+          });
+        });
+
+      ingressListPagePo.waitForPage();
+      ingressListPagePo.list().resourceTable().sortableTable().rowWithName(ingressHeadlessName)
+        .checkVisible();
+      ingressListPagePo.list().resourceTable().sortableTable().rowWithName(ingressHeadlessName)
+        .column(1)
+        .should('contain.text', 'Active');
+    });
   });
 
   describe('List', { tags: ['@noVai', '@adminUser'] }, () => {
