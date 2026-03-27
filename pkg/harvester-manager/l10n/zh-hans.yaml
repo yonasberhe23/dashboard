@@ -11,6 +11,4 @@ harvesterManager:
     templateError: 模版格式不正确
   cpuModel:
     label: CPU 型号
-    advancedTab: 高级设置
-    fetchError: "获取 CPU 型号配置失败: {error}"
     optionLabel: "{modelName} (就绪节点: {count})"

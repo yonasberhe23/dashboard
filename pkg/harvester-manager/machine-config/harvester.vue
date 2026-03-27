@@ -188,10 +188,7 @@ export default {
         this.images = res.images.value?.data;
         this.storageClass = res.storageClass.value?.data;
         this.networks = res.networks.value?.data;
-
-        if (res.cpuModelConfig.status === 'fulfilled') {
-          this.cpuModelConfigMap = res.cpuModelConfig.value;
-        }
+        this.cpuModelConfigMap = res.cpuModelConfig.value?.data;
 
         let systemNamespaces = (res.settings.value?.data || []).filter((x) => x.id === SETTING.SYSTEM_NAMESPACES);
 
@@ -392,14 +389,14 @@ export default {
     cpuModelOptions() {
       const defaultOption = { label: this.t('generic.default'), value: '' };
 
-      if (!this.cpuModelConfigMap?.data?.cpuModels) {
+      if (!this.cpuModelConfigMap?.cpuModels) {
         return [defaultOption];
       }
 
       let cpuModelsData;
 
       try {
-        cpuModelsData = YAML.parse(this.cpuModelConfigMap.data.cpuModels);
+        cpuModelsData = YAML.parse(this.cpuModelConfigMap.cpuModels);
       } catch (e) {
         return [defaultOption];
       }

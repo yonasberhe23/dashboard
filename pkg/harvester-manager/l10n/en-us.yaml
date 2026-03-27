@@ -62,6 +62,4 @@ harvesterManager:
     allocatableUnknown: missing allocation info
   cpuModel:
     label: CPU Model
-    advancedTab: Advanced
-    fetchError: "Failed to fetch CPU model configuration: {error}"
     optionLabel: "{modelName} (Ready nodes: {count})"
