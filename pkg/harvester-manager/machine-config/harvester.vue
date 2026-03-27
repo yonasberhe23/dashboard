@@ -153,13 +153,13 @@ export default {
         }
 
         const res = await allHashSettled({
-          namespaces:      this.$store.dispatch('cluster/request', { url: `${ url }/${ NAMESPACE }s` }),
-          images:          this.$store.dispatch('cluster/request', { url: `${ url }/${ HCI.IMAGE }s` }),
-          configMaps:      this.$store.dispatch('cluster/request', { url: configMapsUrl }),
-          networks:        this.$store.dispatch('cluster/request', { url: `${ url }/k8s.cni.cncf.io.network-attachment-definitions` }),
-          storageClass:    this.$store.dispatch('cluster/request', { url: `${ url }/${ STORAGE_CLASS }es` }),
-          settings:        this.$store.dispatch('cluster/request', { url: `${ url }/${ MANAGEMENT.SETTING }s` }),
-          cpuModelConfig:  this.$store.dispatch('cluster/request', { url: `${ url }/${ CONFIG_MAP }s/harvester-system/node-cpu-model-configuration` }),
+          namespaces:     this.$store.dispatch('cluster/request', { url: `${ url }/${ NAMESPACE }s` }),
+          images:         this.$store.dispatch('cluster/request', { url: `${ url }/${ HCI.IMAGE }s` }),
+          configMaps:     this.$store.dispatch('cluster/request', { url: configMapsUrl }),
+          networks:       this.$store.dispatch('cluster/request', { url: `${ url }/k8s.cni.cncf.io.network-attachment-definitions` }),
+          storageClass:   this.$store.dispatch('cluster/request', { url: `${ url }/${ STORAGE_CLASS }es` }),
+          settings:       this.$store.dispatch('cluster/request', { url: `${ url }/${ MANAGEMENT.SETTING }s` }),
+          cpuModelConfig: this.$store.dispatch('cluster/request', { url: `${ url }/${ CONFIG_MAP }s/harvester-system/node-cpu-model-configuration` }),
         });
 
         for (const key of Object.keys(res)) {
