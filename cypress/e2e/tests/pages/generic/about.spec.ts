@@ -4,9 +4,10 @@ import DiagnosticsPagePo from '@/cypress/e2e/po/pages/diagnostics.po';
 
 const aboutPage = new AboutPagePo();
 
-describe('About Page', { testIsolation: 'off', tags: ['@generic', '@adminUser', '@standardUser'] }, () => {
-  before(() => {
+describe('About Page', { testIsolation: 'on', tags: ['@generic', '@adminUser', '@standardUser'] }, () => {
+  beforeEach(() => {
     cy.login();
+    aboutPage.goTo();
   });
 
   it('can navigate to About page', () => {
@@ -16,15 +17,12 @@ describe('About Page', { testIsolation: 'off', tags: ['@generic', '@adminUser', 
   });
 
   it('no Prime info when community', { tags: '@noPrime' }, () => {
-    HomePagePo.goToAndWaitForGet();
-    AboutPagePo.navTo();
     aboutPage.waitForPage();
 
     aboutPage.rancherPrimeInfo().should('not.exist');
   });
 
   it('can navigate to Diagnostics page', () => {
-    AboutPagePo.navTo();
     aboutPage.waitForPage();
     aboutPage.diagnosticsBtn().click();
 
@@ -37,9 +35,16 @@ describe('About Page', { testIsolation: 'off', tags: ['@generic', '@adminUser', 
     AboutPagePo.navTo();
     aboutPage.waitForPage();
 
-    aboutPage.clickVersionLink('View release notes');
-    cy.origin('https://github.com/rancher/rancher', () => {
-      cy.url().should('include', 'https://github.com/rancher/rancher/releases/tag/');
+    cy.getRancherVersion().then((version) => {
+      const isPrime = version.RancherPrime === 'true';
+      const expectedOrigin = isPrime ? 'https://documentation.suse.com' : 'https://github.com';
+      const expectedPath = isPrime ? '/cloudnative/rancher-manager/latest/en/release-notes' : '/rancher/rancher/releases/tag/';
+
+      aboutPage.clickVersionLink('View release notes');
+      cy.origin(expectedOrigin, { args: { expectedPath } }, ({ expectedPath }) => {
+        cy.location('pathname').should('include', expectedPath);
+        cy.get('body').should('be.visible');
+      });
     });
   });
 
