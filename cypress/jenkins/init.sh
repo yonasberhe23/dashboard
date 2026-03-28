@@ -235,8 +235,8 @@ create_test_clusters() {
 	clean_corral config vars set bastion_ip ""
 
 	clean_corral create --skip-cleanup --recreate customnode "dist/aws-t3a.xlarge"
-	export CUSTOM_NODE_IP="$(clean_corral vars customnode first_node_ip)"
-	export CUSTOM_NODE_KEY="$(clean_corral vars customnode corral_private_key | base64 -w 0)"
+	export CUSTOM_NODE_IP="$(corral vars customnode first_node_ip)"
+	export CUSTOM_NODE_KEY="$(corral vars customnode corral_private_key | base64 -w 0)"
 	clean_corral config vars set custom_node_ip "${CUSTOM_NODE_IP}"
 	clean_corral config vars set custom_node_key "${CUSTOM_NODE_KEY}"
 
@@ -244,7 +244,7 @@ create_test_clusters() {
 	clean_corral config vars set aws_hostname_prefix "jenkins-${prefix_random}-i"
 	clean_corral config vars set server_count 1
 	clean_corral create --skip-cleanup --recreate importcluster "dist/aws-k3s-${K3S_KUBERNETES_VERSION}"
-	clean_corral config vars set imported_kubeconfig "$(clean_corral vars importcluster kubeconfig)"
+	clean_corral config vars set imported_kubeconfig "$(corral vars importcluster kubeconfig)"
 }
 
 # ============================================================================
@@ -264,7 +264,7 @@ wait_for_import_cluster() {
 	local max_attempts="${1:-12}"
 	echo "Waiting for import cluster API to be reachable (max ${max_attempts} attempts)..."
 	for i in $(seq 1 "${max_attempts}"); do
-		kubectl --kubeconfig <(clean_corral vars importcluster kubeconfig | base64 -d) get nodes &>/dev/null && return 0
+		kubectl --kubeconfig <(corral vars importcluster kubeconfig | base64 -d) get nodes &>/dev/null && return 0
 		echo "  attempt $i/${max_attempts}..."
 		sleep 10
 	done
@@ -380,8 +380,8 @@ export CHROME_VERSION
 export RANCHER_TYPE
 export RANCHER_IMAGE_TAG="${RANCHER_IMAGE_TAG_FOR_CORRAL:-${RANCHER_IMAGE_TAG}}"
 
-if clean_corral vars importcluster kubeconfig >/dev/null 2>&1; then
-	export IMPORTED_KUBECONFIG=$(clean_corral vars importcluster kubeconfig)
+if corral vars importcluster kubeconfig >/dev/null 2>&1; then
+	export IMPORTED_KUBECONFIG=$(corral vars importcluster kubeconfig)
 fi
 
 bash "cypress/jenkins/run.sh"
