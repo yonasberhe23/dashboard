@@ -23,12 +23,9 @@ type RcButtonSplitVariant = Exclude<ButtonVariant, 'link' | 'ghost' | 'multiActi
 type RcButtonSplitProps = {
   variant?: RcButtonSplitVariant;
   size?: ButtonSize;
-  // eslint-disable-next-line vue/require-default-prop
   ariaLabel?: string;
   placement?: Placement;
-  // eslint-disable-next-line vue/require-default-prop
   distance?: number;
-  // eslint-disable-next-line vue/require-default-prop
   items?: Record<string, string>;
 } & IconProps;
 
@@ -37,7 +34,10 @@ withDefaults(
   {
     variant:   'primary',
     size:      'medium',
+    ariaLabel: undefined,
     placement: 'bottom-end',
+    distance:  undefined,
+    items:     undefined,
   });
 
 const emit = defineEmits<{
