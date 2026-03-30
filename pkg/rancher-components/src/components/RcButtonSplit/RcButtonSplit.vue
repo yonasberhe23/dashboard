@@ -18,8 +18,10 @@ import RcIcon from '@components/RcIcon/RcIcon.vue';
 import { ButtonVariant, ButtonSize, IconProps } from '@components/RcButton/types';
 import type { Placement } from 'floating-vue';
 
-withDefaults(defineProps<{
-  variant?: Exclude<ButtonVariant, 'link' | 'ghost' | 'multiAction'>;
+type RcButtonSplitVariant = Exclude<ButtonVariant, 'link' | 'ghost' | 'multiAction'>;
+
+type RcButtonSplitProps = {
+  variant?: RcButtonSplitVariant;
   size?: ButtonSize;
   // eslint-disable-next-line vue/require-default-prop
   ariaLabel?: string;
@@ -28,11 +30,15 @@ withDefaults(defineProps<{
   distance?: number;
   // eslint-disable-next-line vue/require-default-prop
   items?: Record<string, string>;
-} & IconProps>(), {
-  variant:   'primary',
-  size:      'medium',
-  placement: 'bottom-end',
-});
+} & IconProps;
+
+withDefaults(
+  defineProps<RcButtonSplitProps>(),
+  {
+    variant:   'primary',
+    size:      'medium',
+    placement: 'bottom-end',
+  });
 
 const emit = defineEmits<{
   click: [event: MouseEvent];
