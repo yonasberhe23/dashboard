@@ -20,7 +20,7 @@ const meta: Meta<typeof RcButtonSplit> = {
   },
   argTypes: {
     variant: {
-      options:     ['primary', 'secondary', 'tertiary', 'link', 'ghost'] as ButtonVariant[],
+      options:     ['primary', 'secondary', 'tertiary'] as ButtonVariant[],
       control:     { type: 'select' },
       description: 'Visual style applied to both the action button and the dropdown trigger.',
     },
@@ -99,7 +99,7 @@ export const AllVariants: Story = {
       RcDropdownItem,
     },
     setup() {
-      const variants: ButtonVariant[] = ['primary', 'secondary', 'tertiary', 'link', 'ghost'];
+      const variants: ButtonVariant[] = ['primary', 'secondary', 'tertiary'];
 
       return { args, variants };
     },

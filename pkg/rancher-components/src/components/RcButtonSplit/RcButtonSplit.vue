@@ -19,7 +19,7 @@ import { ButtonVariant, ButtonSize, IconProps } from '@components/RcButton/types
 import type { Placement } from 'floating-vue';
 
 withDefaults(defineProps<{
-  variant?: ButtonVariant;
+  variant?: Exclude<ButtonVariant, 'link' | 'ghost' | 'multiAction'>;
   size?: ButtonSize;
   // eslint-disable-next-line vue/require-default-prop
   ariaLabel?: string;

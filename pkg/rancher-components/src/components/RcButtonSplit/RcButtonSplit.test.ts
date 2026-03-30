@@ -55,8 +55,6 @@ describe('rcButtonSplit.vue', () => {
       ['primary', 'variant-primary'],
       ['secondary', 'variant-secondary'],
       ['tertiary', 'variant-tertiary'],
-      ['link', 'variant-link'],
-      ['ghost', 'variant-ghost'],
     ] as [ButtonVariant, string][])('applies %s variant class to the action button', (variant, className) => {
       const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { variant } });
 
@@ -67,8 +65,6 @@ describe('rcButtonSplit.vue', () => {
       ['primary', 'variant-primary'],
       ['secondary', 'variant-secondary'],
       ['tertiary', 'variant-tertiary'],
-      ['link', 'variant-link'],
-      ['ghost', 'variant-ghost'],
     ] as [ButtonVariant, string][])('applies %s variant class to the dropdown trigger button', (variant, className) => {
       const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { variant } });
 
