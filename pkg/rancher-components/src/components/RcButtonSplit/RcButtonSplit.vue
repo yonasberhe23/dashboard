@@ -20,6 +20,11 @@ import type { Placement } from 'floating-vue';
 
 type RcButtonSplitVariant = Exclude<ButtonVariant, 'link' | 'ghost' | 'multiAction'>;
 
+type RcButtonSplitItem = {
+  id: string;
+  label: string;
+};
+
 type RcButtonSplitProps = {
   disabled?: boolean;
   variant?: RcButtonSplitVariant;
@@ -27,7 +32,7 @@ type RcButtonSplitProps = {
   ariaLabel?: string;
   placement?: Placement;
   distance?: number;
-  items?: Record<string, string>;
+  items?: RcButtonSplitItem[];
 } & IconProps;
 
 withDefaults(
@@ -96,11 +101,11 @@ const emit = defineEmits<{
 
     <template #dropdownCollection>
       <RcDropdownItem
-        v-for="(label, id) in items"
-        :key="id"
-        @click="emit('select', id)"
+        v-for="item in items"
+        :key="item.id"
+        @click="emit('select', item.id)"
       >
-        {{ label }}
+        {{ item.label }}
       </RcDropdownItem>
       <slot name="dropdownCollection" />
     </template>

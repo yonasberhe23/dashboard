@@ -167,11 +167,11 @@ describe('rcButtonSplit.vue', () => {
   });
 
   describe('items prop', () => {
-    const items = {
-      draft:    'Save as Draft',
-      template: 'Save as Template',
-      discard:  'Discard Changes',
-    };
+    const items = [
+      { id: 'draft', label: 'Save as Draft' },
+      { id: 'template', label: 'Save as Template' },
+      { id: 'discard', label: 'Discard Changes' },
+    ];
 
     it('renders an RcDropdownItem for each entry in items', () => {
       const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { items } });
@@ -191,7 +191,7 @@ describe('rcButtonSplit.vue', () => {
       expect(dropdownItems[2].text()).toContain('Discard Changes');
     });
 
-    it('emits select with the item key when a prop item is clicked', async() => {
+    it('emits select with the item id when a prop item is clicked', async() => {
       const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { items } });
 
       await wrapper.findAllComponents({ name: 'RcDropdownItem' })[0].trigger('click');
@@ -209,7 +209,7 @@ describe('rcButtonSplit.vue', () => {
     it('renders both prop items and dropdownCollection slot content when both are supplied', () => {
       const wrapper = mount(RcButtonSplit, {
         ...globalConfig,
-        props: { items: { draft: 'Save as Draft' } },
+        props: { items: [{ id: 'draft', label: 'Save as Draft' }] },
         slots: { dropdownCollection: '<div class="slot-item">Slot Item</div>' },
       });
 

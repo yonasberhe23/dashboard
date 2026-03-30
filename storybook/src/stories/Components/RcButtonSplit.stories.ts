@@ -48,7 +48,7 @@ const meta: Meta<typeof RcButtonSplit> = {
     },
     items: {
       control:     { type: 'object' },
-      description: 'Convenience prop for populating dropdown items. Each key is emitted as the select event payload; each value is the display text.',
+      description: 'Convenience prop for populating dropdown items. Each object requires an `id` (emitted as the select event payload) and a `label` (display text).',
     },
     leftIcon: {
       options:     ['', ...Object.keys(RcIconTypeToClass)],
@@ -177,11 +177,11 @@ export const WithItems: Story = {
   args: {
     variant: 'primary',
     size:    'medium',
-    items:   {
-      draft:    'Save as Draft',
-      template: 'Save as Template',
-      discard:  'Discard Changes',
-    },
+    items:   [
+      { id: 'draft', label: 'Save as Draft' },
+      { id: 'template', label: 'Save as Template' },
+      { id: 'discard', label: 'Discard Changes' },
+    ],
   },
 };
 
