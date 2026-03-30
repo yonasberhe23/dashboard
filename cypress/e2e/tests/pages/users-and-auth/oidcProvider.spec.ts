@@ -3,8 +3,9 @@ import OidcClientCreateEditPo from '~/cypress/e2e/po/edit/management.cattle.io.o
 import PromptRemove from '@/cypress/e2e/po/prompts/promptRemove.po';
 import { promptModal } from '@/cypress/e2e/po/prompts/shared/modalInstances.po';
 import OIDCClientDetailPo from '@/cypress/e2e/po/detail/management.cattle.io.oidcclient.po';
+import HomePagePo from '@/cypress/e2e/po/pages/home.po';
 
-describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalSettings', '@adminUser'] }, () => {
+describe('Rancher as an OIDC Provider', { tags: ['@globalSettings', '@adminUser'] }, () => {
   const OIDC_CREATE_DATA = {
     APP_NAME: 'some-app-name',
     APP_DESC: 'some-app-desc',
@@ -34,15 +35,16 @@ describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalS
   const oidcClientCreatePage = new OidcClientCreateEditPo(clusterId);
   const oidcClientEditPage = new OidcClientCreateEditPo(clusterId, OIDC_CREATE_DATA.APP_NAME, true);
 
-  before(() => {
+  beforeEach(() => {
     cy.login();
   });
 
   it('should be able to create an OIDC client application', () => {
     cy.intercept('POST', `/v1/management.cattle.io.oidcclients`).as('createRequest');
 
-    oidcClientsPage.goTo();
-    oidcClientsPage.waitForPage();
+    HomePagePo.goTo();
+    OidcClientsPagePo.navTo(); // Do not use goTo() here — deep link (going directly to the list page) makes the full-secret copy row behavior flaky.
+    oidcClientsPage.waitForUrlPathWithoutContext();
 
     // check title and list view
     oidcClientsPage.list().title().should('contain', 'OIDC Apps');
@@ -56,7 +58,7 @@ describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalS
 
     // let's create an oidc client
     oidcClientsPage.createOidcClient();
-    oidcClientCreatePage.waitForPage();
+    oidcClientCreatePage.waitForUrlPathWithoutContext();
 
     oidcClientCreatePage.nameNsDescription().name().set(OIDC_CREATE_DATA.APP_NAME);
     oidcClientCreatePage.nameNsDescription().description().set(OIDC_CREATE_DATA.APP_DESC);
@@ -78,7 +80,7 @@ describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalS
       expect(response?.body.spec.tokenExpirationSeconds).to.equal(OIDC_CREATE_DATA.TOKEN_EXP);
     });
 
-    oidcClientDetailPage.waitForPage();
+    oidcClientDetailPage.waitForUrlPathWithoutContext();
 
     oidcClientDetailPage.clientID().exists();
     oidcClientDetailPage.clientFullSecretCopy(0).exists();
@@ -120,9 +122,13 @@ describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalS
   it('should be able to add a new secret for an OIDC provider', () => {
     cy.intercept('PUT', `/v1/management.cattle.io.oidcclients/${ OIDC_CREATE_DATA.APP_NAME }`).as('addNewSecret');
 
-    oidcClientDetailPage.goTo();
-    oidcClientDetailPage.waitForPage();
-
+    HomePagePo.goTo();
+    OidcClientsPagePo.navTo(); // Do not use goTo() here — deep link (going directly to the detail page) makes the full-secret copy row behavior flaky.
+    oidcClientsPage.waitForUrlPathWithoutContext();
+    oidcClientsPage.list().resourceTable().sortableTable().checkLoadingIndicatorNotVisible();
+    oidcClientsPage.list().resourceTable().sortableTable().noRowsShouldNotExist();
+    oidcClientsPage.list().resourceTable().goToDetailsPage(OIDC_CREATE_DATA.APP_NAME);
+    oidcClientDetailPage.waitForUrlPathWithoutContext();
     oidcClientDetailPage.addNewSecretBtnClick();
 
     // check data from network request
@@ -138,8 +144,13 @@ describe('Rancher as an OIDC Provider', { testIsolation: 'off', tags: ['@globalS
   it('should be able to regenerate a secret for an OIDC provider', () => {
     cy.intercept('PUT', `/v1/management.cattle.io.oidcclients/${ OIDC_CREATE_DATA.APP_NAME }`).as('regenSecret');
 
-    oidcClientDetailPage.goTo();
-    oidcClientDetailPage.waitForPage();
+    HomePagePo.goTo();
+    OidcClientsPagePo.navTo(); // Do not use goTo() here — deep link (going directly to the detail page) makes the full-secret copy row behavior flaky.
+    oidcClientsPage.waitForUrlPathWithoutContext();
+    oidcClientsPage.list().resourceTable().sortableTable().checkLoadingIndicatorNotVisible();
+    oidcClientsPage.list().resourceTable().sortableTable().noRowsShouldNotExist();
+    oidcClientsPage.list().resourceTable().goToDetailsPage(OIDC_CREATE_DATA.APP_NAME);
+    oidcClientDetailPage.waitForUrlPathWithoutContext();
 
     // let's regen the secret we've added the step before
     oidcClientDetailPage.secretCardActionMenuToggle(1);
