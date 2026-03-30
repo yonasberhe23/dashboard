@@ -35,7 +35,15 @@ const meta: Meta<typeof RcButtonSplit> = {
     },
     ariaLabel: {
       control:     { type: 'text' },
-      description: 'Accessible label forwarded to the dropdown menu.',
+      description: 'Accessible label for the primary action button.',
+    },
+    ariaLabelTrigger: {
+      control:     { type: 'text' },
+      description: 'Accessible label for the dropdown trigger button. Recommended for all uses because the trigger has no visible text.',
+    },
+    ariaLabelDropdown: {
+      control:     { type: 'text' },
+      description: 'Accessible label for the dropdown menu container (role="menu").',
     },
     placement: {
       options:     ['bottom-end', 'bottom-start', 'top-end', 'top-start'],
@@ -264,6 +272,44 @@ export const Disabled: Story = {
   parameters: {
     controls: { disabled: true },
     docs:     { canvas: { sourceState: 'none' } },
+  },
+};
+
+export const Accessibility: Story = {
+  render: (args: any) => ({
+    components: {
+      RcButtonSplit,
+      RcDropdownItem,
+    },
+    setup() {
+      return { args };
+    },
+    template: `
+      <RcButtonSplit v-bind="args">
+        Save
+        <template #dropdownCollection>
+          <RcDropdownItem>Save as Draft</RcDropdownItem>
+          <RcDropdownItem>Save as Template</RcDropdownItem>
+        </template>
+      </RcButtonSplit>
+    `,
+  }),
+  args: {
+    variant:           'primary',
+    size:              'medium',
+    ariaLabel:         'Save document',
+    ariaLabelTrigger:  'More save options',
+    ariaLabelDropdown: 'Save actions',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Demonstrates all three aria label props. \`ariaLabel\` labels the primary
+          action button, \`ariaLabelTrigger\` labels the icon-only chevron trigger
+          (always recommended since it has no visible text), and \`ariaLabelDropdown\`
+          labels the \`role="menu"\` container.`,
+      },
+    },
   },
 };
 

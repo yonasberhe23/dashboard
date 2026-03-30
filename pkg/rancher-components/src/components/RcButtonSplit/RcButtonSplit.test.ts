@@ -166,6 +166,38 @@ describe('rcButtonSplit.vue', () => {
     expect(wrapper.find('.rc-button-split-action').classes()).toContain('btn-medium');
   });
 
+  describe('aria label props', () => {
+    it('ariaLabel is applied to the action button', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { ariaLabel: 'Save document' } });
+
+      expect(wrapper.find('.rc-button-split-action').attributes('aria-label')).toBe('Save document');
+    });
+
+    it('ariaLabel is absent from the trigger button', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { ariaLabel: 'Save document' } });
+
+      expect(wrapper.find('.rc-button-split-trigger').attributes('aria-label')).toBeUndefined();
+    });
+
+    it('ariaLabelTrigger is applied to the trigger button', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { ariaLabelTrigger: 'More save options' } });
+
+      expect(wrapper.find('.rc-button-split-trigger').attributes('aria-label')).toBe('More save options');
+    });
+
+    it('ariaLabelTrigger is absent from the action button', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { ariaLabelTrigger: 'More save options' } });
+
+      expect(wrapper.find('.rc-button-split-action').attributes('aria-label')).toBeUndefined();
+    });
+
+    it('ariaLabelDropdown is forwarded to RcDropdown', () => {
+      const wrapper = mount(RcButtonSplit, { ...globalConfig, props: { ariaLabelDropdown: 'Save actions' } });
+
+      expect(wrapper.findComponent({ name: 'RcDropdown' }).props('ariaLabel')).toBe('Save actions');
+    });
+  });
+
   describe('items prop', () => {
     const items = [
       { id: 'draft', label: 'Save as Draft' },

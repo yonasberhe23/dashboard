@@ -30,6 +30,8 @@ type RcButtonSplitProps = {
   variant?: RcButtonSplitVariant;
   size?: ButtonSize;
   ariaLabel?: string;
+  ariaLabelTrigger?: string;
+  ariaLabelDropdown?: string;
   placement?: Placement;
   distance?: number;
   items?: RcButtonSplitItem[];
@@ -38,13 +40,15 @@ type RcButtonSplitProps = {
 withDefaults(
   defineProps<RcButtonSplitProps>(),
   {
-    disabled:  false,
-    variant:   'primary',
-    size:      'medium',
-    ariaLabel: undefined,
-    placement: 'bottom-end',
-    distance:  undefined,
-    items:     undefined,
+    disabled:          false,
+    variant:           'primary',
+    size:              'medium',
+    ariaLabel:         undefined,
+    ariaLabelTrigger:  undefined,
+    ariaLabelDropdown: undefined,
+    placement:         'bottom-end',
+    distance:          undefined,
+    items:             undefined,
   });
 
 const emit = defineEmits<{
@@ -56,7 +60,7 @@ const emit = defineEmits<{
 
 <template>
   <RcDropdown
-    :aria-label="ariaLabel"
+    :aria-label="ariaLabelDropdown"
     :placement="placement"
     :distance="distance"
     @update:open="emit('update:open', $event)"
@@ -64,6 +68,7 @@ const emit = defineEmits<{
     <div class="rc-button-split">
       <RcButton
         class="rc-button-split-action"
+        :aria-label="ariaLabel"
         :disabled="disabled"
         :variant="variant"
         :size="size"
@@ -88,6 +93,7 @@ const emit = defineEmits<{
 
       <RcDropdownTrigger
         class="rc-button-split-trigger"
+        :aria-label="ariaLabelTrigger"
         :disabled="disabled"
         :variant="variant"
         :size="size"
