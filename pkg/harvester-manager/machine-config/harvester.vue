@@ -401,6 +401,10 @@ export default {
         return [defaultOption];
       }
 
+      if (!cpuModelsData || typeof cpuModelsData !== 'object') {
+        return [defaultOption];
+      }
+
       const options = [defaultOption];
 
       const globalModels = cpuModelsData.globalModels || [];
