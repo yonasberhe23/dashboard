@@ -41,7 +41,8 @@ node('harvester-vpn-1') {
               stage('Pre-Clean') {
                 sh """#!/bin/bash
                   set +x
-                  sudo rm -rf "\${HOME}/dashboard" 2>/dev/null || true
+                  mv "\${HOME}/dashboard" "\${HOME}/dashboard.old.\$\$" 2>/dev/null || true
+                  rm -rf "\${HOME}/dashboard.old."* 2>/dev/null &
                   rm -f "\${HOME}/.env" 2>/dev/null || true
                   rm -rf "\${HOME}/.corral" 2>/dev/null || true
                   docker rm -f \$(docker ps -aq --filter ancestor=dashboard-test) 2>/dev/null || true
@@ -103,8 +104,9 @@ node('harvester-vpn-1') {
                   set +x
                   # Remove credentials file
                   rm -f "\${HOME}/.env" || true
-                  # Remove cloned dashboard (may have root-owned files from Docker)
-                  sudo rm -rf "\${HOME}/dashboard" || true
+                  # Remove cloned dashboard (move-then-delete avoids NFS/overlayfs race)
+                  mv "\${HOME}/dashboard" "\${HOME}/dashboard.old.\$\$" 2>/dev/null || true
+                  rm -rf "\${HOME}/dashboard.old."* 2>/dev/null || true
                   # Remove corral config to prevent stale vars leaking between runs
                   rm -rf "\${HOME}/.corral" || true
                   # Remove stale Docker containers and image

@@ -53,7 +53,9 @@ build_image() {
 
 	echo "Cloning ${target_branch}$([ "${target_branch}" != "master" ] && echo ', overlaying CI from master')"
 
-	sudo rm -rf "${HOME}"/dashboard
+	# Move-then-delete avoids "Directory not empty" race on NFS/overlayfs
+	mv "${HOME}/dashboard" "${HOME}/dashboard.old.$$" 2>/dev/null || true
+	rm -rf "${HOME}/dashboard.old."* 2>/dev/null &
 	git clone -b "${target_branch}" \
 		"${GITHUB_URL}${DASHBOARD_REPO}" "${HOME}"/dashboard
 
