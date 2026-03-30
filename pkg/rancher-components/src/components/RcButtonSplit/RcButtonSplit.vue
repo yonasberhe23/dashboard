@@ -21,6 +21,7 @@ import type { Placement } from 'floating-vue';
 type RcButtonSplitVariant = Exclude<ButtonVariant, 'link' | 'ghost' | 'multiAction'>;
 
 type RcButtonSplitProps = {
+  disabled?: boolean;
   variant?: RcButtonSplitVariant;
   size?: ButtonSize;
   ariaLabel?: string;
@@ -32,6 +33,7 @@ type RcButtonSplitProps = {
 withDefaults(
   defineProps<RcButtonSplitProps>(),
   {
+    disabled:  false,
     variant:   'primary',
     size:      'medium',
     ariaLabel: undefined,
@@ -57,6 +59,7 @@ const emit = defineEmits<{
     <div class="rc-button-split">
       <RcButton
         class="rc-button-split-action"
+        :disabled="disabled"
         :variant="variant"
         :size="size"
         :left-icon="leftIcon"
@@ -80,6 +83,7 @@ const emit = defineEmits<{
 
       <RcDropdownTrigger
         class="rc-button-split-trigger"
+        :disabled="disabled"
         :variant="variant"
         :size="size"
       >

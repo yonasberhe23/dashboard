@@ -19,6 +19,10 @@ const meta: Meta<typeof RcButtonSplit> = {
     }
   },
   argTypes: {
+    disabled: {
+      control:     { type: 'boolean' },
+      description: 'Disables both the action button and the dropdown trigger.',
+    },
     variant: {
       options:     ['primary', 'secondary', 'tertiary'] as ButtonVariant[],
       control:     { type: 'select' },
@@ -222,6 +226,38 @@ export const WithIcons: Story = {
             <RcDropdownItem>Deploy to Production</RcDropdownItem>
           </template>
         </RcButtonSplit>
+      </div>
+    `,
+  }),
+  parameters: {
+    controls: { disabled: true },
+    docs:     { canvas: { sourceState: 'none' } },
+  },
+};
+
+export const Disabled: Story = {
+  render: (args: any) => ({
+    components: {
+      RcButtonSplit,
+      RcDropdownItem,
+    },
+    setup() {
+      const variants: ButtonVariant[] = ['primary', 'secondary', 'tertiary'];
+
+      return { args, variants };
+    },
+    template: `
+      <div style="display: flex; flex-direction: column; gap: 20px; max-width: 800px;">
+        <div v-for="variant in variants" :key="variant" style="display: flex; align-items: center; gap: 20px;">
+          <div style="min-width: 120px; font-weight: bold;">{{ variant }}</div>
+          <RcButtonSplit :variant="variant" size="medium" disabled>
+            {{ variant }}
+            <template #dropdownCollection>
+              <RcDropdownItem>Option 1</RcDropdownItem>
+              <RcDropdownItem>Option 2</RcDropdownItem>
+            </template>
+          </RcButtonSplit>
+        </div>
       </div>
     `,
   }),
