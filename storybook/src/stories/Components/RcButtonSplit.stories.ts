@@ -74,8 +74,11 @@ const meta: Meta<typeof RcButtonSplit> = {
 export default meta;
 type Story = StoryObj<typeof RcButtonSplit>;
 
+const dropdownDecorator = () => ({ template: '<div style="min-width: 300px; padding: 20px; display: flex; justify-content: center;"><story /></div>' });
+
 export const Default: Story = {
-  render: (args: any) => ({
+  decorators: [dropdownDecorator],
+  render:     (args: any) => ({
     components: {
       RcButtonSplit,
       RcDropdownItem,
@@ -102,6 +105,7 @@ export const Default: Story = {
     variant: 'primary',
     size:    'medium',
   },
+  parameters: { docs: { story: { height: '250px' } } },
 };
 
 export const AllVariants: Story = {
@@ -169,7 +173,8 @@ export const AllSizes: Story = {
 };
 
 export const WithItems: Story = {
-  render: (args: any) => ({
+  decorators: [dropdownDecorator],
+  render:     (args: any) => ({
     components: { RcButtonSplit },
     setup() {
       const onSelect = (id: string) => console.log('Selected item key:', id); // eslint-disable-line no-console
@@ -191,10 +196,12 @@ export const WithItems: Story = {
       { id: 'discard', label: 'Discard Changes' },
     ],
   },
+  parameters: { docs: { story: { height: '250px' } } },
 };
 
 export const WithIcons: Story = {
-  render: (args: any) => ({
+  decorators: [dropdownDecorator],
+  render:     (args: any) => ({
     components: {
       RcButtonSplit,
       RcDropdownItem,
@@ -239,7 +246,10 @@ export const WithIcons: Story = {
   }),
   parameters: {
     controls: { disabled: true },
-    docs:     { canvas: { sourceState: 'none' } },
+    docs:     {
+      canvas: { sourceState: 'none' },
+      story:  { height: '250px' },
+    },
   },
 };
 
@@ -276,7 +286,8 @@ export const Disabled: Story = {
 };
 
 export const Accessibility: Story = {
-  render: (args: any) => ({
+  decorators: [dropdownDecorator],
+  render:     (args: any) => ({
     components: {
       RcButtonSplit,
       RcDropdownItem,
@@ -309,12 +320,14 @@ export const Accessibility: Story = {
           (always recommended since it has no visible text), and \`ariaLabelDropdown\`
           labels the \`role="menu"\` container.`,
       },
+      story: { height: '250px' },
     },
   },
 };
 
 export const WithSlots: Story = {
-  render: (args: any) => ({
+  decorators: [dropdownDecorator],
+  render:     (args: any) => ({
     components: {
       RcButtonSplit,
       RcDropdownItem,
@@ -354,6 +367,9 @@ export const WithSlots: Story = {
   }),
   parameters: {
     controls: { disabled: true },
-    docs:     { canvas: { sourceState: 'none' } },
+    docs:     {
+      canvas: { sourceState: 'none' },
+      story:  { height: '250px' },
+    },
   },
 };
