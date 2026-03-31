@@ -2,6 +2,7 @@
 
 shopt -s extglob
 set -e
+trap 'echo "FAILED at line $LINENO: $BASH_COMMAND (exit $?)"' ERR
 
 # Source the local configuration file to generate .env
 source cypress/jenkins/configure.sh
@@ -63,7 +64,7 @@ build_image() {
 	if [ "${target_branch}" != "master" ]; then
 		echo "Overlaying cypress/jenkins and dependencies from master onto ${target_branch}"
 		git fetch origin master
-		git checkout origin/master -- cypress/jenkins cypress/support package.json yarn.lock cypress.config.ts || true
+		git checkout origin/master -- cypress/jenkins cypress/package.json cypress/support/qase.ts package.json yarn.lock cypress.config.ts || true
 	fi
 	cd "${HOME}"
 
@@ -92,16 +93,24 @@ build_image() {
 	cd "${HOME}"/dashboard
 
 	npm install -g yarn@"${YARN_VERSION}"
-	yarn config set ignore-engines true --silent
 
-	yarn install --frozen-lockfile
+	# Install only test dependencies from cypress/package.json
+	# This skips the full dashboard monorepo (Vue, webpack, @rancher/components)
+	cd cypress
+	echo "Installing deps from $(pwd)/package.json"
+	yarn install
+	cd ..
+
+	# Symlink so Cypress 11 can resolve ts-node/typescript from the project root
+	# (Cypress uses require.resolve with { paths: [projectRoot] } which ignores NODE_PATH)
+	ln -sf cypress/node_modules node_modules
 
 	# Debugging node_modules
-	if [ -d "node_modules/cypress-multi-reporters" ]; then
-		echo "Reporter found in dashboard/node_modules"
+	if [ -d "cypress/node_modules/cypress-multi-reporters" ]; then
+		echo "Reporter found in cypress/node_modules"
 	else
-		echo "ERROR: Reporter NOT found in dashboard/node_modules"
-		for module_path in node_modules/*cypress*; do
+		echo "ERROR: Reporter NOT found in cypress/node_modules"
+		for module_path in cypress/node_modules/*cypress*; do
 			[ -e "${module_path}" ] || continue
 			basename "${module_path}"
 		done
@@ -234,7 +243,7 @@ elif [ "${RANCHER_TYPE:-existing}" = "recurring" ]; then
 fi
 
 cd "${HOME}/dashboard" || exit 1
-./node_modules/.bin/jrm "${HOME}/dashboard/results.xml" "cypress/jenkins/reports/junit/junit-*" || true
+./cypress/node_modules/.bin/jrm "${HOME}/dashboard/results.xml" "cypress/jenkins/reports/junit/junit-*" || true
 
 if [ -s "${HOME}/dashboard/results.xml" ]; then
 	echo "cypress_exit_code=${exit_code}"

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+trap 'echo "FAILED at line $LINENO: $BASH_COMMAND (exit $?)"' ERR
 
 # Source shared utilities
 source cypress/jenkins/utils.sh

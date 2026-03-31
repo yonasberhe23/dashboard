@@ -1,12 +1,17 @@
 #!/bin/bash
 
 set -e
+trap 'echo "FAILED at line $LINENO: $BASH_COMMAND (exit $?)"' ERR
 
 # Source shared utilities relative to the script's location
 source "$(dirname "$0")/utils.sh"
 
 pwd
 cd "dashboard"
+
+# Use test deps from cypress/node_modules
+export NODE_PATH="${PWD}/cypress/node_modules:${NODE_PATH:-}"
+export PATH="${PWD}/cypress/node_modules/.bin:${PATH}"
 
 kubectl version --client=true
 kubectl get nodes
@@ -46,9 +51,9 @@ fi
 set +e
 
 if [ -n "$PERCY_TOKEN" ]; then
-	npx --no-install percy exec -q -- cypress run --browser chrome --config-file cypress/jenkins/cypress.config.jenkins.ts "${SPEC_ARG[@]}"
+	percy exec -q -- cypress run --browser chrome --config-file cypress/jenkins/cypress.config.jenkins.ts "${SPEC_ARG[@]}"
 else
-	npx --no-install cypress run --browser chrome --config-file cypress/jenkins/cypress.config.jenkins.ts "${SPEC_ARG[@]}"
+	cypress run --browser chrome --config-file cypress/jenkins/cypress.config.jenkins.ts "${SPEC_ARG[@]}"
 fi
 EXIT_CODE=$?
 set -e
