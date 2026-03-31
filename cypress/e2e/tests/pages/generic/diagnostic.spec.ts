@@ -16,7 +16,7 @@ describe('Diagnostics Page', { tags: ['@generic', '@adminUser'] }, () => {
     // Also the focus-trap error triggered when it can’t find any tabbable node inside its container
 
     cy.on('uncaught:exception', (err) => {
-      if (err.message.includes('focus-trap' ) || err.message.includes('tabbable')) {
+      if (err.message.includes('focus-trap') && err.message.includes('tabbable')) {
         return false;
       }
 
@@ -45,6 +45,6 @@ describe('Diagnostics Page', { tags: ['@generic', '@adminUser'] }, () => {
   }));
   afterEach(() => {
     // Keep the downloads directory clean between tests.
-    cy.exec(`rm -f "${ downloadedFilename }"`, { failOnNonZeroExit: false });
+    cy.deleteDownloadsFolder();
   });
 });
