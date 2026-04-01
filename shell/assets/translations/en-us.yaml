@@ -5776,7 +5776,6 @@ projectMembers:
     createNs: Create Namespaces
     configmapsManage: Manage Config Maps
     ingressManage: Manage Ingress
-    projectcatalogsManage: Manage Project Catalogs
     projectroletemplatebindingsManage: Manage Project Members
     secretsManage: Manage Secrets
     serviceaccountsManage: Manage Service Accounts
@@ -5786,7 +5785,6 @@ projectMembers:
     configmapsView: View Config Maps
     ingressView: View Ingress
     monitoringUiView: View Monitoring
-    projectcatalogsView: View Project Catalogs
     projectroletemplatebindingsView: View Project Members
     secretsView: View Secrets
     serviceaccountsView: View Service Accounts
