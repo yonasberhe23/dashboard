@@ -8,6 +8,8 @@ const downloadedFilename = path.join(downloadsFolder, 'rancher-diagnostic-data.j
 describe('Diagnostics Page', { tags: ['@generic', '@adminUser'] }, () => {
   beforeEach(() => {
     cy.login();
+    // Keep the downloads directory clean between tests.
+    cy.deleteDownloadsFolder();
   });
 
   qase(1454, it('User should be able to download the diagnostics package JSON', () => {
@@ -19,8 +21,6 @@ describe('Diagnostics Page', { tags: ['@generic', '@adminUser'] }, () => {
       if (err.message.includes('focus-trap') && err.message.includes('tabbable')) {
         return false;
       }
-
-      return true;
     });
 
     const diagnosticsPage = new DiagnosticsPagePo();
