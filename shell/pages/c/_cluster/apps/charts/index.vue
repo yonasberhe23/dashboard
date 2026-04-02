@@ -684,7 +684,7 @@ export default {
           </RichTranslation>
           <RichTranslation
             k="catalog.charts.noCharts.docsMessage"
-            tag="div"
+            tag="span"
             :raw="true"
           >
             <template #docsUrl="{ content }">
@@ -891,7 +891,7 @@ export default {
 
 .charts-empty-state {
   width: 100%;
-  padding: 72px 120px;
+  padding: 72px 72px;
   text-align: center;
 
   .empty-state-title {
