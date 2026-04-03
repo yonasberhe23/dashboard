@@ -98,7 +98,7 @@ build_image() {
 	# This skips the full dashboard monorepo (Vue, webpack, @rancher/components)
 	cd cypress
 	echo "Installing deps from $(pwd)/package.json"
-	yarn install
+	yarn install --frozen-lockfile
 	cd ..
 
 	# Symlink so Cypress 11 can resolve ts-node/typescript from the project root
