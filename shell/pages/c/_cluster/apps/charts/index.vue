@@ -624,7 +624,6 @@ export default {
       <RichTranslation
         k="catalog.charts.appCollectionRepoMissing"
         tag="div"
-        :raw="true"
       >
         <template #repoCreate="{ content }">
           <router-link
@@ -661,10 +660,7 @@ export default {
           {{ t('catalog.charts.noCharts.title') }}
         </h1>
         <div class="empty-state-tips">
-          <RichTranslation
-            k="catalog.charts.noCharts.message"
-            :raw="true"
-          >
+          <RichTranslation k="catalog.charts.noCharts.message">
             <template #resetAllFilters="{ content }">
               <a
                 tabindex="0"
@@ -685,7 +681,6 @@ export default {
           <RichTranslation
             k="catalog.charts.noCharts.docsMessage"
             tag="span"
-            :raw="true"
           >
             <template #docsUrl="{ content }">
               <a
