@@ -1,5 +1,6 @@
+import { defaultsDeep } from 'lodash';
 import Axios from 'axios';
-import defu from 'defu';
+
 import axiosRetry from 'axios-retry';
 
 // Axios.prototype cannot be modified
@@ -39,7 +40,7 @@ const axiosExtra = {
     this.onResponseError(fn);
   },
   create(options) {
-    return createAxiosInstance(defu(options, this.defaults));
+    return createAxiosInstance(defaultsDeep({}, this.defaults, options));
   }
 };
 
