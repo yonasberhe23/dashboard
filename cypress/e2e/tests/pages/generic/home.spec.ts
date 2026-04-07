@@ -35,12 +35,12 @@ function goToHomePageAndSettle() {
   homeClusterList.resourceTable().sortableTable().rowElements().should((el) => expect(el).to.contain.text('There are no rows which match your search query.'));
 }
 
-// Prime shows an extra notification vs Community
+// Min items: Community 1, Prime 2. Count can be higher (dynamic new-release applies to Community and Prime).
 function assertHomeNotificationCount(nc: NotificationsCenterPo) {
   cy.getRancherVersion().then((version) => {
-    const expectedCount = version.RancherPrime === 'true' ? 2 : 1;
+    const minCount = version.RancherPrime === 'true' ? 2 : 1;
 
-    nc.checkCount(expectedCount);
+    nc.checkCountAtLeast(minCount);
   });
 }
 
