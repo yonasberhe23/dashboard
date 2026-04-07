@@ -16,6 +16,7 @@ describe('Diagnostics Page', { tags: ['@generic', '@adminUser'] }, () => {
     // Ignore the focus-trap error that fires when the modal closes immediately
     // after the download is triggered (known cosmetic side-effect of the dialog)
     // Also the focus-trap error triggered when it can’t find any tabbable node inside its container
+    // This workaround is needed until we can update the focus-trap library to a version that has the fix for this issue https://github.com/rancher/dashboard/issues/17104
 
     cy.on('uncaught:exception', (err) => {
       if (err?.message?.includes('focus-trap') || err?.message?.includes('tabbable')) {
