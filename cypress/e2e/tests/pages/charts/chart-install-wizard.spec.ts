@@ -136,8 +136,8 @@ describe('Charts Wizard', { testIsolation: 'off', tags: ['@charts', '@adminUser'
     });
 
     after('clean up', () => {
-      cy.createRancherResource('v1', `catalog.cattle.io.apps/${ chartNamespace }/${ chartApp }?action=uninstall`, '{}');
-      cy.createRancherResource('v1', `catalog.cattle.io.apps/${ chartNamespace }/${ chartCrd }?action=uninstall`, '{}');
+      cy.createRancherResource('v1', `catalog.cattle.io.apps/${ chartNamespace }/${ chartApp }?action=uninstall`, '{}', false);
+      cy.createRancherResource('v1', `catalog.cattle.io.apps/${ chartNamespace }/${ chartCrd }?action=uninstall`, '{}', false);
       cy.updateNamespaceFilter('local', 'none', '{"local":["all://user"]}');
     });
   });
