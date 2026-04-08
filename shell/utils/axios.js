@@ -1,4 +1,3 @@
-import { defaultsDeep } from 'lodash';
 import Axios from 'axios';
 
 import axiosRetry from 'axios-retry';
@@ -38,9 +37,6 @@ const axiosExtra = {
   onError(fn) {
     this.onRequestError(fn);
     this.onResponseError(fn);
-  },
-  create(options) {
-    return createAxiosInstance(defaultsDeep({}, this.defaults, options));
   }
 };
 
