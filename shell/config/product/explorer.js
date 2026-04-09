@@ -34,6 +34,7 @@ import { COLUMN_BREAKPOINTS } from '@shell/types/store/type-map';
 import { STEVE_CACHE } from '@shell/store/features';
 import { configureConditionalDepaginate } from '@shell/store/type-map.utils';
 import { CATTLE_PUBLIC_ENDPOINTS, STORAGE } from '@shell/config/labels-annotations';
+import { POD_LAST_RESTART_FIELD as POD_RESTARTS_LAST_FIELD, POD_RESTART_FIELD as POD_RESTARTS_COUNT_FIELD } from '@shell/types/resources/pod';
 
 export const NAME = 'explorer';
 
@@ -419,8 +420,6 @@ export function init(store) {
     [STEVE_STATE_COL, STEVE_NAME_COL, STEVE_NAMESPACE_COL, createSteveWorkloadImageCol(6), STEVE_WORKLOAD_ENDPOINTS, 'Ready', 'Current', 'Desired', STEVE_AGE_COL],
   );
 
-  const POD_RESTART_REG_EX = /^(\d+)\s*\(([^)]+)\)/;
-
   headers(POD,
     [STATE, NAME_COL, NAMESPACE_COL, POD_IMAGES, 'Ready', 'Restarts', 'IP', NODE_COL, AGE],
     [
@@ -436,14 +435,14 @@ export function init(store) {
         name:     'pod-restart',
         labelKey: 'tableHeaders.podRestarts',
         search:   false,
-        sort:     ['metadata.fields[3][0]', 'metadata.fields[3][1]', 'metadata.name'],
-        value:    (row) => row.metadata.fields[3]?.match(POD_RESTART_REG_EX)?.[1] || '',
+        sort:     [POD_RESTARTS_COUNT_FIELD, POD_RESTARTS_LAST_FIELD, 'metadata.name'],
+        value:    'restartsCount',
       }, {
         name:     'pod-last-restart',
         labelKey: 'tableHeaders.podLastRestart',
-        value:    (row) => row.metadata.fields[3]?.match(POD_RESTART_REG_EX)?.[2] || '',
+        value:    'restartsLaster',
         search:   false,
-        sort:     ['metadata.fields[3][1]', 'metadata.fields[3][0]', 'metadata.name'],
+        sort:     [POD_RESTARTS_LAST_FIELD, POD_RESTARTS_COUNT_FIELD, 'metadata.name'],
       },
       'IP',
       {
