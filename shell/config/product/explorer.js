@@ -409,7 +409,7 @@ export function init(store) {
       sort:      'metadata.fields.3',
       search:    'metadata.fields.3',
       formatter: undefined, // Now that sort/search is remote we're not doing weird things with start time (see `duration` in model)
-    }, STEVE_WORKLOAD_HEALTH_SCALE, STEVE_AGE_COL],
+    }, STEVE_AGE_COL, STEVE_WORKLOAD_HEALTH_SCALE],
   );
   headers(WORKLOAD_TYPES.CRON_JOB,
     [STATE, NAME_COL, NAMESPACE_COL, WORKLOAD_IMAGES, WORKLOAD_ENDPOINTS, 'Schedule', 'Last Schedule', POD_RESTARTS, AGE, WORKLOAD_HEALTH_SCALE],
@@ -417,7 +417,7 @@ export function init(store) {
   );
   headers(WORKLOAD_TYPES.REPLICATION_CONTROLLER,
     [STATE, NAME_COL, NAMESPACE_COL, WORKLOAD_IMAGES, WORKLOAD_ENDPOINTS, 'Ready', 'Current', 'Desired', POD_RESTARTS, AGE, WORKLOAD_HEALTH_SCALE],
-    [STEVE_STATE_COL, STEVE_NAME_COL, STEVE_NAMESPACE_COL, createSteveWorkloadImageCol(6), STEVE_WORKLOAD_ENDPOINTS, 'Ready', 'Current', 'Desired'],
+    [STEVE_STATE_COL, STEVE_NAME_COL, STEVE_NAMESPACE_COL, createSteveWorkloadImageCol(6), STEVE_WORKLOAD_ENDPOINTS, 'Ready', 'Current', 'Desired', STEVE_AGE_COL],
   );
 
   headers(POD,
