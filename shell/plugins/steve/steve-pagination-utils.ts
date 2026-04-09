@@ -23,6 +23,7 @@ import { PaginationSettingsStores } from '@shell/types/resources/settings';
 import paginationUtils from '@shell/utils/pagination-utils';
 import { KubeLabelSelector, KubeLabelSelectorExpression } from '@shell/types/kube/kube-api';
 import { parseField } from '@shell/utils/sort';
+import { POD_LAST_RESTART_FIELD, POD_RESTART_FIELD } from '@shell/types/resources/pod';
 
 /**
  * This is a workaround for a ts build issue found in check-plugins-build.
@@ -240,6 +241,8 @@ class StevePaginationUtils extends NamespaceProjectFilters {
     [POD]: [
       { field: 'spec.containers.image' },
       { field: 'spec.nodeName' },
+      { field: POD_RESTART_FIELD },
+      { field: POD_LAST_RESTART_FIELD },
     ],
     [MANAGEMENT.NODE]: [
       { field: 'status.nodeName' },

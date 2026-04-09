@@ -34,6 +34,7 @@ import { COLUMN_BREAKPOINTS } from '@shell/types/store/type-map';
 import { STEVE_CACHE } from '@shell/store/features';
 import { configureConditionalDepaginate } from '@shell/store/type-map.utils';
 import { CATTLE_PUBLIC_ENDPOINTS, STORAGE } from '@shell/config/labels-annotations';
+import { POD_LAST_RESTART_FIELD as POD_RESTARTS_LAST_FIELD, POD_RESTART_FIELD as POD_RESTARTS_COUNT_FIELD } from '@shell/types/resources/pod';
 
 export const NAME = 'explorer';
 
@@ -428,7 +429,23 @@ export function init(store) {
         ...POD_IMAGES,
         sort:   false,
         search: 'spec.containers.image'
-      }, 'Ready', 'Restarts', 'IP', {
+      },
+      'Ready',
+      {
+        name:     'pod-restart',
+        labelKey: 'tableHeaders.podRestarts',
+        search:   false,
+        sort:     [POD_RESTARTS_COUNT_FIELD, POD_RESTARTS_LAST_FIELD, 'metadata.name'],
+        value:    'restartsCount',
+      }, {
+        name:     'pod-last-restart',
+        labelKey: 'tableHeaders.podLastRestart',
+        value:    'restartsLaster',
+        search:   false,
+        sort:     [POD_RESTARTS_LAST_FIELD, POD_RESTARTS_COUNT_FIELD, 'metadata.name'],
+      },
+      'IP',
+      {
         ...NODE_COL,
         search: 'spec.nodeName'
       },
