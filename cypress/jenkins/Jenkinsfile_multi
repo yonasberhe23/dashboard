@@ -73,6 +73,7 @@ test_tags.eachWithIndex { String rancher_version, int i ->
     }
 }
 
+timeout(time: 45, unit: 'MINUTES') {
 node {
   ansiColor('xterm') {
     withFolderProperties {
@@ -125,9 +126,12 @@ node {
             }
           }
 
-          parallel batchBranches
+          timeout(time: 270, unit: 'MINUTES') {
+            parallel batchBranches
+          }
         }
       }
     }
   }
+}
 }
