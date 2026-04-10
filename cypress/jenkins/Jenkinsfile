@@ -128,13 +128,15 @@ node('harvester-vpn-1') {
                   } else {
                     testExecutionResult = null
                   }
-                  publishHTML(target: [allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'html',
-                    reportFiles: 'index.html',
-                    reportName: 'html-report',
-                    reportTitles: 'Report'])
+                  if (fileExists('html')) {
+                    publishHTML(target: [allowMissing: true,
+                      alwaysLinkToLastBuild: true,
+                      keepAll: true,
+                      reportDir: 'html',
+                      reportFiles: 'index.html',
+                      reportName: 'html-report',
+                      reportTitles: 'Report'])
+                  }
                 }
               } catch (err) {
                 echo 'Error in Test Report stage: ' + err

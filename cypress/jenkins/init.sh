@@ -323,9 +323,25 @@ else
 
   # Copy results to workspace for Jenkins artifact collection
   dashboard_dir="${PLAYBOOK_DIR}/dashboard"
-  cp "${dashboard_dir}/results.xml" "${JENKINS_WORKSPACE}/" 2>/dev/null || true
+  copy_ok=true
+  cp "${dashboard_dir}/results.xml" "${JENKINS_WORKSPACE}/" 2>/dev/null || copy_ok=false
   mkdir -p "${JENKINS_WORKSPACE}/html"
-  cp -r "${dashboard_dir}/cypress/reports/html/"* "${JENKINS_WORKSPACE}/html/" 2>/dev/null || true
+  cp -r "${dashboard_dir}/cypress/reports/html/"* "${JENKINS_WORKSPACE}/html/" 2>/dev/null || copy_ok=false
+
+  # Warn only on a genuine container crash (all three must be true):
+  #   1. Artifact copy failed
+  #   2. Source results.xml doesn't exist (Cypress never finished)
+  #   3. Exit code is a known Docker crash signal, not a Cypress failure count
+  #     - 125=daemon error, 126=cannot invoke, 127=not found
+  #     - 134=SIGABRT, 137=SIGKILL/OOM, 139=SIGSEGV, 143=SIGTERM
+  crash=false
+  case "${cypress_exit}" in
+    125|126|127|134|137|139|143) crash=true ;;
+  esac
+
+  if [[ "${copy_ok}" == false && ! -f "${dashboard_dir}/results.xml" && "${crash}" == true ]]; then
+    echo "[init] WARNING: artifacts failed to copy — container likely crashed (exit ${cypress_exit})"
+  fi
 
   exit "${cypress_exit}"
 fi
