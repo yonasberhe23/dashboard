@@ -8,6 +8,7 @@ def branch = "${env.BRANCH}" != 'null' && "${env.BRANCH}" != '' ? "${env.BRANCH}
 def testExecutionResult = null
 def testExitCode = null
 
+timeout(time: 270, unit: 'MINUTES') {
 node('harvester-vpn-1') {
   ansiColor('xterm') {
     withFolderProperties {
@@ -174,4 +175,5 @@ node('harvester-vpn-1') {
       }
     }
   }
+}
 }
