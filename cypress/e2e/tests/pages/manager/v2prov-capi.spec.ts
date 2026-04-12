@@ -31,17 +31,11 @@ describe('Cluster List - v2 Provisioning CAPI Clusters', { tags: ['@manager', '@
     clusterList.waitForPage();
   });
 
-  it('should not provide a link to capi cluster details', () => {
+  qase(18525, it('should not provide a link to capi cluster details', () => {
     clusterList.list().name(clusterName).find('a').should('not.exist');
     clusterList.list().name('local').find('a').should('exist');
-  });
+  }));
 
-  it('should show a message indicating that CAPI clusters are not editable', () => {
-    clusterList.capiWarningSubRow(clusterName)
-      .should('be.visible');
-    clusterList.capiWarningSubRow('Local')
-      .should('not.exist');
-  });
   qase(18526, it('should not allow editing CAPI cluster configs', () => {
     const capiActionMenu = clusterList.list().actionMenu(clusterName);
 
@@ -52,6 +46,13 @@ describe('Cluster List - v2 Provisioning CAPI Clusters', { tags: ['@manager', '@
     cy.get('body').find('[dropdown-menu-collection]:visible').should('have.length', 0);
 
     clusterList.list().actionMenu('local').getMenuItem('Edit Config').should('exist');
+  }));
+
+  qase(18527, it('should show a message indicating that CAPI clusters are not editable', () => {
+    clusterList.capiWarningSubRow(clusterName)
+      .should('be.visible');
+    clusterList.capiWarningSubRow('Local')
+      .should('not.exist');
   }));
 
   qase(18528, it('should not report a machine provider for CAPI clusters', () => {
