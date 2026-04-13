@@ -83,6 +83,7 @@ const SOURCE_TYPE = {
 };
 
 const VGPU_PREFIX = { NVIDIA: 'nvidia.com/' };
+const HARVESTER_CPU_MODEL = 'harvester-system/node-cpu-model-configuration';
 
 export default {
   name: 'ConfigComponentHarvester',
@@ -147,7 +148,8 @@ export default {
             filters: [
               PaginationParamFilter.createMultipleFields([
                 new PaginationFilterField({ field: `metadata.labels[${ HCI_ANNOTATIONS.CLOUD_INIT }]`, value: 'user' }),
-                new PaginationFilterField({ field: `metadata.labels[${ HCI_ANNOTATIONS.CLOUD_INIT }]`, value: 'network' })
+                new PaginationFilterField({ field: `metadata.labels[${ HCI_ANNOTATIONS.CLOUD_INIT }]`, value: 'network' }),
+                new PaginationFilterField({ field: 'id', value: HARVESTER_CPU_MODEL })
               ])
             ]
           });
@@ -161,7 +163,7 @@ export default {
           configMaps:   this.$store.dispatch('cluster/request', { url: configMapsUrl }),
           networks:     this.$store.dispatch('cluster/request', { url: `${ url }/k8s.cni.cncf.io.network-attachment-definitions` }),
           storageClass: this.$store.dispatch('cluster/request', { url: `${ url }/${ STORAGE_CLASS }es` }),
-          settings:     this.$store.dispatch('cluster/request', { url: `${ url }/${ MANAGEMENT.SETTING }s` })
+          settings:     this.$store.dispatch('cluster/request', { url: `${ url }/${ MANAGEMENT.SETTING }s` }),
         });
 
         for (const key of Object.keys(res)) {
@@ -190,6 +192,7 @@ export default {
         this.images = res.images.value?.data;
         this.storageClass = res.storageClass.value?.data;
         this.networks = res.networks.value?.data;
+        this.cpuModelConfigMap = this.genCpuModelConfigMap(res.configMaps.value?.data);
 
         let systemNamespaces = (res.settings.value?.data || []).filter((x) => x.id === SETTING.SYSTEM_NAMESPACES);
 
@@ -380,6 +383,7 @@ export default {
       vGpuDevices:        {},
       vGpusInit:          vGpus,
       vGpus,
+      cpuModelConfigMap:  null,
     };
   },
 
@@ -407,6 +411,51 @@ export default {
       set(neu) {
         this.images = neu;
       }
+    },
+
+    cpuModelOptions() {
+      const defaultOption = { label: this.t('generic.default'), value: '' };
+
+      if (!this.cpuModelConfigMap?.cpuModels) {
+        return [defaultOption];
+      }
+
+      let cpuModelsData;
+
+      try {
+        cpuModelsData = YAML.parse(this.cpuModelConfigMap.cpuModels);
+      } catch (e) {
+        return [defaultOption];
+      }
+
+      if (!cpuModelsData || typeof cpuModelsData !== 'object') {
+        return [defaultOption];
+      }
+
+      const options = [defaultOption];
+
+      const globalModels = cpuModelsData.globalModels || [];
+
+      globalModels.sort((a, b) => a[0].localeCompare(b[0]));
+
+      globalModels.forEach((modelName) => {
+        options.push({ label: modelName, value: modelName });
+      });
+
+      const modelEntries = Object.entries(cpuModelsData.models || {});
+
+      modelEntries.sort((a, b) => a[0].localeCompare(b[0]));
+
+      modelEntries.forEach(([modelName, modelInfo]) => {
+        const readyCount = modelInfo.readyCount || 0;
+
+        options.push({
+          label: this.t('harvesterManager.cpuModel.optionLabel', { modelName, count: readyCount }),
+          value: modelName
+        });
+      });
+
+      return options;
     },
 
     networkOptions: {
@@ -574,6 +623,11 @@ export default {
 
   methods: {
     stringify,
+    genCpuModelConfigMap(configMaps = []) {
+      const cpuModelConfigMap = configMaps.find((cm) => cm.id === HARVESTER_CPU_MODEL);
+
+      return cpuModelConfigMap?.data || null;
+    },
     genCloudDataOptions(configMaps = [], type = 'user') {
       const valueMap = new Map();
 
@@ -1287,6 +1341,15 @@ export default {
             :mode="mode"
             :disabled="disabled"
             :placeholder="t('cluster.harvester.machinePool.reservedMemory.placeholder')"
+          />
+        </div>
+        <div class="col span-6">
+          <LabeledSelect
+            v-model:value="value.cpuModel"
+            :label="t('harvesterManager.cpuModel.label')"
+            :options="cpuModelOptions"
+            :mode="mode"
+            :disabled="disabled"
           />
         </div>
       </div>
