@@ -202,7 +202,7 @@ export default {
         data-testid="detail-top_html"
         class="conceal"
         aria-live="polite"
-      >&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span>
+      />
       <span
         v-else
         v-clean-html="bodyHtml"
@@ -276,6 +276,9 @@ export default {
   .conceal {
     white-space: nowrap;
     display: block;
+    &::before {
+      content: '••••••••••••••••••••••••';
+    }
   }
 
   .action-group {

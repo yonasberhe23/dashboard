@@ -783,9 +783,7 @@ export default {
                     class="concealed-value conceal"
                     data-testid="concealed-value"
                     :aria-label="t('generic.ariaLabel.value', {index: i+1})"
-                  >
-                    &#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;
-                  </div>
+                  />
                   <TextAreaAutoGrow
                     v-else-if="valueMultiline && row[valueName] !== undefined"
                     v-model:value="row[valueName]"
@@ -952,6 +950,9 @@ export default {
         padding: 10px;
         min-height: 40px;
         user-select: none;
+        &::before {
+          content: '••••••••••••••••••••';
+        }
       }
 
       .text-monospace:not(.conceal) {
