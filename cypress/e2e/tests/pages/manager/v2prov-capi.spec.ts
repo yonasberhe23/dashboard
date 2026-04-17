@@ -43,7 +43,7 @@ describe('Cluster List - v2 Provisioning CAPI Clusters', { tags: ['@manager', '@
 
     // Close the first row action menu so its overlay does not block subsequent row actions.
     clusterList.list().actionMenuClose(clusterName);
-    cy.get('body').find('[dropdown-menu-collection]:visible').should('have.length', 0);
+    clusterList.list().checkActionMenuNotVisible();
 
     clusterList.list().actionMenu('local').getMenuItem('Edit Config').should('exist');
   }));
