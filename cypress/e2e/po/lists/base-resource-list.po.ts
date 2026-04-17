@@ -22,13 +22,6 @@ export default class BaseResourceList extends ComponentPo {
     return this.resourceTable().sortableTable().rowActionMenuClose(rowLabel);
   }
 
-  /**
-   * Asserts that no action menu dropdowns are currently visible
-   */
-  checkActionMenuNotVisible() {
-    return cy.get('body').find('[dropdown-menu-collection]:visible').should('have.length', 0);
-  }
-
   rowWithName(rowLabel: string) {
     return this.resourceTable().sortableTable().rowWithName(rowLabel);
   }
