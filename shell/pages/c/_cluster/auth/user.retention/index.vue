@@ -23,8 +23,15 @@ import { ToggleSwitch } from '@components/Form/ToggleSwitch';
 
 import dayjs from 'dayjs';
 
+type UserRetentionSettingId =
+  | typeof SETTING.DISABLE_INACTIVE_USER_AFTER
+  | typeof SETTING.DELETE_INACTIVE_USER_AFTER
+  | typeof SETTING.USER_RETENTION_CRON
+  | typeof SETTING.USER_RETENTION_DRY_RUN
+  | typeof SETTING.USER_LAST_LOGIN_DEFAULT;
+
 const store = useStore();
-const userRetentionSettings = reactive<{[id: string]: string | null }>({
+const userRetentionSettings = reactive<Record<UserRetentionSettingId, string | null>>({
   [SETTING.DISABLE_INACTIVE_USER_AFTER]: null,
   [SETTING.DELETE_INACTIVE_USER_AFTER]:  null,
   [SETTING.USER_RETENTION_CRON]:         null,
@@ -103,11 +110,16 @@ watch([disableAfterPeriod, deleteAfterPeriod], ([newDisableAfterPeriod, newDelet
     return;
   }
 
-  ids.filter((id) => ![SETTING.DISABLE_INACTIVE_USER_AFTER, SETTING.DELETE_INACTIVE_USER_AFTER].includes(id))
+  const skippedIds: readonly UserRetentionSettingId[] = [
+    SETTING.DISABLE_INACTIVE_USER_AFTER,
+    SETTING.DELETE_INACTIVE_USER_AFTER,
+  ];
+
+  ids.filter((id) => !skippedIds.includes(id))
     .forEach(assignSettings);
 });
 
-const assignSettings = (key: string) => {
+const assignSettings = (key: UserRetentionSettingId) => {
   if (settings[key].id === SETTING.USER_LAST_LOGIN_DEFAULT && settings[key].value && typeof settings[key].value === 'string') {
     const value = settings[key].value as string;
 
@@ -123,7 +135,11 @@ const fetchSetting = async(id: string) => {
   return await store.dispatch('management/find', { type: MANAGEMENT.SETTING, id });
 };
 
-const ids = Object.keys(userRetentionSettings);
+const getKeys = <T extends object>(obj: T): Array<keyof T> => {
+  return Object.keys(obj) as Array<keyof T>;
+};
+
+const ids = getKeys(userRetentionSettings);
 const settingPromises = ids.map((id) => fetchSetting(id));
 
 onMounted(async() => {
