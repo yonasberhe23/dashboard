@@ -135,11 +135,7 @@ const fetchSetting = async(id: string) => {
   return await store.dispatch('management/find', { type: MANAGEMENT.SETTING, id });
 };
 
-const getKeys = <T extends object>(obj: T): Array<keyof T> => {
-  return Object.keys(obj) as Array<keyof T>;
-};
-
-const ids = getKeys(userRetentionSettings);
+const ids = Object.keys(userRetentionSettings) as UserRetentionSettingId[];
 const settingPromises = ids.map((id) => fetchSetting(id));
 
 onMounted(async() => {
