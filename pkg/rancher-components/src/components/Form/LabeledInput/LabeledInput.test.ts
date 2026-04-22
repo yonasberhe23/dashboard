@@ -221,5 +221,92 @@ describe('component: LabeledInput', () => {
 
       expect(labeledInput.vm.validationMessage).toStrictEqual(errorMessage);
     });
+
+    it('without name prop: error clears when a previously invalid value becomes valid', async() => {
+      const errorMessage = 'This field cannot be empty';
+      const notEmptyRule = (v: string) => (!v ? errorMessage : undefined);
+
+      const wrapper = mount(LabeledInput, {
+        propsData: {
+          rules: [notEmptyRule],
+          value: '',
+        },
+        mocks: i18nMock
+      });
+
+      await wrapper.find('input').trigger('blur');
+      await nextTick();
+
+      expect(wrapper.vm.validationMessage).toBe(errorMessage);
+
+      await wrapper.setProps({ value: 'valid value' });
+      await nextTick();
+
+      expect(wrapper.vm.validationMessage).toBeUndefined();
+    });
+
+    it('with name prop: error clears when a previously invalid value becomes valid', async() => {
+      const errorMessage = 'Field cannot be empty';
+      const notEmptyRule = (v: string) => (!v ? errorMessage : undefined);
+
+      const wrapper = mount(LabeledInput, {
+        propsData: {
+          name:  'testField',
+          rules: [notEmptyRule],
+          value: '',
+        },
+        mocks: i18nMock
+      });
+
+      await wrapper.find('input').trigger('blur');
+      await flushPromises();
+
+      expect(wrapper.vm.validationMessage).toStrictEqual(errorMessage);
+
+      await wrapper.setProps({ value: 'valid value' });
+      await flushPromises();
+
+      expect(wrapper.vm.validationMessage).toBeUndefined();
+    });
+
+    describe('with both name and rules provided', () => {
+      it('shows the error message exactly once when invalid (not duplicated across both validation paths)', async() => {
+        const errorMessage = 'Field cannot be empty';
+        const notEmptyRule = (v: string) => (!v ? errorMessage : undefined);
+
+        const wrapper = mount(LabeledInput, {
+          propsData: {
+            name:  'testField',
+            rules: [notEmptyRule],
+            value: '',
+          },
+          mocks: i18nMock
+        });
+
+        await wrapper.find('input').trigger('blur');
+        await flushPromises();
+
+        expect(wrapper.vm.validationMessage).toStrictEqual(errorMessage);
+        expect(wrapper.vm.validationMessage).not.toContain(`${ errorMessage }, ${ errorMessage }`);
+      });
+
+      it('shows no error when the value satisfies the rules', async() => {
+        const notEmptyRule = (v: string) => (!v ? 'Field cannot be empty' : undefined);
+
+        const wrapper = mount(LabeledInput, {
+          propsData: {
+            name:  'testField',
+            rules: [notEmptyRule],
+            value: 'valid value',
+          },
+          mocks: i18nMock
+        });
+
+        await wrapper.find('input').trigger('blur');
+        await flushPromises();
+
+        expect(wrapper.vm.validationMessage).toBeUndefined();
+      });
+    });
   });
 });
