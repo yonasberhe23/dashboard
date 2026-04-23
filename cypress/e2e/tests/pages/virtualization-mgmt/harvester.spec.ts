@@ -3,6 +3,7 @@ import { HarvesterClusterDetailsPo, HarvesterClusterPagePo } from '@/cypress/e2e
 import RepositoriesPagePo from '@/cypress/e2e/po/pages/chart-repositories.po';
 import { LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
 import { CLUSTER_REPOS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
+import { qase } from '~/cypress/support/qase';
 
 const extensionsPo = new ExtensionsPagePo();
 const harvesterPo = new HarvesterClusterPagePo();
@@ -30,6 +31,27 @@ function harvesterExtensionCatalog(version: Cypress.RancherVersion) {
 }
 
 describe('Harvester', { tags: ['@virtualizationMgmt', '@adminUser'] }, () => {
+  before(() => {
+    cy.login();
+
+    // Clean up stale Harvester extension app and extension source repos to prevent test collisions
+    cy.createRancherResource('v1', 'catalog.cattle.io.apps/cattle-ui-plugin-system/harvester?action=uninstall', {}, false);
+
+    cy.getRancherResource('v1', 'catalog.cattle.io.clusterrepos').then((resp: Cypress.Response<any>) => {
+      const extensionRepoUrls = ['rancher/ui-plugin-charts', 'harvester/harvester-ui-extension'];
+      const matchingRepoIds = (resp.body?.data || [])
+        .filter((repo: any) => extensionRepoUrls.some((url) => repo?.spec?.gitRepo?.includes(url)))
+        .map((repo: any) => repo?.id)
+        .filter((id: string | undefined) => !!id);
+
+      cy.wrap(matchingRepoIds, { log: false }).each((repoId: string) => {
+        cy.deleteRancherResource('v1', 'catalog.cattle.io.clusterrepos', repoId);
+        cy.waitForRancherResource('v1', 'catalog.cattle.io.clusterrepos', repoId, (resourceResp) => resourceResp.status === 404, 10, { failOnStatusCode: false })
+          .should('eq', true);
+      });
+    });
+  });
+
   beforeEach(() => {
     cy.login();
     cy.getRancherVersion().then((version) => {
@@ -40,14 +62,7 @@ describe('Harvester', { tags: ['@virtualizationMgmt', '@adminUser'] }, () => {
     });
   });
 
-  /**
-   * Assumes that Harvester Extension is NOT installed
-   *
-   * Harvester Extension will also be removed after all tests run
-   *
-   * (pattern needs fixing)
-   */
-  it('can auto install harvester and begin process of importing a harvester cluster', () => {
+  qase(7020, it('can auto install harvester and begin process of importing a harvester cluster', () => {
     cy.get<Cypress.RancherVersion>('@rancherVersion').then((version) => {
       const catalog = harvesterExtensionCatalog(version);
       const chartRepo = catalog.repo;
@@ -117,9 +132,9 @@ describe('Harvester', { tags: ['@virtualizationMgmt', '@adminUser'] }, () => {
         cy.deleteRancherResource('v1', 'provisioning.cattle.io.clusters', `fleet-default/${ harvesterClusterId }`);
       });
     });
-  });
+  }));
 
-  it('missing repo message should display when repo does NOT exist', () => {
+  qase(7021, it('missing repo message should display when repo does NOT exist', () => {
     cy.get<Cypress.RancherVersion>('@rancherVersion').then((version) => {
       const catalog = harvesterExtensionCatalog(version);
       const chartRepo = catalog.repo;
@@ -193,9 +208,9 @@ describe('Harvester', { tags: ['@virtualizationMgmt', '@adminUser'] }, () => {
       harvesterPo.updateOrInstallButton().checkVisible();
       harvesterPo.extensionWarning().should('have.text', 'The Harvester UI Extension is not installed');
     });
-  });
+  }));
 
-  it('able to update harvester extension version', () => {
+  qase(7022, it('able to update harvester extension version', () => {
     cy.get<Cypress.RancherVersion>('@rancherVersion').then((version) => {
       const catalog = harvesterExtensionCatalog(version);
       const chartRepo = catalog.repo;
@@ -280,12 +295,16 @@ describe('Harvester', { tags: ['@virtualizationMgmt', '@adminUser'] }, () => {
         extensionsPo.extensionCardHeaderStatusTooltip(harvesterTitle, 0).waitForTooltipWithText(`Installed (${ versions[0] })`);
       });
     });
-  });
+  }));
 
   afterEach(() => {
+    // Ensure Harvester extension is uninstalled and repo is deleted
     cy.createRancherResource('v1', 'catalog.cattle.io.apps/cattle-ui-plugin-system/harvester?action=uninstall', {}, false);
     cy.get<Cypress.RancherVersion>('@rancherVersion').then((version) => {
       cy.deleteRancherResource('v1', 'catalog.cattle.io.clusterrepos', harvesterExtensionCatalog(version).repo, false);
+      // Verify deletion completed before proceeding (with retries)
+      cy.waitForRancherResource('v1', 'catalog.cattle.io.clusterrepos', harvesterExtensionCatalog(version).repo, (resp) => resp.status === 404, 10, { failOnStatusCode: false })
+        .should('eq', true);
     });
   });
 });
