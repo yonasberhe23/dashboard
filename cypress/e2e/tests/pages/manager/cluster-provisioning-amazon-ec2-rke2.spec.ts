@@ -226,7 +226,7 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /1$/, LONG_TIMEOUT_OPT);
 
     // progress bar should either be all green (first machine done by this stage) or all red (first machine still provisioning)
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
     // Scale up the machine pool
     clusterDetails.poolsList('machine').scaleUpButton(`${ this.rke2Ec2ClusterName }-pool1`)
@@ -238,16 +238,16 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^[0-9] of 2$/);
 
     // progress bar should contain red - possibly green/red if first machine is done but definitely at least red
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error').should('exist');
 
     // Verify the machine pool is scaled up to 2
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^2$/, VERY_LONG_TIMEOUT_OPT);
     clusterDetails.poolsList('machine').resourceTable().sortableTable().checkRowCount(false, 2, LONG_TIMEOUT_OPT);
 
     // check that progress bar contains green and no red
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('not.exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error', MEDIUM_TIMEOUT_OPT).should('not.exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
     // Verify the scale down button is now enabled (since we have 2 nodes)
     clusterDetails.poolsList('machine').scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`)
@@ -278,9 +278,9 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
       .click();
 
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^2$/, MEDIUM_TIMEOUT_OPT);
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('not.exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error').should('not.exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
     // Verify the scale down button is enabled
     clusterDetails.poolsList('machine').scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`)
@@ -299,19 +299,21 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     promptModal().clickActionButton('Confirm');
 
     cy.wait('@scaleDownMachineDeployment').its('response.statusCode').should('eq', 200);
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 2);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error', MEDIUM_TIMEOUT_OPT).should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 2);
+
+    // Verify the cluster is updating
+    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Updating');
 
     // Verify the machine pool is scaled down to 1
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^1$/, MEDIUM_TIMEOUT_OPT);
     // progress bar should contain green and no other color
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('not.exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error', VERY_LONG_TIMEOUT_OPT).should('not.exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
-    // Verify the cluster is updating -> active
-    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Updating');
+    // Verify the cluster is active
     clusterDetails.resourceDetail().masthead().resourceStatus().contains('Active', VERY_LONG_TIMEOUT_OPT);
     clusterDetails.poolsList('machine').resourceTable().sortableTable().checkRowCount(false, 1, VERY_LONG_TIMEOUT_OPT);
 
