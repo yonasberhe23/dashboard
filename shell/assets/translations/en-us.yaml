@@ -185,6 +185,7 @@ locale:
   none: (None)
 
 nav:
+  skipToContent: Skip to main content
   ariaLabel:
     clusterIconKeyCombo: Cluster keyboard shortcut combination icon
     localClusterIcon: Local Cluster icon
