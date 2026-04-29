@@ -74,6 +74,15 @@ It is now possible to skip features by using the `TEST_SKIP` env var, e.g. `TEST
 Alternatively is possible to solely run a specific feature by using the `TEST_ONLY` env var, e.g. `TEST_ONLY=setup`.
 The features are folder name based and can be found in `cypress/e2e/tests/pages`.
 
+### Skip chart tests behavior
+
+Some chart E2E tests check charts that are hidden in the UI catalog. If a chart is intentionally hidden, the E2E test is skipped.
+
+- `CYPRESS_ALLOW_FILTERED_CATALOG_SKIP=true`: skip those tests.
+- `CYPRESS_ALLOW_FILTERED_CATALOG_SKIP` unset (or not `true`): fail those tests.
+
+This only applies when the chart exists in the unfiltered catalog index but is hidden in the UI filtered catalog.
+
 ## Skipping e2e tests
 
 CI gates can be disabled in the following way:
