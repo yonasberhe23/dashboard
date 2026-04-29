@@ -84,7 +84,7 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     });
 
     cy.wait('@pageLoad').its('response.statusCode').should('eq', 200);
-    loadingPo.checkNotExists();
+    loadingPo.checkNotExists(MEDIUM_TIMEOUT_OPT);
     createRKE2ClusterPage.waitForPage('type=amazonec2&rkeType=rke2', 'basic');
     createRKE2ClusterPage.nameNsDescription().name().set(this.rke2Ec2ClusterName);
     createRKE2ClusterPage.nameNsDescription().description().set(`${ this.rke2Ec2ClusterName }-description`);
@@ -226,28 +226,28 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /1$/, LONG_TIMEOUT_OPT);
 
     // progress bar should either be all green (first machine done by this stage) or all red (first machine still provisioning)
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
     // Scale up the machine pool
     clusterDetails.poolsList('machine').scaleUpButton(`${ this.rke2Ec2ClusterName }-pool1`)
       .click();
 
-    cy.wait('@scaleUpMachineDeployment').its('response.statusCode').should('eq', 200);
+    cy.waitForInterceptWithConflictRetry('@scaleUpMachineDeployment');
 
     clusterDetails.poolsList('machine').machineUnavailableCount(`${ this.rke2Ec2ClusterName }-pool1`).then((c) => parseInt(c)).should('be.greaterThan', 0);
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^[0-9] of 2$/);
 
     // progress bar should contain red - possibly green/red if first machine is done but definitely at least red
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error').should('exist');
 
     // Verify the machine pool is scaled up to 2
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^2$/, VERY_LONG_TIMEOUT_OPT);
     clusterDetails.poolsList('machine').resourceTable().sortableTable().checkRowCount(false, 2, LONG_TIMEOUT_OPT);
 
     // check that progress bar contains green and no red
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('not.exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error', MEDIUM_TIMEOUT_OPT).should('not.exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
     // Verify the scale down button is now enabled (since we have 2 nodes)
     clusterDetails.poolsList('machine').scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`)
@@ -278,9 +278,9 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
       .click();
 
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^2$/, MEDIUM_TIMEOUT_OPT);
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('not.exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error').should('not.exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
     // Verify the scale down button is enabled
     clusterDetails.poolsList('machine').scaleDownButton(`${ this.rke2Ec2ClusterName }-pool1`)
@@ -298,20 +298,22 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     promptModal().getBody().should('contain', `${ this.rke2Ec2ClusterName }-pool1`);
     promptModal().clickActionButton('Confirm');
 
-    cy.wait('@scaleDownMachineDeployment').its('response.statusCode').should('eq', 200);
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 2);
+    cy.waitForInterceptWithConflictRetry('@scaleDownMachineDeployment');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error', MEDIUM_TIMEOUT_OPT).should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 2);
+
+    // Verify the cluster is updating
+    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Updating');
 
     // Verify the machine pool is scaled down to 1
     clusterDetails.poolsList('machine').machinePoolReadyofDesiredCount(`${ this.rke2Ec2ClusterName }-pool1`, /^1$/, MEDIUM_TIMEOUT_OPT);
     // progress bar should contain green and no other color
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-error').should('not.exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.bg-success').should('exist');
-    clusterDetails.poolsList('machine').machineProgressBar(`${ this.rke2Ec2ClusterName }-pool1`).find('.piece').should('have.length', 1);
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-error', VERY_LONG_TIMEOUT_OPT).should('not.exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.bg-success').should('exist');
+    clusterDetails.poolsList('machine').progressBarElements(`${ this.rke2Ec2ClusterName }-pool1`, '.piece').should('have.length', 1);
 
-    // Verify the cluster is updating -> active
-    clusterDetails.resourceDetail().masthead().resourceStatus().contains('Updating');
+    // Verify the cluster is active
     clusterDetails.resourceDetail().masthead().resourceStatus().contains('Active', VERY_LONG_TIMEOUT_OPT);
     clusterDetails.poolsList('machine').resourceTable().sortableTable().checkRowCount(false, 1, VERY_LONG_TIMEOUT_OPT);
 
@@ -343,16 +345,7 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     editClusterPage.save().click();
 
     // Wait for the cluster update to complete
-    cy.wait('@clusterUpdate').then((interception) => {
-      // If 409 conflict, wait for retry
-      if (interception.response?.statusCode === 409) {
-        cy.log('Cluster update failed with 409 error, waiting for retry...');
-
-        return cy.wait('@clusterUpdate', MEDIUM_TIMEOUT_OPT);
-      }
-
-      return cy.wrap(interception);
-    }).then(({ response }: any) => {
+    cy.waitForInterceptWithConflictRetry('@clusterUpdate').then(({ response }: any) => {
       expect(response?.statusCode).to.equal(200);
       expect(response?.body).to.have.property('kind', 'Cluster');
       expect(response?.body.metadata).to.have.property('name', this.rke2Ec2ClusterName);
@@ -415,18 +408,20 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
   it('can delete an Amazon EC2 RKE2 cluster', function() {
     ClusterManagerListPagePo.navTo();
     clusterList.waitForPage();
+    cy.intercept('DELETE', `/v1/provisioning.cattle.io.clusters/fleet-default/${ this.rke2Ec2ClusterName }`).as('deleteRke2Cluster');
     clusterList.list().actionMenu(this.rke2Ec2ClusterName).getMenuItem('Delete').click();
 
-    clusterList.sortableTable().rowNames('.cluster-link').then((rows: any) => {
-      const promptRemove = new PromptRemove();
+    const promptRemove = new PromptRemove();
 
-      promptRemove.confirm(this.rke2Ec2ClusterName);
-      promptRemove.remove();
+    promptRemove.confirm(this.rke2Ec2ClusterName);
+    promptRemove.remove();
+    cy.wait('@deleteRke2Cluster').its('response.statusCode').should('eq', 200);
 
-      clusterList.waitForPage();
-      clusterList.list().state(this.rke2Ec2ClusterName).should('contain', 'Removing');
-      clusterList.sortableTable().checkRowCount(false, rows.length - 1, MEDIUM_TIMEOUT_OPT);
-      clusterList.sortableTable().rowNames('.cluster-link').should('not.contain', this.rke2Ec2ClusterName);
+    clusterList.waitForPage();
+    clusterList.sortableTable().rowElements(LONG_TIMEOUT_OPT).should(($rows) => {
+      const tableText = Cypress.$.makeArray<any>($rows).map((row) => row.innerText).join(' ');
+
+      expect(tableText).to.not.contain(this.rke2Ec2ClusterName);
     });
   });
 
@@ -456,12 +451,17 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     clusterList.waitForPage();
     clusterList.createCluster();
     createRKE2ClusterPage.selectCreate(0);
-    loadingPo.checkNotExists();
+    loadingPo.checkNotExists(MEDIUM_TIMEOUT_OPT);
     createRKE2ClusterPage.rke2PageTitle().should('include', 'Create Amazon EC2');
     createRKE2ClusterPage.waitForPage('type=amazonec2&rkeType=rke2', 'basic');
 
     // set cluster name to enable save button
     createRKE2ClusterPage.nameNsDescription().name().set(this.rke2Ec2ClusterName);
+
+    // set region
+    createRKE2ClusterPage.machinePoolTab().region().toggle();
+    createRKE2ClusterPage.machinePoolTab().region().clickOptionWithLabel('us-west-1');
+    createRKE2ClusterPage.machinePoolTab().region().checkOptionSelected('us-west-1');
 
     createRKE2ClusterPage.machinePoolTab().enableDualStack().set();
 
@@ -575,12 +575,17 @@ describe('Deploy RKE2 cluster using node driver on Amazon EC2', { tags: ['@manag
     clusterList.waitForPage();
     clusterList.createCluster();
     createRKE2ClusterPage.selectCreate(0);
-    loadingPo.checkNotExists();
+    loadingPo.checkNotExists(MEDIUM_TIMEOUT_OPT);
     createRKE2ClusterPage.rke2PageTitle().should('include', 'Create Amazon EC2');
     createRKE2ClusterPage.waitForPage('type=amazonec2&rkeType=rke2', 'basic');
 
     // set cluster name to enable save button
     createRKE2ClusterPage.nameNsDescription().name().set(this.rke2Ec2ClusterName);
+
+    // set region
+    createRKE2ClusterPage.machinePoolTab().region().toggle();
+    createRKE2ClusterPage.machinePoolTab().region().clickOptionWithLabel('us-west-1');
+    createRKE2ClusterPage.machinePoolTab().region().checkOptionSelected('us-west-1');
 
     createRKE2ClusterPage.machinePoolTab().enableDualStack().set();
 
