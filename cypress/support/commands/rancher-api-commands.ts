@@ -691,12 +691,17 @@ Cypress.Commands.add('waitForRepositoryDownload', (prefix, resourceType, resourc
 /**
  * Wait for repository to be state
  */
-Cypress.Commands.add('waitForResourceState', (prefix, resourceType, resourceId, resourceState = 'active', retries = 20) => {
+Cypress.Commands.add('waitForResourceState', (prefix, resourceType, resourceId, resourceState = 'active', retries = 20, failOnStatusCode = false) => {
   return cy.waitForRancherResource(prefix, resourceType, resourceId, (resp) => {
+    // The resource may not exist yet (404) right after creation or update; keep polling until it appears.
+    if (resp.status === 404) {
+      return false;
+    }
+
     const state = resp.body.metadata?.state;
 
     return state && state.transitioning === false && state.name === resourceState;
-  }, retries);
+  }, retries, { failOnStatusCode });
 });
 
 /**

@@ -132,7 +132,7 @@ declare global {
       waitForRancherResources(prefix: 'v3' | 'v1', resourceType: string, expectedResourcesTotal: number, greaterThan?: boolean): Chainable;
       waitForInterceptWithConflictRetry(alias: string, successStatusCode?: number, retryStatusCodes?: number[], options?: { timeout?: number }): Chainable;
       waitForRepositoryDownload(prefix: 'v3' | 'v1', resourceType: string, resourceId: string, retries?: number): Chainable;
-      waitForResourceState(prefix: 'v3' | 'v1', resourceType: string, resourceId: string, resourceState?: string, retries?: number): Chainable;
+      waitForResourceState(prefix: 'v3' | 'v1', resourceType: string, resourceId: string, resourceState?: string, retries?: number, failOnStatusCode?: boolean): Chainable;
       deleteRancherResource(prefix: 'v3' | 'v1' | 'k8s', resourceType: string, resourceId: string, failOnStatusCode?: boolean): Chainable;
       getClusterIdByName(clusterName: string): Chainable<string>;
       checkChartPresence(repoName: string, chartKey: string): Chainable<{ inFiltered: boolean, inUnfiltered: boolean }>;

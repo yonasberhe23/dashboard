@@ -5,7 +5,6 @@ import { CLUSTER_APPS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
 import { runTestWhenChartAvailable } from '@/cypress/support/commands/rancher-api-commands';
 import Kubectl from '@/cypress/e2e/po/components/kubectl.po';
 import PromptRemove from '@/cypress/e2e/po/prompts/promptRemove.po';
-import { LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
 
 const clusterTools = new ClusterToolsPagePo('local');
 const kubectl = new Kubectl();
@@ -47,12 +46,13 @@ describe('Cluster Tools', { tags: ['@explorer2', '@adminUser'] }, () => {
         installCharts.waitForPage(installAlertingDriversPage);
         installCharts.nextPage();
 
-        cy.intercept('POST', 'v1/catalog.cattle.io.clusterrepos/rancher-charts?action=install').as('chartInstall');
+        cy.intercept('POST', '/v1/catalog.cattle.io.clusterrepos/rancher-charts?action=install').as('chartInstall');
         installCharts.installChart();
         cy.wait('@chartInstall').its('response.statusCode').should('eq', 201);
         clusterTools.waitForPage();
         kubectl.waitForTerminalStatus('Connected');
-        kubectl.waitForTerminalStatus('Disconnected', LONG_TIMEOUT_OPT);
+        cy.waitForResourceState('v1', 'catalog.cattle.io.apps', 'default/rancher-alerting-drivers', 'deployed', 40);
+        kubectl.waitForTerminalStatus('Disconnected');
       });
     });
   });
@@ -72,7 +72,8 @@ describe('Cluster Tools', { tags: ['@explorer2', '@adminUser'] }, () => {
       cy.wait('@chartUpdate').its('response.statusCode').should('eq', 201);
       clusterTools.waitForPage();
       kubectl.waitForTerminalStatus('Connected');
-      kubectl.waitForTerminalStatus('Disconnected', MEDIUM_TIMEOUT_OPT);
+      cy.waitForResourceState('v1', 'catalog.cattle.io.apps', 'default/rancher-alerting-drivers', 'deployed', 40);
+      kubectl.waitForTerminalStatus('Disconnected');
     });
   });
 
