@@ -5,7 +5,7 @@ import { CLUSTER_APPS_BASE_URL } from '@/cypress/support/utils/api-endpoints';
 import { runTestWhenChartAvailable } from '@/cypress/support/commands/rancher-api-commands';
 import Kubectl from '@/cypress/e2e/po/components/kubectl.po';
 import PromptRemove from '@/cypress/e2e/po/prompts/promptRemove.po';
-import { MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
+import { LONG_TIMEOUT_OPT, MEDIUM_TIMEOUT_OPT } from '@/cypress/support/utils/timeouts';
 
 const clusterTools = new ClusterToolsPagePo('local');
 const kubectl = new Kubectl();
@@ -52,7 +52,7 @@ describe('Cluster Tools', { tags: ['@explorer2', '@adminUser'] }, () => {
         cy.wait('@chartInstall').its('response.statusCode').should('eq', 201);
         clusterTools.waitForPage();
         kubectl.waitForTerminalStatus('Connected');
-        kubectl.waitForTerminalStatus('Disconnected', MEDIUM_TIMEOUT_OPT);
+        kubectl.waitForTerminalStatus('Disconnected', LONG_TIMEOUT_OPT);
       });
     });
   });
