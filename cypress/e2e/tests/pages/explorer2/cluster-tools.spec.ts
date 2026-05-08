@@ -13,7 +13,7 @@ const clusterTools = new ClusterToolsPagePo('local');
 const kubectl = new Kubectl();
 const loadingPo = new LoadingPo('.loading-indicator');
 
-describe('Cluster Tools', { tags: ['@explorer2', '@adminUser'] }, () => {
+describe('Cluster Tools', { tags: ['@yb', '@explorer2', '@adminUser'] }, () => {
   const CHART = {
     name: 'Alerting Drivers',
     id:   'rancher-alerting-drivers',
