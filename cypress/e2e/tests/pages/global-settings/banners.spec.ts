@@ -673,7 +673,6 @@ describe('Banners', { testIsolation: false }, () => {
       const banner = new FixedBannerPo('#banner-consent');
 
       cy.logout();
-      cy.then(() => Cypress.session.clearAllSavedSessions());
 
       const loginPage = new LoginPagePo();
 
@@ -696,7 +695,6 @@ describe('Banners', { testIsolation: false }, () => {
       });
 
       cy.logout();
-      cy.then(() => Cypress.session.clearAllSavedSessions());
 
       const loginPage = new LoginPagePo();
 
@@ -741,7 +739,6 @@ describe('Banners', { testIsolation: false }, () => {
 
       // Back to the login screen - check the banner is using the individual setting
       cy.logout();
-      cy.then(() => Cypress.session.clearAllSavedSessions());
 
       const loginPage = new LoginPagePo();
 
@@ -770,7 +767,6 @@ describe('Banners', { testIsolation: false }, () => {
 
       // Back to the login screen - there should be no banners displayed
       cy.logout();
-      cy.then(() => Cypress.session.clearAllSavedSessions());
 
       loginPage.goTo();
       loginPage.waitForPage();

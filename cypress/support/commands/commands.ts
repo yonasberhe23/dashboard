@@ -52,6 +52,11 @@ Cypress.Commands.add('logout', () => {
   //   cy.intercept('POST', '/v3/tokens?action=logout').as('loggedOut');
   cy.visit('/auth/logout?logged-out=true');
   //   cy.wait('@loggedOut').its('response.statusCode').should('eq', 200);
+
+  // Logging out invalidates the token server side, so drop the cached Cypress session as well.
+  // Otherwise the next `cy.login()` restores a session that Rancher has already discarded and its
+  // API calls fail with `401: must authenticate`.
+  cy.then(() => Cypress.session.clearAllSavedSessions());
 });
 
 /**

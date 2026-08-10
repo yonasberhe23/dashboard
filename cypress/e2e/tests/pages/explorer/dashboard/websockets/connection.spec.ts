@@ -11,7 +11,11 @@ function executeWebSocket(command: string, podName: string, namespace: string, c
   );
 }
 
-describe('Pod management and WebSocket interaction', { tags: ['@jenkins', '@adminUser'] }, () => {
+// `testIsolation: false` keeps the session from `before` for the whole suite. With the Cypress
+// default of `true`, state is cleared before every test after the first, so the login in `before`
+// is lost from the second test onwards and the `after` hook's API calls fail with
+// `401: must authenticate`.
+describe('Pod management and WebSocket interaction', { testIsolation: false, tags: ['@jenkins', '@adminUser'] }, () => {
   let token:string;
   const tokenDesc = 'e2e-test-description';
   let tokenId:string;
@@ -92,8 +96,6 @@ describe('Pod management and WebSocket interaction', { tags: ['@jenkins', '@admi
     });
   });
   after(() => {
-    // restoring session
-    cy.login();
     // delete token
     cy.deleteRancherResource('v3', 'tokens', tokenId, false);
   });
